@@ -27,7 +27,7 @@ from scipy.signal import chirp, peak_widths
 from scipy.signal import find_peaks, savgol_filter, medfilt
 # load pickle module
 import time, os, math
-from nptdms import TdmsFile
+# nptdms import TdmsFile
 
 from scipy import signal
 
@@ -86,7 +86,7 @@ def NormalizeData(data):
 
 
 # from scipy.spatial.distance import pdist
-from ripser import ripser as tda
+#from ripser import ripser as tda
 # from persim import plot_diagrams
 # from sklearn import neighbors
 # from sklearn.manifold import Isomap
