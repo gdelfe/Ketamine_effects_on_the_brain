@@ -68,6 +68,11 @@ def upsample_speed(speed, LFP, sess, LFP_rate = 2500, speed_rate = 100):
     interpolator = interp1d(speed_T, speed[sess], kind = 'linear', fill_value="extrapolate")
     speed_upsampled = interpolator(LFP_T) 
     
+    # check if upsample done correctly
+    if (speed_upsampled.size - LFP.shape[0]) !=0:
+        sys.exit("Speed upsampled size and Lfp size are not the same!")
+    print('speed upsampled shape {}, Lfp shape {}'.format(speed_upsampled.shape, LFP.shape))
+    
     return speed_upsampled
 
 # -----------------------------------------------------
@@ -143,3 +148,29 @@ def lfp_artifacts_mask(lfp_dec,win,std_th):
     good_trial_arr = np.array(good_trial_cnt)
     
     return mask_trial_arr, mask_arr, good_trial_arr
+
+
+# =============================================================================
+
+
+def filter_lfp_in_each_epoch(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min,gain):
+
+    # baseline
+    lfp_scaled_B = Lfp_B_min*gain*1e6 # scale in mV
+    lfp_filt_B = bandpass_filter(lfp_scaled_B, lowcut = 1, highcut = 300, fs=2500, order=5) # band pass filter at 1 Hz and 300 Hz
+    # low injection 
+    lfp_scaled_L = Lfp_L_min*gain*1e6 # scale in mV
+    lfp_filt_L = bandpass_filter(lfp_scaled_L, lowcut = 1, highcut = 300, fs=2500, order=5) # band pass filter at 1 Hz and 300 Hz
+    # mid injection 
+    lfp_scaled_M = Lfp_M_min*gain*1e6 # scale in mV
+    lfp_filt_M = bandpass_filter(lfp_scaled_M, lowcut = 1, highcut = 300, fs=2500, order=5) # band pass filter at 1 Hz and 300 Hz
+    # high injection 
+    lfp_scaled_H = Lfp_H_min*gain*1e6 # scale in mV
+    lfp_filt_H = bandpass_filter(lfp_scaled_H, lowcut = 1, highcut = 300, fs=2500, order=5) # band pass filter at 1 Hz and 300 Hz
+
+
+    return lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H
+
+
+
+

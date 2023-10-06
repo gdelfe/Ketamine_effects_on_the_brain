@@ -7,6 +7,9 @@ Created on Fri Oct  6 14:27:03 2023
 import numpy as np
 import matplotlib.pyplot as plt
 
+# =============================================================================
+# PLOT SPEED FUNCTIONS 
+# =============================================================================
 
 def plot_speed(speed_up,sess,start,end,Xtick,fs_lfp=2500,fs_beh=100):
 
@@ -50,6 +53,8 @@ def plot_speed(speed_up,sess,start,end,Xtick,fs_lfp=2500,fs_beh=100):
     plt.tight_layout()
     plt.show()
 
+# =============================================================================
+
 
 def plot_speed_histo_logscale(speed,sess):
     
@@ -60,6 +65,8 @@ def plot_speed_histo_logscale(speed,sess):
     plt.xlabel('Value',fontsize=12)
     plt.ylabel('count',fontsize=12)
     plt.show()
+
+# =============================================================================
 
 
 def plot_speed_histo_regimes(speed_up, th_low = 50,th_mid = 100):
@@ -87,5 +94,86 @@ def plot_speed_histo_regimes(speed_up, th_low = 50,th_mid = 100):
     plt.yticks(fontsize=12)
     
     plt.show()
+
+
+
+# =============================================================================
+# PLOT LFP FUNCTIONS
+# =============================================================================
+
+def plot_lfp_two_channels(Lfp,ch1,ch2,start,end,Xtick,N=2500):
+
+    L_start = start*N # start of time series in sec
+    L_end = end*N # end of time series 
+    T = Xtick*N # xtick period 
+    
+    
+    plt.figure(figsize=(10,5))
+    plt.plot(Lfp[L_start:L_end,ch1],linewidth=0.5)
+    plt.title(f'LFP for channel {ch1}',fontsize=12)
+    plt.xlabel('time (sec)',fontsize=12)
+    plt.ylabel('Unknown UOM',fontsize=12)
+    
+    
+    xticks = np.arange(0,L_end-L_start, step=T)
+    plt.xticks(ticks=xticks, labels=[str(i/N) for i in xticks],fontsize=10)
+    plt.yticks(fontsize=10)
+    # print(xticks)
+    plt.tight_layout()
+    plt.show()
+    
+    
+    plt.figure(figsize=(10,5))
+    plt.plot(Lfp[L_start:L_end,ch2],linewidth=0.5)
+    plt.title(f'LFP for channel {ch2}',fontsize=12)
+    plt.xlabel('time (sec)',fontsize=12)
+    plt.ylabel('Unknown UOM',fontsize=12)
+    
+    
+    xticks = np.arange(0,L_end-L_start, step=T)
+    plt.xticks(ticks=xticks, labels=[str(i/N) for i in xticks],fontsize=10)
+    plt.yticks(fontsize=10)
+    
+    plt.tight_layout()
+    plt.show()
+
+# =============================================================================
+
+# P rows, Q columns 
+
+def plot_lfp_various_channels(Lfp,ch1,ch2,start,end,P,Q,Xtick,N=2500):
+    
+    
+    L_start = start*N # start of time series in sec
+    L_end = end*N # end of time series 
+    T = Xtick*N # xtick period 
+    
+    
+    # uncomment for zscore spectrogram 
+    # zlfp = zscore(Lfp[L_start:L_end,:],axis=0)
+    # lfp_plot = zlfp
+    
+    lfp_plot = Lfp[L_start:L_end,:]
+    
+    plt.figure(figsize=(10,12))
+    i = 1
+    for ch in range(ch1,ch2):
+        
+        plt.subplot(P,Q,i)
+        i += 1   
+        
+        plt.plot(lfp_plot[:,ch],linewidth=0.5)
+        plt.title(f'LFP for channel {ch}',fontsize=12)
+        plt.xlabel('time (sec)',fontsize=12)
+        plt.ylabel('Unknown UOM',fontsize=12)
+    
+    
+        xticks = np.arange(0,L_end-L_start, step=T)
+        plt.xticks(ticks=xticks, labels=[str(i/N) for i in xticks],fontsize=10)
+        plt.yticks(fontsize=10)
+    
+    plt.tight_layout()
+    plt.show()
+
 
 
