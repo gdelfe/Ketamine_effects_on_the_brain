@@ -1,3 +1,9 @@
+"""
+Spyder Editor
+
+@ Gino Del Ferraro, Fenton lab, Oct 2023
+"""
+
 import numpy as np
 
 from scipy.signal import butter, lfilter, freqz, iirnotch, welch, filtfilt 
@@ -157,6 +163,7 @@ def lfp_artifacts_mask(lfp_dec,win,std_th):
 
 def filter_lfp_in_each_epoch(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min,gain):
 
+    print('Filtering Lfp ...')
     # baseline
     lfp_scaled_B = Lfp_B_min*gain*1e6 # scale in mV
     lfp_filt_B = bandpass_filter(lfp_scaled_B, lowcut = 1, highcut = 300, fs=2500, order=5) # band pass filter at 1 Hz and 300 Hz

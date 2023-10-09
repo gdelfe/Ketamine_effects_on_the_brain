@@ -2,7 +2,7 @@
 """
 Spyder Editor
 
-This is a temporary script file.
+@ Gino Del Ferraro, Fenton lab, Oct 2023
 """
 
 from utilities_ketamine_analysis_v8 import *
@@ -43,16 +43,15 @@ speed_up = upsample_speed(speed, Lfp, sess, LFP_rate = 2500, speed_rate = 100)
 # plot_lfp_various_channels(Lfp,1,9,10,100,3,3,10,N=2500)
  
  
-#%%
 
-# Split speed and Lfp into injection periods (epochs): baseline, low, mid, and high injection
+# ====== Split speed and Lfp into injection periods (epochs): baseline, low, mid, and high injection
 
 Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H = split_into_epochs(Lfp,speed_up,N=2500)
  
 
-# Create list to store Lfp for each epoch: (channel, minute, n trial, trial data )
+# ====== Create list to store Lfp for each epoch: (channel, minute, n trial, trial data )
  
-nch = Lfp_B.shape[1]
+nch = int(Lfp_B.shape[1]/2)
 # low speed
 lfp_B_ep_low_s = [[] for ch in range(nch)]
 lfp_L_ep_low_s = [[] for ch in range(nch)]
@@ -64,22 +63,27 @@ lfp_L_ep_high_s = [[] for ch in range(nch)]
 lfp_M_ep_high_s = [[] for ch in range(nch)]
 lfp_H_ep_high_s = [[] for ch in range(nch)]
 
+#%%
 # =============================================================================
 # SELECT ONE MINUTE DATA 
 # =============================================================================
 
 
 for current_min in range(0,2):
-
+    
+    print('\n# ======== Current minute in epoch = {} \n'.format(current_min))
     # ====== Select 1 min data 
     Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min, speed_B_min, speed_L_min, speed_M_min, speed_H_min = select_1min_data(Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H, current_min, N=2500)
+    
+    # ====== Average Lfp in Neuropixel at the same depth (avg 2 electrodes together)
+    Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_same_depth(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min)
     
     # =============================================================================
     # Filter LFP (band pass)
     # =============================================================================
     
     # ====== Filter Lfp in each epoch
-    lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H = filter_lfp_in_each_epoch(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min,gain)
+    lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H = filter_lfp_in_each_epoch(Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg, gain)
     
     # plot_filtered_lfp(lfp_filt_B,0,10,1,36, 2500)
     
@@ -106,7 +110,6 @@ for current_min in range(0,2):
     
     print('reshaped Lfp, ', LfpRB.shape, LfpRL.shape, LfpRM.shape, LfpRH.shape)
     
-    #%%
     
     # =============================================================================
     # Keep good trials only and stack them into a 4D array
@@ -129,12 +132,16 @@ for current_min in range(0,2):
     lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s = stack_lfp_1min(lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s, lfp_B_high_s_list, lfp_L_high_s_list, lfp_M_high_s_list, lfp_H_high_s_list)
     
     
-    print('nch ', len(lfp_B_ep_low_s), 'n min ', len(lfp_B_ep_low_s[0][0]),' size', lfp_B_ep_low_s[0][0].shape)
+    print('nch ', len(lfp_B_ep_low_s), 'n. min ', len(lfp_B_ep_low_s[0][0]),' size', lfp_B_ep_low_s[0][0].shape)
+
+#%%
+
 
 # =============================================================================
 # Save files in matlab
 # =============================================================================
 
+print('Saving ...')
 save_matlab_files(rec,sess,'HPC', lfp_B_ep_low_s,lfp_L_ep_low_s,lfp_M_ep_low_s,lfp_H_ep_low_s, lfp_B_ep_high_s,lfp_L_ep_high_s,lfp_M_ep_high_s,lfp_H_ep_high_s)
 
 

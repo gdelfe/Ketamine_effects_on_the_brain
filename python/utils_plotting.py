@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Oct  6 14:27:03 2023
+Spyder Editor
 
-@author: fentonlab
+@ Gino Del Ferraro, Fenton lab, Oct 2023
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 

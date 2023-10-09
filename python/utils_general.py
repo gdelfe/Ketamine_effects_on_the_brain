@@ -141,6 +141,33 @@ def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
 
 # =============================================================================
 
+# Average 2 channels in the Neuropixel array which are on the same depth, i.e.
+# average consecutive channels in the Lfp map, for each epoch separately, for 1 min of data at the time 
+
+def average_lfp_same_depth(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min):
+    
+    print("Averaging lfp ...")
+    
+    if int(Lfp_B_min.shape[1]/2) % 2:
+        sys.exit("Number of channels in the brain region considered is not EVEN! Check channel list!")
+        
+    # baseline
+    Lfp_RS_B = Lfp_B_min.reshape(Lfp_B_min.shape[0],int(Lfp_B_min.shape[1]/2),2) # reshape Lfp, such that channels on the same depth are into adjacent columns
+    Lfp_avg_B = Lfp_RS_B.mean(axis=2)
+    # low injection 
+    Lfp_RS_L = Lfp_L_min.reshape(Lfp_L_min.shape[0],int(Lfp_L_min.shape[1]/2),2) # reshape Lfp, such that channels on the same depth are into adjacent columns
+    Lfp_avg_L = Lfp_RS_L.mean(axis=2)
+    # mid injection 
+    Lfp_RS_M = Lfp_M_min.reshape(Lfp_M_min.shape[0],int(Lfp_M_min.shape[1]/2),2) # reshape Lfp, such that channels on the same depth are into adjacent columns
+    Lfp_avg_M = Lfp_RS_M.mean(axis=2)
+    # high injection 
+    Lfp_RS_H = Lfp_B_min.reshape(Lfp_H_min.shape[0],int(Lfp_H_min.shape[1]/2),2) # reshape Lfp, such that channels on the same depth are into adjacent columns
+    Lfp_avg_H = Lfp_RS_H.mean(axis=2)
+    
+    return Lfp_avg_B, Lfp_avg_L, Lfp_avg_M, Lfp_avg_H
+
+# =============================================================================
+
 def split_into_epochs(Lfp,speed_up,N=2500):
     
     # cut Lfp and speed up to 2 h time window (disregard data above 2 h)
@@ -163,7 +190,6 @@ def split_into_epochs(Lfp,speed_up,N=2500):
     speed_H = speed_periods[3,:]
     
     print('min in each epoch: ',speed_B.size/N/60)
-    Lfp_B.shape, speed_B.shape
     
     return Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H
 
@@ -195,8 +221,7 @@ def select_1min_data(Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, spee
     speed_M_min = speed_M[start:end]
     speed_H_min = speed_H[start:end]
 
-
-    print('Lfp shape {}, speed shape {}, length in sec: {}'.format(Lfp_B_min.shape, speed_B_min.shape, speed_B_min.size/N))
+    print('1 min data: Lfp shape {}, speed shape {}, length in sec: {}\n'.format(Lfp_B_min.shape, speed_B_min.shape, speed_B_min.size/N))
     
     return Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min, speed_B_min, speed_L_min, speed_M_min, speed_H_min
          
@@ -337,6 +362,7 @@ def make_speed_and_lfp_maks(lfp_dec_B,lfp_dec_L, lfp_dec_M, lfp_dec_H, speed_dec
     speed_mask_L_high = create_speed_mask(speed_dec_L,win,th,'high','low')
     speed_mask_M_high = create_speed_mask(speed_dec_M,win,th,'high','mid')
     speed_mask_H_high = create_speed_mask(speed_dec_H,win,th,'high','high')
+    print()
     
     # =============================================================================
     # Combine speed mask and Lfp artifact mask
@@ -381,7 +407,7 @@ def make_speed_and_lfp_maks(lfp_dec_B,lfp_dec_L, lfp_dec_M, lfp_dec_H, speed_dec
     tot_good_trial_rate_M = np.sum(np.sum(tot_mask_M_high_s,axis=0))/60/nch
     tot_good_trial_rate_H = np.sum(np.sum(tot_mask_H_high_s,axis=0))/60/nch
     print('good trial-high speed rate, base = {:.2f}, low = {:.2f}, mid = {:.2f}., high = {:.2f}'.format(tot_good_trial_rate_B,tot_good_trial_rate_L,tot_good_trial_rate_M,tot_good_trial_rate_H))
-    
+    print()
     
     return tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s, tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s,tot_mask_H_high_s 
 
@@ -410,7 +436,7 @@ def keep_only_good_trials(LfpRB,LfpRL,LfpRM,LfpRH, tot_mask_B,tot_mask_L,tot_mas
         good_trials = LfpRH[tot_mask_H[:,ch],:,ch] # good trials per each channel
         lfp_H_list.append(good_trials)
     
-    print(speed_string,', nch:', len(lfp_B_list), lfp_B_list[0].shape, lfp_L_list[0].shape, lfp_L_list[0].shape, lfp_L_list[0].shape)
+    print('\n',speed_string,', nch:', len(lfp_B_list), lfp_B_list[0].shape, lfp_L_list[0].shape, lfp_L_list[0].shape, lfp_L_list[0].shape)
         
         
     return lfp_B_list, lfp_L_list, lfp_M_list, lfp_H_list
