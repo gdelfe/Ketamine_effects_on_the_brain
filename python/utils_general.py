@@ -386,4 +386,45 @@ def make_speed_and_lfp_maks(lfp_dec_B,lfp_dec_L, lfp_dec_M, lfp_dec_H, speed_dec
     return tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s, tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s,tot_mask_H_high_s 
 
 
+# =============================================================================
 
+def keep_only_good_trials(LfpRB,LfpRL,LfpRM,LfpRH, tot_mask_B,tot_mask_L,tot_mask_M,tot_mask_H, speed_string):
+    
+    
+    # Keep only good trial in Lfp for 1 min recording
+    # ouput: list with nch, each element contains good-trial-idx x time values, good-trial-idx may differ channel by channel
+    
+    lfp_B_list = [] 
+    lfp_L_list = []
+    lfp_M_list = []
+    lfp_H_list = []  
+    
+    nch = LfpRB.shape[2] # numb of channels 
+    for ch in range(nch):
+        good_trials = LfpRB[tot_mask_B[:,ch],:,ch] # good trials per each channel
+        lfp_B_list.append(good_trials)
+        good_trials = LfpRL[tot_mask_L[:,ch],:,ch] # good trials per each channel
+        lfp_L_list.append(good_trials)
+        good_trials = LfpRM[tot_mask_M[:,ch],:,ch] # good trials per each channel
+        lfp_M_list.append(good_trials)
+        good_trials = LfpRH[tot_mask_H[:,ch],:,ch] # good trials per each channel
+        lfp_H_list.append(good_trials)
+    
+    print(speed_string,', nch:', len(lfp_B_list), lfp_B_list[0].shape, lfp_L_list[0].shape, lfp_L_list[0].shape, lfp_L_list[0].shape)
+        
+        
+    return lfp_B_list, lfp_L_list, lfp_M_list, lfp_H_list
+
+# =============================================================================
+
+def stack_lfp_1min(lfp_B_epoch,lfp_L_epoch,lfp_M_epoch,lfp_H_epoch,lfp_B_list,lfp_L_list,lfp_M_list,lfp_H_list):
+    
+    nch = len(lfp_B_list)
+    for ch in range(nch):
+        lfp_B_epoch[ch].append(lfp_B_list[ch]) # add one minute lfp: trial num x trial length, for each channel
+        lfp_L_epoch[ch].append(lfp_L_list[ch])
+        lfp_M_epoch[ch].append(lfp_M_list[ch])
+        lfp_H_epoch[ch].append(lfp_H_list[ch])
+    
+
+    return lfp_B_epoch, lfp_L_epoch, lfp_M_epoch, lfp_H_epoch
