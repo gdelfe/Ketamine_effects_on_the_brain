@@ -13,12 +13,12 @@ from pathlib import Path
 # import ghostipy as gsp
 import numpy as np
 import scipy.signal as signal
+from scipy.io import savemat
 import matplotlib.pyplot as plt
 import matplotlib.ticker as plticker
 import pandas as pd
 import os
 import h5py
-import warnings
 import copy
 from scipy.stats import zscore
 from urllib.request import urlopen
@@ -43,19 +43,19 @@ def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
         with open(HPC_path_file,'rb') as f:
             HPC_file_list = pickle.load(f)
             
-        for ch, path in enumerate(HPC_file_list):
-            rec[ch]['HPC'] =  str(path)
+        for sess, path in enumerate(HPC_file_list):
+            rec[sess]['HPC'] =  str(path)
     
     elif brain_reg == 'PFC':
         # load PFC file names and store them in rec 
         with open(PFC_path_file,'rb') as f:
             PFC_file_list = pickle.load(f)
             
-        for ch, path in enumerate(PFC_file_list):
-            rec[ch]['PFC'] =  str(path)
+        for sess, path in enumerate(PFC_file_list):
+            rec[sess]['PFC'] =  str(path)
         
     else:
-        sys.exit('Brain regio is not HPC or PFC -- exit')
+        sys.exit('Brain region is not HPC or PFC -- exit')
         
         
     # select path for specific session recording 
@@ -135,7 +135,7 @@ def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
     print('Length in minutes of Lfp recordings: ',(Lfp.shape[0])/2500/60)
     print('Difference in seconds: ',((Lfp.shape[0])/2500/60 - (speed[sess].size)/100/60)*60)
 
-    return Lfp, speed, gain
+    return Lfp, speed, gain, rec
 
 
 
@@ -428,3 +428,69 @@ def stack_lfp_1min(lfp_B_epoch,lfp_L_epoch,lfp_M_epoch,lfp_H_epoch,lfp_B_list,lf
     
 
     return lfp_B_epoch, lfp_L_epoch, lfp_M_epoch, lfp_H_epoch
+
+# =============================================================================
+
+
+def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s,lfp_L_ep_low_s,lfp_M_ep_low_s,lfp_H_ep_low_s, lfp_B_ep_high_s,lfp_L_ep_high_s,lfp_M_ep_high_s,lfp_H_ep_high_s):
+    
+    main_dir = r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC'
+    path = rec[sess][brain_reg]
+    
+    dir_sess = path.split('\\')[-3] # path for session directory
+    full_dir_path = os.path.join(main_dir,dir_sess)
+    
+    if not os.path.exists(full_dir_path):
+        os.makedirs(full_dir_path)
+    
+    # =============================================================================
+    #     Low Speed Lfp 
+    # =============================================================================
+    
+    # file path to save in matlab 
+    out_file_B = os.path.join(full_dir_path, "lfp_B_epoch_low_speed.mat")
+    out_file_L = os.path.join(full_dir_path, "lfp_L_epoch_low_speed.mat")
+    out_file_M = os.path.join(full_dir_path, "lfp_M_epoch_low_speed.mat")
+    out_file_H = os.path.join(full_dir_path, "lfp_H_epoch_low_speed.mat")
+    
+    # create dictionaries to save in matlab
+    mat_lfp_B = {'lfp_B': lfp_B_ep_low_s}
+    mat_lfp_L = {'lfp_L': lfp_B_ep_low_s}
+    mat_lfp_M = {'lfp_M': lfp_B_ep_low_s}
+    mat_lfp_H = {'lfp_H': lfp_B_ep_low_s}
+    
+    # save lfp for each epoch in matlab format 
+    savemat(out_file_B,mat_lfp_B)
+    savemat(out_file_L,mat_lfp_L)
+    savemat(out_file_M,mat_lfp_M)
+    savemat(out_file_H,mat_lfp_H)
+    
+    # =============================================================================
+    #     High Speed Lfp 
+    # =========================================================================
+    
+    # file path to save in matlab 
+    out_file_B = os.path.join(full_dir_path, "lfp_B_epoch_high_speed.mat")
+    out_file_L = os.path.join(full_dir_path, "lfp_L_epoch_high_speed.mat")
+    out_file_M = os.path.join(full_dir_path, "lfp_M_epoch_high_speed.mat")
+    out_file_H = os.path.join(full_dir_path, "lfp_H_epoch_high_speed.mat")
+    
+    # create dictionaries to save in matlab
+    mat_lfp_B = {'lfp_B': lfp_B_ep_high_s}
+    mat_lfp_L = {'lfp_L': lfp_B_ep_high_s}
+    mat_lfp_M = {'lfp_M': lfp_B_ep_high_s}
+    mat_lfp_H = {'lfp_H': lfp_B_ep_high_s}
+    
+    # save lfp for each epoch in matlab format 
+    savemat(out_file_B,mat_lfp_B)
+    savemat(out_file_L,mat_lfp_L)
+    savemat(out_file_M,mat_lfp_M)
+    savemat(out_file_H,mat_lfp_H)
+    
+    
+    return 
+
+
+
+
+

@@ -153,6 +153,7 @@ def lfp_artifacts_mask(lfp_dec,win,std_th):
 
 # =============================================================================
 
+# scale Lfp into mV and band pass it at [1,300] Hz by using a non-causal filter
 
 def filter_lfp_in_each_epoch(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min,gain):
 
