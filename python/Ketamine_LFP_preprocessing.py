@@ -129,6 +129,15 @@ lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s = stack_lfp_1
 
 print('nch ', len(lfp_B_ep_low_s), 'n min ', len(lfp_B_ep_low_s[0][0]),' size', lfp_B_ep_low_s[0][0].shape)
 
-#%%
+# =============================================================================
+# Save files in matlab
+# =============================================================================
 
 save_matlab_files(rec,sess,'HPC', lfp_B_ep_low_s,lfp_L_ep_low_s,lfp_M_ep_low_s,lfp_H_ep_low_s, lfp_B_ep_high_s,lfp_L_ep_high_s,lfp_M_ep_high_s,lfp_H_ep_high_s)
+
+
+
+
+
+
+
