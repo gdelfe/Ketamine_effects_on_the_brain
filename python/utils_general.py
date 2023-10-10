@@ -140,8 +140,13 @@ def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
 
 # =============================================================================
 
+# detect bad (silent) Lfp channel. The bad Lfp channel has much less activity than 
+# any other channel (about 1 order of magnitude less)
+# Procedure:
+# Scale each lfp channel by its mean, take the abs for each time point, take the min
+# of the abs(lfp), find the channel with the minimum abs(lfp) and flag it as bad channel
 
-def detect_silent_lfp_channel(Lfp, N = 2500):
+def detect_silent_lfp_channel(Lfp, length, N = 2500):
     
     current_min = 0 # current min to look at 
     length = 3 # length of period to look at, i.e. 1 = 1 min 
@@ -162,48 +167,24 @@ def detect_silent_lfp_channel(Lfp, N = 2500):
     mean_abs = np.mean(lfp_abs_all,axis=0)
     
     min_val = np.min(mean_abs)
-    min_id = np.argmin(mean_abs)
+    bad_id = np.argmin(mean_abs)
     
-    print('Bad channel Lfp abs average over 3 min time: ',min_val, 'Bad channel ID: ', min_id)
+    print('Bad channel Lfp abs average over 3 min time: {:.2f}'.format(min_val), 'Bad channel ID: ', bad_id)
     
     
-    if min_id % 2: # if odd channel 
-        next_id = min_id - 1
+    if bad_id % 2: # if odd channel 
+        next_id = bad_id - 1
     else:           # if even channel
-        next_id = min_id + 1 
+        next_id = bad_id + 1 
+    
+    print('Nearest neighbor channel to bad channel: ',next_id)
     
     # plot bad channel and channel next to it
-    plot_lfp_two_channels_together(Lfp,next_id,min_id,10,200,20,N=2500)
-    
-    return 
-    
+    plot_lfp_two_channels_together(Lfp,next_id,bad_id,10,200,20,N=2500)
 
-# =============================================================================
+    
+    return next_id, bad_id
 
-# Average 2 channels in the Neuropixel array which are on the same depth, i.e.
-# average consecutive channels in the Lfp map, for each epoch separately, for 1 min of data at the time 
-
-def average_lfp_same_depth(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min):
-    
-    print("Averaging lfp ...")
-    
-    if int(Lfp_B_min.shape[1]/2) % 2:
-        sys.exit("Number of channels in the brain region considered is not EVEN! Check channel list!")
-        
-    # baseline
-    Lfp_RS_B = Lfp_B_min.reshape(Lfp_B_min.shape[0],int(Lfp_B_min.shape[1]/2),2) # reshape Lfp, such that channels on the same depth are into adjacent columns
-    Lfp_avg_B = Lfp_RS_B.mean(axis=2)
-    # low injection 
-    Lfp_RS_L = Lfp_L_min.reshape(Lfp_L_min.shape[0],int(Lfp_L_min.shape[1]/2),2) # reshape Lfp, such that channels on the same depth are into adjacent columns
-    Lfp_avg_L = Lfp_RS_L.mean(axis=2)
-    # mid injection 
-    Lfp_RS_M = Lfp_M_min.reshape(Lfp_M_min.shape[0],int(Lfp_M_min.shape[1]/2),2) # reshape Lfp, such that channels on the same depth are into adjacent columns
-    Lfp_avg_M = Lfp_RS_M.mean(axis=2)
-    # high injection 
-    Lfp_RS_H = Lfp_B_min.reshape(Lfp_H_min.shape[0],int(Lfp_H_min.shape[1]/2),2) # reshape Lfp, such that channels on the same depth are into adjacent columns
-    Lfp_avg_H = Lfp_RS_H.mean(axis=2)
-    
-    return Lfp_avg_B, Lfp_avg_L, Lfp_avg_M, Lfp_avg_H
 
 # =============================================================================
 
@@ -248,11 +229,11 @@ def select_1min_data(Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, spee
     start = (offset + current_min)*60*N - 1    # start point in time points
     end = (offset + current_min + length)*60*N - 1   # stop point in time points
 
-    # Lfp trim: 1 minute, one every M channel
-    Lfp_B_min = Lfp_B[start:end,::M]  # base line period
-    Lfp_L_min = Lfp_L[start:end,::M]  # low injection 
-    Lfp_M_min = Lfp_M[start:end,::M]  # mid injection 
-    Lfp_H_min = Lfp_H[start:end,::M]  # high injection 
+    # Lfp trim: 1 minute, one every M channel and tranform memap to numpy array
+    Lfp_B_min = np.array(Lfp_B[start:end,::M])  # base line period
+    Lfp_L_min = np.array(Lfp_L[start:end,::M])  # low injection 
+    Lfp_M_min = np.array(Lfp_M[start:end,::M])  # mid injection 
+    Lfp_H_min = np.array(Lfp_H[start:end,::M])  # high injection 
 
     # speed
     speed_B_min = speed_B[start:end] 
@@ -264,6 +245,47 @@ def select_1min_data(Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, spee
     
     return Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min, speed_B_min, speed_L_min, speed_M_min, speed_H_min
          
+
+# =============================================================================
+
+# Replace bad lfp channel with the nearest neighbor channel
+
+def replace_bad_lfp_channel(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min, bad_id, next_id):
+    
+    Lfp_B_min[:,bad_id] = Lfp_B_min[:,next_id]
+    Lfp_L_min[:,bad_id] = Lfp_L_min[:,next_id]
+    Lfp_M_min[:,bad_id] = Lfp_M_min[:,next_id]
+    Lfp_H_min[:,bad_id] = Lfp_H_min[:,next_id]
+    
+    return Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min
+
+# =============================================================================
+
+
+# Average 2 channels in the Neuropixel array which are on the same depth, i.e.
+# average consecutive channels in the Lfp map, for each epoch separately, for 1 min of data at the time 
+
+def average_lfp_same_depth(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min):
+    
+    print("Averaging lfp ...")
+    
+    if int(Lfp_B_min.shape[1]) % 2:
+        sys.exit("Number of channels in the brain region considered is not EVEN! Check channel list!")
+        
+    # baseline
+    Lfp_RS_B = Lfp_B_min.reshape(Lfp_B_min.shape[0],int(Lfp_B_min.shape[1]/2),2) # reshape Lfp, such that channels on the same depth are into adjacent columns
+    Lfp_avg_B = Lfp_RS_B.mean(axis=2)
+    # low injection 
+    Lfp_RS_L = Lfp_L_min.reshape(Lfp_L_min.shape[0],int(Lfp_L_min.shape[1]/2),2) # reshape Lfp, such that channels on the same depth are into adjacent columns
+    Lfp_avg_L = Lfp_RS_L.mean(axis=2)
+    # mid injection 
+    Lfp_RS_M = Lfp_M_min.reshape(Lfp_M_min.shape[0],int(Lfp_M_min.shape[1]/2),2) # reshape Lfp, such that channels on the same depth are into adjacent columns
+    Lfp_avg_M = Lfp_RS_M.mean(axis=2)
+    # high injection 
+    Lfp_RS_H = Lfp_B_min.reshape(Lfp_H_min.shape[0],int(Lfp_H_min.shape[1]/2),2) # reshape Lfp, such that channels on the same depth are into adjacent columns
+    Lfp_avg_H = Lfp_RS_H.mean(axis=2)
+    
+    return Lfp_avg_B, Lfp_avg_L, Lfp_avg_M, Lfp_avg_H
 
 # =============================================================================
 

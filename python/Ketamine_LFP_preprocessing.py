@@ -43,7 +43,9 @@ speed_up = upsample_speed(speed, Lfp, sess, LFP_rate = 2500, speed_rate = 100)
 # plot_lfp_two_channels(Lfp,2,3,10,100,100,N=2500)
 # plot_lfp_various_channels(Lfp,20,29,10,500,3,3,10,N=2500)
 
-detect_silent_lfp_channel(Lfp,2500)
+next_id, bad_id = detect_silent_lfp_channel(Lfp,2500)
+
+plot_lfp_two_channels(Lfp,next_id,bad_id,10,100,100,N=2500
 
 #%% 
 
