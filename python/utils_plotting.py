@@ -16,11 +16,11 @@ def plot_speed(speed_up,sess,start,end,Xtick,fs_lfp=2500,fs_beh=100):
 
     speed_T_up = np.linspace(0,speed_up.size,speed_up.size) # t axis for speed
     
-    X = fs_lfp*Xtick   # interval for xticks
+    X = Xtick   # interval for xticks
     s = fs_lfp*start # star
     e = fs_lfp*end # end
     
-    # print('Number of seconds: ',(e-s)/fs_lfp)
+    print('Number of seconds: ',(e-s)/fs_lfp)
     
     plt.figure(figsize=(12,5))
     
@@ -139,6 +139,34 @@ def plot_lfp_two_channels(Lfp,ch1,ch2,start,end,Xtick,N=2500):
     plt.show()
 
 # =============================================================================
+
+
+def plot_lfp_two_channels_together(Lfp,ch1,ch2,start,end,Xtick,N=2500):
+
+    L_start = start*N # start of time series in sec
+    L_end = end*N # end of time series 
+    T = Xtick*N # xtick period 
+    
+    
+    plt.figure(figsize=(10,5))
+    plt.plot(Lfp[L_start:L_end,ch1],linewidth=0.5)
+    plt.plot(Lfp[L_start:L_end,ch2],linewidth=0.5)
+    plt.title(f'LFP for channel {ch1} and bad channel {ch2}',fontsize=12)
+    plt.xlabel('time (sec)',fontsize=12)
+    plt.ylabel('Unknown UOM',fontsize=12)
+    
+    
+    xticks = np.arange(0,L_end-L_start, step=T)
+    plt.xticks(ticks=xticks, labels=[str(i/N) for i in xticks],fontsize=10)
+    plt.yticks(fontsize=10)
+    # print(xticks)
+    plt.tight_layout()
+    plt.show()
+    
+
+
+# =============================================================================
+
 
 # P rows, Q columns 
 

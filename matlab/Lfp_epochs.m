@@ -11,4 +11,7 @@ addpath('C:\Users\fentonlab\Desktop\Gino\chronux_2_11\');
 
 main_dir = 'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC\2022-08-01_04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk\';
 
-load(strcat(main_dir,'lfp_B_epoch_low_speed.mat'))
+load(strcat(main_dir,'lfp_B_epoch_low_speed.mat')) % channel x minute x trial x lfp
+load(strcat(main_dir,'lfp_L_epoch_low_speed.mat')) % channel x minute x trial x lfp
+load(strcat(main_dir,'lfp_M_epoch_low_speed.mat')) % channel x minute x trial x lfp
+load(strcat(main_dir,'lfp_H_epoch_low_speed.mat')) % channel x minute x trial x lfp

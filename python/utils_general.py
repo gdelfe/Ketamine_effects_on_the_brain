@@ -28,6 +28,7 @@ plt.rcParams['pdf.fonttype'] = 42
 #import mne
 import sys
 import pickle
+from utils_plotting import *
 
 
 def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
@@ -44,16 +45,16 @@ def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
         with open(HPC_path_file,'rb') as f:
             HPC_file_list = pickle.load(f)
             
-        for sess, path in enumerate(HPC_file_list):
-            rec[sess]['HPC'] =  str(path)
+        for isess, path in enumerate(HPC_file_list):
+            rec[isess]['HPC'] =  str(path)
     
     elif brain_reg == 'PFC':
         # load PFC file names and store them in rec 
         with open(PFC_path_file,'rb') as f:
             PFC_file_list = pickle.load(f)
             
-        for sess, path in enumerate(PFC_file_list):
-            rec[sess]['PFC'] =  str(path)
+        for isess, path in enumerate(PFC_file_list):
+            rec[isess]['PFC'] =  str(path)
         
     else:
         sys.exit('Brain region is not HPC or PFC -- exit')
@@ -61,6 +62,7 @@ def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
         
     # select path for specific session recording 
     binFullPath = rec[sess][brain_reg] 
+    print('Loading file in: ',binFullPath)
     # print(binFullPath)
     numChannels = 385
     
@@ -135,6 +137,46 @@ def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
     return Lfp, speed, gain, rec
 
 
+
+# =============================================================================
+
+
+def detect_silent_lfp_channel(Lfp, N = 2500):
+    
+    current_min = 0 # current min to look at 
+    length = 3 # length of period to look at, i.e. 1 = 1 min 
+    offset = 5 # starting of epoch in min
+
+    start = (offset + current_min)*60*N - 1    # start point in time points
+    end = (offset + current_min + length)*60*N - 1   # stop point in time points
+
+    # Lfp trim: 3 minute, one every M channel
+    Lfp_B_3min = Lfp[start:end,:]  # base line period
+    
+
+    # remove mean from Lfp for each channel
+    lfp_ms = Lfp[start:end,:] - np.mean(Lfp[start:end,:],axis=0)
+    # take abs value for each lfp channel
+    lfp_abs_all = np.abs(lfp_ms)
+    # compute mean across time for abs lfp
+    mean_abs = np.mean(lfp_abs_all,axis=0)
+    
+    min_val = np.min(mean_abs)
+    min_id = np.argmin(mean_abs)
+    
+    print('Bad channel Lfp abs average over 3 min time: ',min_val, 'Bad channel ID: ', min_id)
+    
+    
+    if min_id % 2: # if odd channel 
+        next_id = min_id - 1
+    else:           # if even channel
+        next_id = min_id + 1 
+    
+    # plot bad channel and channel next to it
+    plot_lfp_two_channels_together(Lfp,next_id,min_id,10,200,20,N=2500)
+    
+    return 
+    
 
 # =============================================================================
 
