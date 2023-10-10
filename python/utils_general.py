@@ -17,6 +17,7 @@ from scipy.io import savemat
 import matplotlib.pyplot as plt
 import matplotlib.ticker as plticker
 import pandas as pd
+from IPython.display import display
 import os
 import h5py
 import copy
@@ -91,7 +92,7 @@ def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
     #### Read LFP start/end time, HPC channels - Choose whether loading HPC or PFC here
         
     pd.set_option('display.max_colwidth',100)
-    in_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs\\', "lfp_aln_idx.csv")
+    in_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs\CA1_DG_id', "recid_CA1_DG_id.csv")
     Lfp_aln = pd.read_csv(in_file)
     
 
@@ -105,16 +106,12 @@ def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
     
     start = Lfp_aln["Lfp start"][sess] # starting of the trial in Lfp data points
     end = Lfp_aln["Lfp end"][sess] # end of trial
-    # ch_start = Lfp_aln["HPC ch start"][sess]  # Hpc first channel
-    # ch_end = Lfp_aln["HPC ch end"][sess]  # Hpc last channel
     
-    # 0-120 CA1
-    # 0-86 ripples 
-    # 126-244 dentate
+    # multiply by two to account for the full channel list 
+    ch_start = Lfp_aln["theta_start"][sess]*2  # Hpc first channel
+    ch_end = Lfp_aln["theta_end"][sess]*2  # Hpc last channel
     
-    
-    ch_start = 0
-    ch_end = 120
+
     # Trim Lfp to specific channels in the HPC and to specific start/end times 
     Lfp= dataLfp[start:end,ch_start:ch_end]
     # Lfp = dataLfp[start:end,:]
