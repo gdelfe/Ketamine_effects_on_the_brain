@@ -146,10 +146,9 @@ def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
 # Scale each lfp channel by its mean, take the abs for each time point, take the min
 # of the abs(lfp), find the channel with the minimum abs(lfp) and flag it as bad channel
 
-def detect_silent_lfp_channel(Lfp, length, N = 2500):
+def detect_silent_lfp_channel(Lfp, length = 3, threshold = 4, N = 2500):
     
     current_min = 0 # current min to look at 
-    length = 3 # length of period to look at, i.e. 1 = 1 min 
     offset = 5 # starting of epoch in min
 
     start = (offset + current_min)*60*N - 1    # start point in time points
@@ -165,28 +164,43 @@ def detect_silent_lfp_channel(Lfp, length, N = 2500):
     lfp_abs_all = np.abs(lfp_ms)
     # compute mean across time for abs lfp
     mean_abs = np.mean(lfp_abs_all,axis=0)
+    print('\n',mean_abs,'\n')
+    
+    mean_tot = np.mean(mean_abs)
+    print('total mean abs lfp across channels {:.4f}'.format(mean_tot))
     
     min_val = np.min(mean_abs)
     bad_id = np.argmin(mean_abs)
     
-    print('Bad channel Lfp abs average over 3 min time: {:.2f}'.format(min_val), 'Bad channel ID: ', bad_id)
+    # if bad channel detected
+    if min_val < mean_tot/threshold: 
+        bad_flag = True
+        print('Bad channel Lfp abs average over 3 min time: {:.2f}'.format(min_val), 'Bad channel ID: ', bad_id)
     
+        if bad_id % 2: # if odd channel 
+            next_id = bad_id - 1
+        else:           # if even channel
+            next_id = bad_id + 1 
+        
+        print('Nearest neighbor channel to bad channel: ',next_id)
+        
+        # plot bad channel and channel next to it
+        plot_lfp_two_channels_together(Lfp,next_id,bad_id,10,200,20,N=2500)
     
-    if bad_id % 2: # if odd channel 
-        next_id = bad_id - 1
-    else:           # if even channel
-        next_id = bad_id + 1 
+    # if there is no bad channel
+    else:
+        print('No bad channel detected\n')
+        bad_flag = False 
+        next_id = None
+        bad_id = None
     
-    print('Nearest neighbor channel to bad channel: ',next_id)
-    
-    # plot bad channel and channel next to it
-    plot_lfp_two_channels_together(Lfp,next_id,bad_id,10,200,20,N=2500)
-
-    
-    return next_id, bad_id
+    return bad_flag, next_id, bad_id
 
 
 # =============================================================================
+
+# Split Lfp and speed into 30 min Epochs: baseline, low dose injection, mid dose, high dose
+
 
 def split_into_epochs(Lfp,speed_up,N=2500):
     
@@ -215,6 +229,7 @@ def split_into_epochs(Lfp,speed_up,N=2500):
 
 # =============================================================================
 
+# Select only 1 min data at the time to speed up data processing 
 
 def select_1min_data(Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H, current_min, N=2500):
     

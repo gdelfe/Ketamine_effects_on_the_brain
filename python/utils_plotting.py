@@ -200,6 +200,7 @@ def plot_lfp_various_channels(Lfp,ch1,ch2,start,end,P,Q,Xtick,N=2500):
         xticks = np.arange(0,L_end-L_start, step=T)
         plt.xticks(ticks=xticks, labels=[str(i/N) for i in xticks],fontsize=10)
         plt.yticks(fontsize=10)
+        plt.ylim([-100,100])
     
     plt.tight_layout()
     plt.show()
