@@ -277,6 +277,47 @@ def replace_bad_lfp_channel(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min, bad_id, 
 # =============================================================================
 
 
+# Average 4 channels in the Neuropixel together and keep only the average Lfp.
+# Channels averaged together are nearest neighbors in the x and y directions. 
+# They are in the same 2x2 block of channels.
+# The averaging is done for 1 min of data at the time to deal with excessive usage of RAM otherwise 
+
+def average_lfp_4_channels(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min):
+    
+    
+    print("Averaging lfp ...")
+    
+    if int(Lfp_B_min.shape[1]) % 2:
+        sys.exit("Number of channels in the brain region considered is not EVEN! Check channel list!")
+        
+    # If the tot number of channels is not a multiple of 4, remove the extra channels 
+    if int(Lfp_B_min.shape[1] % 4):
+        ch_extra = (Lfp_B_min.shape[1] % 4 ) # extra channels, which make the tot number not a multiple of 4
+        Lfp_B_min = Lfp_B_min[:,:-ch_extra]
+        Lfp_L_min = Lfp_L_min[:,:-ch_extra]
+        Lfp_M_min = Lfp_M_min[:,:-ch_extra]
+        Lfp_H_min = Lfp_H_min[:,:-ch_extra]
+        print(f'-- {ch_extra} Lfp channels were removed in order to have the tot number of channels a multiple of 4, for the average in a 2x2 channel block\n')
+            
+    # baseline
+    Lfp_RS_B = Lfp_B_min.reshape(Lfp_B_min.shape[0],int(Lfp_B_min.shape[1]/4),4) # reshape Lfp, such that channels in the same 2x2 block are in the same colum dim
+    Lfp_avg_B = Lfp_RS_B.mean(axis=2)
+    # low injection 
+    Lfp_RS_L = Lfp_L_min.reshape(Lfp_L_min.shape[0],int(Lfp_L_min.shape[1]/4),4) # reshape Lfp, such that channels in the same 2x2 block are in the same colum dim
+    Lfp_avg_L = Lfp_RS_L.mean(axis=2)
+    # mid injection 
+    Lfp_RS_M = Lfp_M_min.reshape(Lfp_M_min.shape[0],int(Lfp_M_min.shape[1]/4),4) # reshape Lfp, such that channels in the same 2x2 block are in the same colum dim
+    Lfp_avg_M = Lfp_RS_M.mean(axis=2)
+    # high injection 
+    Lfp_RS_H = Lfp_B_min.reshape(Lfp_H_min.shape[0],int(Lfp_H_min.shape[1]/4),4) # reshape Lfp, such that channels in the same 2x2 block are in the same colum dim
+    Lfp_avg_H = Lfp_RS_H.mean(axis=2)
+    
+    return Lfp_avg_B, Lfp_avg_L, Lfp_avg_M, Lfp_avg_H
+
+
+# =============================================================================
+
+
 # Average 2 channels in the Neuropixel array which are on the same depth, i.e.
 # average consecutive channels in the Lfp map, for each epoch separately, for 1 min of data at the time 
 

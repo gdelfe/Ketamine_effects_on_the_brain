@@ -12,7 +12,7 @@ from utils_general import *
 
 #%%
 
-sess = 1 # session number 
+sess = 2 # session number 
 
 binFullPath = r'C:\Users\fentonlab\Desktop\Gino\LFPs'
 HPC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs','HPC_lfp_paths.file')
@@ -22,14 +22,14 @@ PFC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs','PFC_lfp_pa
 # =============================================================================
 # Load LFP and speed - upsample speed 
 # =============================================================================
-# Load Lfp and speed data for a specific recording and brain area 
+
+# ====== Load Lfp and speed data for a specific recording and brain area 
 Lfp, speed, gain, rec = load_data(binFullPath,HPC_path_file,PFC_path_file,"HPC",sess)
 
-# ====== Detect bad (silent) Lfp channel
+# ====== Detect bad (silent) Lfp channel (if it exist)
 bad_flag, next_id, bad_id = detect_silent_lfp_channel(Lfp,4,4,2500)
 
-
-# Upsample Speed recording
+# ====== Upsample Speed recording
 speed_up = upsample_speed(speed, Lfp, sess, LFP_rate = 2500, speed_rate = 100)
 
 # =============================================================================
@@ -43,19 +43,16 @@ speed_up = upsample_speed(speed, Lfp, sess, LFP_rate = 2500, speed_rate = 100)
 # plot_speed_histo_regimes(speed_up, th_low = 30,th_mid = 100)
 
 # # plot Lfp
-plot_lfp_two_channels(Lfp,1,2,10,100,100,N=2500)
-#%%
-plot_lfp_various_channels(Lfp,0,9,0,100,3,3,10,N=2500)
-
-
-#%% 
+# plot_lfp_two_channels(Lfp,1,2,10,100,100,N=2500)
+# plot_lfp_various_channels(Lfp,0,9,0,60,3,3,10,N=2500)
+ 
 
 # ====== Split speed and Lfp into injection periods (epochs): baseline, low, mid, and high injection
 Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H = split_into_epochs(Lfp,speed_up,N=2500)
  
 
 # ====== Create list to store Lfp for each epoch: (channel, minute, n trial, trial data )
-nch = int(Lfp_B.shape[1]/2)
+nch = int(Lfp_B.shape[1]// 4)*4 # number of channel after averaging a 2x2 block 
 # low speed
 lfp_B_ep_low_s = [[] for ch in range(nch)]
 lfp_L_ep_low_s = [[] for ch in range(nch)]
@@ -73,9 +70,9 @@ lfp_H_ep_high_s = [[] for ch in range(nch)]
 # =============================================================================
 
 
-for current_min in range(0,20):
+for current_min in range(0,2):
     
-    print('\n# ======== Current minute in epoch = {} \n'.format(current_min))
+    print('\n# ======== Current minute = {}  ----------------------- \n'.format(current_min))
     
     # =============================================================================
     # Prepare Lfp data, 1 min 
@@ -85,16 +82,20 @@ for current_min in range(0,20):
     Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min, speed_B_min, speed_L_min, speed_M_min, speed_H_min = \
         select_1min_data(Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H, current_min, N=2500)
     
-    # ====== Replace Lfp bad channel with nearest neighbor
+    # ====== Replace Lfp bad channel with nearest neighbor (if bad channel exists)
     if bad_flag:
         Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min = replace_bad_lfp_channel(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min, bad_id, next_id)
    
     # === plot bad channel replaced and nearest neighbor
     # plot_lfp_two_channels(Lfp_L_min,bad_id,next_id,0,60,10,N=2500)
    
+   
     # ====== Average Lfp in Neuropixel at the same depth (avg 2 electrodes together)
-    Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_same_depth(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min)
+    # Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_same_depth(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min)
     
+    # ====== Average Lfp in Neuropixelin a 2x2 channel block (avg 4 electrodes together)
+    Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_4_channels(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min)
+
 
     # =============================================================================
     # Filter 1 min LFP (band pass)
@@ -160,7 +161,7 @@ for current_min in range(0,20):
     print('nch ', len(lfp_B_ep_low_s), 'n. min ', len(lfp_B_ep_low_s[0][0]),' size', lfp_B_ep_low_s[0][0].shape)
 
 
-
+#%%
 # =============================================================================
 # Save files in matlab
 # =============================================================================
