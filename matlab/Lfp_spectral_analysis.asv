@@ -10,8 +10,8 @@ addpath('C:\Users\fentonlab\Desktop\Gilgamesh\Codes\eeglab\functions\adminfunc\'
 addpath('C:\Users\fentonlab\Desktop\Gino\chronux_2_11\');
 addpath('C:\Users\fentonlab\Desktop\Gino\Gino_codes\');
 
-main_dir = 'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC\2022-08-01_04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk\';
-% main_dir = 'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC\2022-07-27-07-41-00_M015_SAL_PFC_HPC_0_0_0mpk\';
+% main_dir = 'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC\2022-08-01_04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk\';
+main_dir = 'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC\2022-07-27-07-41-00_M015_SAL_PFC_HPC_0_0_0mpk\';
 
 display(['Loading LFP data ...'])
 load(strcat(main_dir,'lfp_B_epoch_low_speed.mat')); % channel x minute x trial x lfp
@@ -40,13 +40,13 @@ plot_psd_20_min_normalize(spec_B, spec_L, spec_M, spec_H, f, 'PSD all HPC normal
 
 fs = 1250;
 fk = [0 100]; % freq range
-tapers = [0.4 5]; % Time resolution, Freq. resoluzion 
+tapers = [0.3 7]; % Time resolution, Freq. resoluzion 
 k = floor(2*tapers(1)*tapers(2) - 1) % number of tapers used 
 dn = 0.005; % sliding step
 fs = 1024; % sampling 
 pad = 2;
 
-[spec,f,ti] = compute_plot_spec(lfp_B_all{1}, tapers , fs, dn, fk, pad, 0.05,'min 1')
+[spec,f,ti] = compute_plot_spec(lfp_B_all(1,:), [], fs, dn, fk, pad, pval,str_title)
 
 
 

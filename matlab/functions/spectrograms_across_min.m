@@ -1,7 +1,7 @@
 
 function [spec_B, spec_L, spec_M, spec_H, f] = spectrograms_across_min(lfp_B_all, lfp_L_all, lfp_M_all, lfp_H_all, W, fk)
 
-display(['Computing spectrograms for the whole recoding  ...')
+display(['Computing spectrograms for the whole recoding  ...'])
 % W = 3; % Frequency resolution for PSD 
 N = 1250; % Lenght of time series
 sampling = 1250; % sampling 
