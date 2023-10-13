@@ -8,7 +8,6 @@ addpath('C:\Users\fentonlab\Desktop\Gilgamesh\Codes\eeglab\functions\sigprocfunc
 addpath('C:\Users\fentonlab\Desktop\Gilgamesh\Codes\eeglab\functions\guifunc\');
 addpath('C:\Users\fentonlab\Desktop\Gilgamesh\Codes\eeglab\functions\adminfunc\');
 addpath('C:\Users\fentonlab\Desktop\Gino\chronux_2_11\');
-addpath('C:\Users\fentonlab\Desktop\Gino\Gino_codes\');
 
 main_dir = 'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC\2022-08-01_04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk\';
 
@@ -22,9 +21,6 @@ plot(lfp_B{1,1}(1,:)); hold on
 plot(lfp_L{1,1}(1,:)); hold on 
 plot(lfp_M{1,1}(1,:)); hold on 
 plot(lfp_H{1,1}(1,:))
-
-
-[lfp_B_all, lfp_L_all, lfp_M_all, lfp_H_all] = aggregate_trials(lfp_B,lfp_L,lfp_M,lfp_H)
 
 lfp_B_all = cell(size(lfp_B,2),1); % cell min x
 lfp_L_all = cell(size(lfp_L,2),1); % cell min x
@@ -76,48 +72,17 @@ grid on
 
 for min = 1:20
     subplot(5,4,min)
-    plot(f,log10(spec_B(min,:)/sum(spec_B(min,:))),'LineWidth', 2); hold on
-    plot(f,log10(spec_L(min,:)/sum(spec_L(min,:))),'LineWidth', 2); hold on
-    plot(f,log10(spec_M(min,:)/sum(spec_M(min,:))),'LineWidth', 2); hold on
-    plot(f,log10(spec_H(min,:)/sum(spec_H(min,:))),'LineWidth', 2); 
+    plot(f,log10(spec_B(min,:)),'LineWidth', 2); hold on
+    plot(f,log10(spec_L(min,:)),'LineWidth', 2); hold on
+    plot(f,log10(spec_M(min,:)),'LineWidth', 2); hold on
+    plot(f,log10(spec_H(min,:)),'LineWidth', 2); 
     title(sprintf('PSD for min = %d',min))
-    grid on
+    
     % Adjust subplot spacing for minimal space between them
     set(gcf, 'DefaultAxesLooseInset', [0,0,0,0]);
 %     tight_layout();
 end
-% Title for the entire figure (the manual way without suptitle)
-fig_title = uicontrol('Style', 'text',...
-    'String', 'PSD - Stationary - RS Ketamine',...
-    'Units', 'normalized',...
-    'Position', [0.3 0.95 0.4 0.04],...
-    'BackgroundColor', get(gcf, 'Color'),...
-    'FontSize', 15,...
-    'FontWeight', 'bold');
 
-
-
-
-for min = 1:20
-    subplot(5,4,min)
-    plot(f,log10(spec_B(min,:)/sum(spec_B(min,:))),'LineWidth', 2); hold on
-    plot(f,log10(spec_L(min,:)/sum(spec_L(min,:))),'LineWidth', 2); hold on
-    plot(f,log10(spec_M(min,:)/sum(spec_M(min,:))),'LineWidth', 2); hold on
-    plot(f,log10(spec_H(min,:)/sum(spec_H(min,:))),'LineWidth', 2); 
-    title(sprintf('PSD for min = %d',min))
-    grid on
-    % Adjust subplot spacing for minimal space between them
-    set(gcf, 'DefaultAxesLooseInset', [0,0,0,0]);
-%     tight_layout();
-end
-% Title for the entire figure (the manual way without suptitle)
-fig_title = uicontrol('Style', 'text',...
-    'String', 'PDS normalized - Stationary - RS Ketamine',...
-    'Units', 'normalized',...
-    'Position', [0.3 0.95 0.4 0.04],...
-    'BackgroundColor', get(gcf, 'Color'),...
-    'FontSize', 15,...
-    'FontWeight', 'bold');
 
 
 
