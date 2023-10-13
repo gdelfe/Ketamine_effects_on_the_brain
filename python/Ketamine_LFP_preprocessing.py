@@ -12,7 +12,7 @@ from utils_general import *
 
 
 
-sess = 2 # session number 
+sess = 1 # session number 
 tot_min = 20
 
 binFullPath = r'C:\Users\fentonlab\Desktop\Gino\LFPs'
@@ -53,7 +53,6 @@ Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H = split_into_epoc
  
 
 
-#%%
 # ====== Create list to store Lfp for each epoch: (channel, minute, n trial, trial data )
 nch = int(Lfp_B.shape[1]// 4) # number of channel after averaging a 2x2 block 
 # low speed
