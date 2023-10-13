@@ -13,7 +13,7 @@ from pathlib import Path
 # import ghostipy as gsp
 import numpy as np
 import scipy.signal as signal
-from scipy.io import savemat
+from scipy.io import savemat, loadmat
 import matplotlib.pyplot as plt
 import matplotlib.ticker as plticker
 import pandas as pd
@@ -309,7 +309,7 @@ def average_lfp_4_channels(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min):
     Lfp_RS_M = Lfp_M_min.reshape(Lfp_M_min.shape[0],int(Lfp_M_min.shape[1]/4),4) # reshape Lfp, such that channels in the same 2x2 block are in the same colum dim
     Lfp_avg_M = Lfp_RS_M.mean(axis=2)
     # high injection 
-    Lfp_RS_H = Lfp_B_min.reshape(Lfp_H_min.shape[0],int(Lfp_H_min.shape[1]/4),4) # reshape Lfp, such that channels in the same 2x2 block are in the same colum dim
+    Lfp_RS_H = Lfp_H_min.reshape(Lfp_H_min.shape[0],int(Lfp_H_min.shape[1]/4),4) # reshape Lfp, such that channels in the same 2x2 block are in the same colum dim
     Lfp_avg_H = Lfp_RS_H.mean(axis=2)
     
     return Lfp_avg_B, Lfp_avg_L, Lfp_avg_M, Lfp_avg_H
@@ -338,7 +338,7 @@ def average_lfp_same_depth(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min):
     Lfp_RS_M = Lfp_M_min.reshape(Lfp_M_min.shape[0],int(Lfp_M_min.shape[1]/2),2) # reshape Lfp, such that channels on the same depth are into adjacent columns
     Lfp_avg_M = Lfp_RS_M.mean(axis=2)
     # high injection 
-    Lfp_RS_H = Lfp_B_min.reshape(Lfp_H_min.shape[0],int(Lfp_H_min.shape[1]/2),2) # reshape Lfp, such that channels on the same depth are into adjacent columns
+    Lfp_RS_H = Lfp_H_min.reshape(Lfp_H_min.shape[0],int(Lfp_H_min.shape[1]/2),2) # reshape Lfp, such that channels on the same depth are into adjacent columns
     Lfp_avg_H = Lfp_RS_H.mean(axis=2)
     
     return Lfp_avg_B, Lfp_avg_L, Lfp_avg_M, Lfp_avg_H
@@ -574,8 +574,8 @@ def stack_lfp_1min(lfp_B_epoch,lfp_L_epoch,lfp_M_epoch,lfp_H_epoch,lfp_B_list,lf
 
 # =============================================================================
 
-
-def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s,lfp_L_ep_low_s,lfp_M_ep_low_s,lfp_H_ep_low_s, lfp_B_ep_high_s,lfp_L_ep_high_s,lfp_M_ep_high_s,lfp_H_ep_high_s):
+import pdb
+def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_ep_low_s, lfp_H_ep_low_s, lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s):
     
     main_dir = r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC'
     path = rec[sess][brain_reg]
@@ -598,10 +598,10 @@ def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s,lfp_L_ep_low_s,lfp_M_ep
     
     # create dictionaries to save in matlab
     mat_lfp_B = {'lfp_B': lfp_B_ep_low_s}
-    mat_lfp_L = {'lfp_L': lfp_B_ep_low_s}
-    mat_lfp_M = {'lfp_M': lfp_B_ep_low_s}
-    mat_lfp_H = {'lfp_H': lfp_B_ep_low_s}
-    
+    mat_lfp_L = {'lfp_L': lfp_L_ep_low_s}
+    mat_lfp_M = {'lfp_M': lfp_M_ep_low_s}
+    mat_lfp_H = {'lfp_H': lfp_H_ep_low_s}
+        
     # save lfp for each epoch in matlab format 
     savemat(out_file_B,mat_lfp_B)
     savemat(out_file_L,mat_lfp_L)
@@ -620,9 +620,9 @@ def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s,lfp_L_ep_low_s,lfp_M_ep
     
     # create dictionaries to save in matlab
     mat_lfp_B = {'lfp_B': lfp_B_ep_high_s}
-    mat_lfp_L = {'lfp_L': lfp_B_ep_high_s}
-    mat_lfp_M = {'lfp_M': lfp_B_ep_high_s}
-    mat_lfp_H = {'lfp_H': lfp_B_ep_high_s}
+    mat_lfp_L = {'lfp_L': lfp_L_ep_high_s}
+    mat_lfp_M = {'lfp_M': lfp_M_ep_high_s}
+    mat_lfp_H = {'lfp_H': lfp_H_ep_high_s}
     
     # save lfp for each epoch in matlab format 
     savemat(out_file_B,mat_lfp_B)
@@ -631,9 +631,14 @@ def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s,lfp_L_ep_low_s,lfp_M_ep
     savemat(out_file_H,mat_lfp_H)
     
     
-    return 
 
-
-
+# Example to load the saved MAT files in Python:
+def load_lfp_data(filename):
+    try:
+        data = loadmat(filename)
+        return data
+    except Exception as e:
+        print(f"Error loading {filename}: {e}")
+        return None
 
 

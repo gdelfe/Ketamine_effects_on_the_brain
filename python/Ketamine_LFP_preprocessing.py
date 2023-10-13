@@ -11,7 +11,8 @@ from utils_plotting import *
 from utils_general import *
 
 
-sess = 3 # session number 
+
+sess = 2 # session number 
 tot_min = 20
 
 binFullPath = r'C:\Users\fentonlab\Desktop\Gino\LFPs'
@@ -51,6 +52,8 @@ speed_up = upsample_speed(speed, Lfp, sess, LFP_rate = 2500, speed_rate = 100)
 Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H = split_into_epochs(Lfp,speed_up,N=2500)
  
 
+
+#%%
 # ====== Create list to store Lfp for each epoch: (channel, minute, n trial, trial data )
 nch = int(Lfp_B.shape[1]// 4) # number of channel after averaging a 2x2 block 
 # low speed
@@ -160,6 +163,7 @@ for current_min in range(0,tot_min):
     print('nch ', len(lfp_B_ep_low_s), 'n. min ', len(lfp_B_ep_low_s[0][0]),' size', lfp_B_ep_low_s[0][0].shape)
 
 
+
 # =============================================================================
 # Save files in matlab
 # =============================================================================
@@ -171,7 +175,9 @@ save_matlab_files(rec, sess, 'HPC',
 
 
 
-
+#%%
+# data_B_low = load_lfp_data(r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC\2022-08-01_04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk\lfp_B_epoch_low_speed.mat')
+# data_L_low = load_lfp_data(r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC\2022-08-01_04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk\lfp_L_epoch_low_speed.mat')
 
 
 
