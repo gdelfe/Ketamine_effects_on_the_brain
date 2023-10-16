@@ -11,19 +11,24 @@ addpath('C:\Users\fentonlab\Desktop\Gino\chronux_2_11\');
 addpath('C:\Users\fentonlab\Desktop\Gino\Gino_codes\');
 
 main_dir = 'C:\Users\fentonlab\Desktop\Gino\LFPs\';
-HPC_file = strcat(main_dir,'HPC_lfp_paths.mat')
-PFC_file = strcat(main_dir,'PFC_lfp_paths.mat')
+HPC_file = strcat(main_dir,'HPC_lfp_paths.mat');
+PFC_file = strcat(main_dir,'PFC_lfp_paths.mat');
+
+main_dir_HPC = 'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC';
+main_dir_PFC = 'C:\Users\fentonlab\Desktop\Gino\LFPs\PFC';
 
 load(HPC_file) 
+Paths_HPC = extract_paths(HPC_file_list);
 
-% main_dir = 'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC\2022-08-01_04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk\'; % ketamine
-main_dir = 'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC\2022-07-27-07-41-00_M015_SAL_PFC_HPC_0_0_0mpk\'; % saline
+sess = 1;
+
+BRAIN_reg_rec_dir = strcat(main_dir_HPC,Paths_HPC{sess})
 
 display(['Loading LFP data ...'])
-load(strcat(main_dir,'lfp_B_epoch_low_speed.mat')); % channel x minute x trial x lfp
-load(strcat(main_dir,'lfp_L_epoch_low_speed.mat')); % channel x minute x trial x lfp
-load(strcat(main_dir,'lfp_M_epoch_low_speed.mat')); % channel x minute x trial x lfp
-load(strcat(main_dir,'lfp_H_epoch_low_speed.mat')); % channel x minute x trial x lfp
+load(strcat(BRAIN_reg_rec_dir,'\lfp_B_epoch_low_speed.mat')); % channel x minute x trial x lfp
+load(strcat(BRAIN_reg_rec_dir,'\lfp_L_epoch_low_speed.mat')); % channel x minute x trial x lfp
+load(strcat(BRAIN_reg_rec_dir,'\lfp_M_epoch_low_speed.mat')); % channel x minute x trial x lfp
+load(strcat(BRAIN_reg_rec_dir,'\lfp_H_epoch_low_speed.mat')); % channel x minute x trial x lfp
 
 % plot 1 min lfp to check data is loaded correctly 
 figure;
