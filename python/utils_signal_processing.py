@@ -6,7 +6,7 @@ Spyder Editor
 
 import numpy as np
 
-from scipy.signal import butter, lfilter, freqz, iirnotch, welch, filtfilt 
+from scipy.signal import butter, lfilter, freqz, iirnotch, welch, filtfilt, iirfilter, iirfilter 
 from scipy.interpolate import interp1d
 from scipy.stats import zscore
 import sys
@@ -57,6 +57,20 @@ def notch_filter(data, notch_freq, fs=2500, Q=30):
     for i in range(data.shape[1]):
         filtered_data[:, i] = lfilter(b, a, data[:, i])
 
+    return filtered_data
+
+# -----------------------------------------------------
+
+
+def bandstop_filter(data, f_low, f_high, fs=2500, order=4):
+    nyq = 0.5 * fs
+    low = f_low / nyq
+    high = f_high / nyq
+
+    b, a = iirfilter(N=order, Wn=[low, high], btype='bandstop', ftype='butter')
+    
+    filtered_data = lfilter(b, a, data)
+    
     return filtered_data
 
 
@@ -160,23 +174,31 @@ def lfp_artifacts_mask(lfp_dec,win,std_th):
 # =============================================================================
 
 # scale Lfp into mV and band pass it at [1,300] Hz by using a non-causal filter
+# Apply notch filter at 60 Hz to remove power line distortion
 
-def filter_lfp_in_each_epoch(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min,gain):
+def filter_lfp_in_each_epoch(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min,gain,qband):
 
     print('Filtering Lfp ...')
+    
     # baseline
     lfp_scaled_B = Lfp_B_min*gain*1e6 # scale in mV
-    lfp_filt_B = bandpass_filter(lfp_scaled_B, lowcut = 1, highcut = 300, fs=2500, order=5) # band pass filter at 1 Hz and 300 Hz
+    lfp_filt_B_bp = bandpass_filter(lfp_scaled_B, lowcut = 1, highcut = 300, fs=2500, order=5) # band pass filter at 1 Hz and 300 Hz
+    lfp_filt_B = notch_filter(lfp_filt_B_bp, 60, fs=2500, Q=qband)
+    
     # low injection 
     lfp_scaled_L = Lfp_L_min*gain*1e6 # scale in mV
-    lfp_filt_L = bandpass_filter(lfp_scaled_L, lowcut = 1, highcut = 300, fs=2500, order=5) # band pass filter at 1 Hz and 300 Hz
+    lfp_filt_L_bp = bandpass_filter(lfp_scaled_L, lowcut = 1, highcut = 300, fs=2500, order=5) # band pass filter at 1 Hz and 300 Hz
+    lfp_filt_L = notch_filter(lfp_filt_L_bp, 60, fs=2500, Q=qband)
+    
     # mid injection 
     lfp_scaled_M = Lfp_M_min*gain*1e6 # scale in mV
-    lfp_filt_M = bandpass_filter(lfp_scaled_M, lowcut = 1, highcut = 300, fs=2500, order=5) # band pass filter at 1 Hz and 300 Hz
+    lfp_filt_M_bp = bandpass_filter(lfp_scaled_M, lowcut = 1, highcut = 300, fs=2500, order=5) # band pass filter at 1 Hz and 300 Hz
+    lfp_filt_M = notch_filter(lfp_filt_M_bp, 60, fs=2500, Q=qband)
+    
     # high injection 
     lfp_scaled_H = Lfp_H_min*gain*1e6 # scale in mV
-    lfp_filt_H = bandpass_filter(lfp_scaled_H, lowcut = 1, highcut = 300, fs=2500, order=5) # band pass filter at 1 Hz and 300 Hz
-
+    lfp_filt_H_bp = bandpass_filter(lfp_scaled_H, lowcut = 1, highcut = 300, fs=2500, order=5) # band pass filter at 1 Hz and 300 Hz
+    lfp_filt_H = notch_filter(lfp_filt_H_bp, 60, fs=2500, Q=qband)
 
     return lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H
 
