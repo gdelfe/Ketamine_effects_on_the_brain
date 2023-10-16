@@ -14,6 +14,7 @@ from utils_general import *
 
 sess = 1 # session number 
 tot_min = 20
+qband = 200 # Q factor in the notch filter 
 
 binFullPath = r'C:\Users\fentonlab\Desktop\Gino\LFPs'
 HPC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs','HPC_lfp_paths.file')
@@ -25,8 +26,9 @@ PFC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs','PFC_lfp_pa
 # =============================================================================
 
 # ====== Load Lfp and speed data for a specific recording and brain area 
-Lfp, speed, gain, rec = load_data(binFullPath,HPC_path_file,PFC_path_file,"HPC",sess)
+Lfp, speed, gain, rec = load_data(binFullPath,HPC_path_file,PFC_path_file,"PFC",sess)
 
+#%%
 # ====== Detect bad (silent) Lfp channel (if it exist)
 bad_flag, next_id, bad_id = detect_silent_lfp_channel(Lfp,4,4,2500)
 
@@ -103,7 +105,7 @@ for current_min in range(0,tot_min):
     # =============================================================================
     
     # ====== Filter Lfp in each epoch
-    lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H = filter_lfp_in_each_epoch(Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg, gain)
+    lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H = filter_lfp_in_each_epoch(Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg, gain, qband)
     
     # plot_filtered_lfp(lfp_filt_B,0,10,1,36, 2500)
     
