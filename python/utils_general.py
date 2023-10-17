@@ -448,6 +448,8 @@ def create_speed_mask(speed_up,win,thresh,level,period):
 
 # win = window length, e.g. 1250 = 1 sec
 # th = speed threshold 
+
+# Input: 1 min Lfp in the form: time x channel
     
 def make_speed_and_lfp_maks(lfp_dec_B,lfp_dec_L, lfp_dec_M, lfp_dec_H, speed_dec_B, speed_dec_L, speed_dec_M, speed_dec_H, win = 1250, th = 30):
     
@@ -574,7 +576,46 @@ def stack_lfp_1min(lfp_B_epoch,lfp_L_epoch,lfp_M_epoch,lfp_H_epoch,lfp_B_list,lf
 
 # =============================================================================
 
-import pdb
+def stack_lfp_1min_all_trials(lfp_B_epoch,lfp_L_epoch,lfp_M_epoch,lfp_H_epoch, lfp_dec_B, lfp_dec_L, lfp_dec_M, lfp_dec_H):
+     
+
+    lfp_B_epoch.append(lfp_dec_B) # add one minute lfp: trial num x trial length, for each channel
+    lfp_L_epoch.append(lfp_dec_L)
+    lfp_M_epoch.append(lfp_dec_M)
+    lfp_H_epoch.append(lfp_dec_H)
+    
+    
+    
+    return lfp_B_epoch, lfp_L_epoch, lfp_M_epoch, lfp_H_epoch
+
+
+# =============================================================================
+
+
+def stack_mask_1min_(mask_B_low, mask_L_low, mask_M_low, mask_H_low, 
+                     mask_B_high, mask_L_high, mask_M_high, mask_H_high,
+                     tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s,
+                     tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s, tot_mask_H_high_s):
+     
+
+    mask_B_low.append(tot_mask_B_low_s) # add one minute lfp: trial num x trial length, for each channel
+    mask_L_low.append(tot_mask_L_low_s) 
+    mask_M_low.append(tot_mask_M_low_s)
+    mask_H_low.append(tot_mask_H_low_s)
+    
+    mask_B_high.append(tot_mask_B_high_s) # add one minute lfp: trial num x trial length, for each channel
+    mask_L_high.append(tot_mask_L_high_s) 
+    mask_M_high.append(tot_mask_M_high_s)
+    mask_H_high.append(tot_mask_H_high_s)
+    
+    
+    
+    return mask_B_low, mask_L_low, mask_M_low, mask_H_low, mask_B_high, mask_L_high, mask_M_high, mask_H_high
+
+
+# =============================================================================
+
+
 def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_ep_low_s, lfp_H_ep_low_s, lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s):
     
     main_dir = r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC'
@@ -631,6 +672,103 @@ def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_
     savemat(out_file_H,mat_lfp_H)
     
     
+# =============================================================================
+
+# Save the whole Lfp in the form: min x time x channel
+# Save masks for low speed-no artifact and high speed-no artifcats
+
+def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, 
+                               tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s,
+                               tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s, tot_mask_H_high_s):
+    
+    main_dir = r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC'
+    path = rec[sess][brain_reg]
+    
+    dir_sess = path.split('\\')[-3] # path for session directory
+    full_dir_path = os.path.join(main_dir,dir_sess)
+    
+    if not os.path.exists(full_dir_path):
+        os.makedirs(full_dir_path)
+    
+    # =============================================================================
+    #     Lfp all trials 
+    # =============================================================================
+    
+    # file path to save Lfp in matlab 
+    out_file_B = os.path.join(full_dir_path, "lfp_B_epoch_all_trials.mat")
+    out_file_L = os.path.join(full_dir_path, "lfp_L_epoch_all_trials.mat")
+    out_file_M = os.path.join(full_dir_path, "lfp_M_epoch_all_trials.mat")
+    out_file_H = os.path.join(full_dir_path, "lfp_H_epoch_all_trials.mat")
+
+    
+    # create dictionaries to save in matlab
+    mat_lfp_B = {'lfp_B_all': np.array(lfp_B_ep)}
+    mat_lfp_L = {'lfp_L_all': np.array(lfp_L_ep)}
+    mat_lfp_M = {'lfp_M_all': np.array(lfp_M_ep)}
+    mat_lfp_H = {'lfp_H_all': np.array(lfp_H_ep)}
+        
+    # save lfp for each epoch in matlab format 
+    savemat(out_file_B,mat_lfp_B)
+    savemat(out_file_L,mat_lfp_L)
+    savemat(out_file_M,mat_lfp_M)
+    savemat(out_file_H,mat_lfp_H)
+    
+    # =============================================================================
+    #     Mask low speed - no artifact
+    # =============================================================================    
+    
+    # file path to save Masks, low speed-no artifact in matlab 
+    
+    out_file_B = os.path.join(full_dir_path, "mask_low_B.mat")
+    out_file_L = os.path.join(full_dir_path, "mask_low_L.mat")
+    out_file_M = os.path.join(full_dir_path, "mask_low_M.mat")
+    out_file_H = os.path.join(full_dir_path, "mask_low_H.mat")
+
+    
+    # create dictionaries to save in matlab
+    mat_mask_B = {'mask_B_low': tot_mask_B_low_s}
+    mat_mask_L = {'mask_L_low': tot_mask_L_low_s}
+    mat_mask_M = {'mask_M_low': tot_mask_M_low_s}
+    mat_mask_H = {'mask_H_low': tot_mask_H_low_s}
+    
+        
+    # save lfp for each epoch in matlab format 
+    savemat(out_file_B,mat_mask_B)
+    savemat(out_file_L,mat_mask_L)
+    savemat(out_file_M,mat_mask_M)
+    savemat(out_file_H,mat_mask_H)
+
+    # =============================================================================
+    #     Mask low speed - no artifact
+    # =============================================================================
+    
+    # file path to save Masks, low speed-no artifact in matlab 
+    
+    out_file_B = os.path.join(full_dir_path, "mask_high_B.mat")
+    out_file_L = os.path.join(full_dir_path, "mask_high_L.mat")
+    out_file_M = os.path.join(full_dir_path, "mask_high_M.mat")
+    out_file_H = os.path.join(full_dir_path, "mask_high_H.mat")
+
+    
+    # create dictionaries to save in matlab
+    mat_mask_B = {'mask_B_high': tot_mask_B_high_s}
+    mat_mask_L = {'mask_L_high': tot_mask_L_high_s}
+    mat_mask_M = {'mask_M_high': tot_mask_M_high_s}
+    mat_mask_H = {'mask_H_high': tot_mask_H_high_s}
+    
+        
+    # save lfp for each epoch in matlab format 
+    savemat(out_file_B,mat_mask_B)
+    savemat(out_file_L,mat_mask_L)
+    savemat(out_file_M,mat_mask_M)
+    savemat(out_file_H,mat_mask_H)
+    
+
+    
+    
+# =============================================================================
+
+
 
 # Example to load the saved MAT files in Python:
 def load_lfp_data(filename):

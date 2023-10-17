@@ -12,7 +12,7 @@ from utils_general import *
 
 
 
-sess = 1 # session number 
+sess = 2 # session number 
 tot_min = 20
 qband = 200 # Q factor in the notch filter 
 
@@ -26,9 +26,9 @@ PFC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs','PFC_lfp_pa
 # =============================================================================
 
 # ====== Load Lfp and speed data for a specific recording and brain area 
-Lfp, speed, gain, rec = load_data(binFullPath,HPC_path_file,PFC_path_file,"PFC",sess)
+Lfp, speed, gain, rec = load_data(binFullPath,HPC_path_file,PFC_path_file,"HPC",sess)
 
-#%%
+
 # ====== Detect bad (silent) Lfp channel (if it exist)
 bad_flag, next_id, bad_id = detect_silent_lfp_channel(Lfp,4,4,2500)
 
@@ -67,6 +67,24 @@ lfp_B_ep_high_s = [[] for ch in range(nch)]
 lfp_L_ep_high_s = [[] for ch in range(nch)]
 lfp_M_ep_high_s = [[] for ch in range(nch)]
 lfp_H_ep_high_s = [[] for ch in range(nch)]
+
+# all trials 
+lfp_B_ep = []
+lfp_L_ep = []
+lfp_M_ep = []
+lfp_H_ep = []
+
+# mask low 
+mask_B_low = []
+mask_L_low = []
+mask_M_low = []
+mask_H_low = []
+
+# mask high 
+mask_B_high = []
+mask_L_high = []
+mask_M_high = []
+mask_H_high = []
 
 
 # =============================================================================
@@ -113,7 +131,9 @@ for current_min in range(0,tot_min):
     lfp_dec_B, lfp_dec_L, lfp_dec_M, lfp_dec_H, speed_dec_B, speed_dec_L, speed_dec_M, speed_dec_H = \
         decimate_lfp_and_speed(lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H, speed_B_min,speed_L_min,speed_M_min,speed_H_min)
     
-
+    # ====== Stack lfp all trials for each minute together 
+    lfp_B_ep,lfp_L_ep,lfp_M_ep,lfp_H_ep = \
+        stack_lfp_1min_all_trials(lfp_B_ep,lfp_L_ep,lfp_M_ep,lfp_H_ep, lfp_dec_B, lfp_dec_L, lfp_dec_M, lfp_dec_H)
 
     # =============================================================================
     # MASKING SPEED AND LFP ARTIFACTS 
@@ -121,6 +141,13 @@ for current_min in range(0,tot_min):
     
     tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s, tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s,tot_mask_H_high_s = \
         make_speed_and_lfp_maks(lfp_dec_B,lfp_dec_L, lfp_dec_M, lfp_dec_H, speed_dec_B, speed_dec_L, speed_dec_M, speed_dec_H, win = 1250, th = 30)
+  
+    # ====== Stack lfp all trials for each minute toget
+    mask_B_low, mask_L_low, mask_M_low, mask_H_low, mask_B_high, mask_L_high, mask_M_high, mask_H_high = \
+        stack_mask_1min_(mask_B_low, mask_L_low, mask_M_low, mask_H_low, 
+                         mask_B_high, mask_L_high, mask_M_high, mask_H_high,
+                         tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s,
+                         tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s, tot_mask_H_high_s)
     
     # =============================================================================
     #  Reshape Lfp into: trial number, trial length, channels
@@ -131,7 +158,9 @@ for current_min in range(0,tot_min):
     LfpRB = lfp_dec_B.reshape(int(lfp_dec_B.shape[0]/win),-1,lfp_dec_B.shape[1]) # reshape Lfp: trial x win length x channel
     LfpRL = lfp_dec_L.reshape(int(lfp_dec_L.shape[0]/win),-1,lfp_dec_L.shape[1]) # reshape Lfp: trial x win length x channel
     LfpRM = lfp_dec_M.reshape(int(lfp_dec_M.shape[0]/win),-1,lfp_dec_M.shape[1]) # reshape Lfp: trial x win length x channel
-    LfpRH = lfp_dec_H.reshape(int(lfp_dec_H.shape[0]/win),-1,lfp_dec_H.shape[1]) # reshape Lfp: trial x win length x channel
+    LfpRH = lfp_dec_H.reshape(int(lfp_dec_H.shape[0]/win),-1,lfp_dec_H.shape[1]) # reshape Lfp: trial x win length x 
+    
+    
     
     print('reshaped Lfp, ', LfpRB.shape, LfpRL.shape, LfpRM.shape, LfpRH.shape)
     
@@ -169,16 +198,17 @@ for current_min in range(0,tot_min):
 # Save files in matlab
 # =============================================================================
 
-print('Saving ...')
+print('Saving Lfp split into trials ...')
 save_matlab_files(rec, sess, 'HPC', 
                   lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_ep_low_s, lfp_H_ep_low_s, 
                   lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s)
 
 
 
-#%%
 # data_B_low = load_lfp_data(r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC\2022-08-01_04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk\lfp_B_epoch_low_speed.mat')
 # data_L_low = load_lfp_data(r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC\2022-08-01_04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk\lfp_L_epoch_low_speed.mat')
 
-
-
+print('Saving lfp whole min recording + masks ...')
+save_matlab_files_all_lfps(rec,sess,'HPC', lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, 
+                               mask_B_low, mask_L_low, mask_M_low, mask_H_low, 
+                               mask_B_high, mask_L_high, mask_M_high, mask_H_high)
