@@ -38,10 +38,18 @@ load(strcat(BRAIN_reg_rec_dir,'\lfp_L_epoch_all_trials.mat')); % channel x minut
 load(strcat(BRAIN_reg_rec_dir,'\lfp_M_epoch_all_trials.mat')); % channel x minute x trial x lfp
 load(strcat(BRAIN_reg_rec_dir,'\lfp_H_epoch_all_trials.mat')); % channel x minute x trial x lfp
 
+% low speed masks
 load(strcat(BRAIN_reg_rec_dir,'\mask_low_B.mat')); % channel x minute x trial x lfp
 load(strcat(BRAIN_reg_rec_dir,'\mask_low_L.mat')); % channel x minute x trial x lfp
 load(strcat(BRAIN_reg_rec_dir,'\mask_low_M.mat')); % channel x minute x trial x lfp
 load(strcat(BRAIN_reg_rec_dir,'\mask_low_H.mat')); % channel x minute x trial x lfp
+
+
+% high speed masks
+load(strcat(BRAIN_reg_rec_dir,'\mask_high_B.mat')); % channel x minute x trial x lfp
+load(strcat(BRAIN_reg_rec_dir,'\mask_high_L.mat')); % channel x minute x trial x lfp
+load(strcat(BRAIN_reg_rec_dir,'\mask_high_M.mat')); % channel x minute x trial x lfp
+load(strcat(BRAIN_reg_rec_dir,'\mask_high_H.mat')); % channel x minute x trial x lfp
 
 
 % plot 1 min lfp to check data is loaded correctly 
@@ -69,13 +77,13 @@ fs = 1250;
 start = 1 % 30*fs;
 ends = 60*fs;
 fk = [0 100]; % freq range
-tapers = [0.4 5]; % Time resolution, Freq. resoluzion
+tapers = [0.6 5]; % Time resolution, Freq. resoluzion
 k = floor(2*tapers(1)*tapers(2) - 1) % number of tapers used
 dn = 0.05; % sliding step
 pad = 2;
 
 min = 15;
-X = sq(lfp_H_all(min,start:ends,:))';
+X = sq(lfp_B_all(min,start:ends,:))';
 title_spec = sprintf('min %d',min);
 step_t = 10;
 step_f = 10;
@@ -84,6 +92,11 @@ epoch = 'high';
 [spec, f, ti] = tfspec(X, tapers, fs, dn, fk, pad, 0.05,1);
 plot_spectrogram(X, spec, f, ti, fs, step_t, step_f, title_spec, epoch,[]);
 plot_spectrogram(X, spec, f, ti, fs, step_t, step_f, title_spec, epoch, "zscore");
+
+
+
+
+
 
 
 

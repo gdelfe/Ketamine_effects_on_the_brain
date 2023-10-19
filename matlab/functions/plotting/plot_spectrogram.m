@@ -26,12 +26,12 @@ fig = figure('Position', [50, 100, 1700, 200]);
 if isempty(norm)
     tvimage(log10(spec))
     colorbar
-    str_title = ['no norm - Epoch:', epoch,' - ', str_title];
+    str_title = ['no norm - Epoch: ', epoch,' - ', str_title];
 % zscore along frequency normalization 
 elseif strcmp(norm,'zscore')
     tvimage(zscore(log10(spec),1,2))
     colorbar
-    str_title = ['zscored - Epoch:', epoch,' - ', str_title];
+    str_title = ['zscored - Epoch: ', epoch,' - ', str_title];
 end
 
 set(gca, 'XTick',valx_idx, 'XTickLabel',valxlbl)

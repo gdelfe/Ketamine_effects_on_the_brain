@@ -29,6 +29,7 @@ plt.rcParams['pdf.fonttype'] = 42
 import sys
 import pickle
 from utils_plotting import *
+import pdb
 
 
 def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
@@ -460,7 +461,7 @@ def make_speed_and_lfp_maks(lfp_dec_B,lfp_dec_L, lfp_dec_M, lfp_dec_H, speed_dec
     # =============================================================================
         
     # Create mask for artifact trials in Lfp
-
+    
     mask_trial_B, lfp_mask_B, good_trial_rate_B = lfp_artifacts_mask(lfp_dec_B,win,4)
     mask_trial_L, lfp_mask_L, good_trial_rate_L = lfp_artifacts_mask(lfp_dec_L,win,4)
     mask_trial_M, lfp_mask_M, good_trial_rate_M = lfp_artifacts_mask(lfp_dec_M,win,4)
