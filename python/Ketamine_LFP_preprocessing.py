@@ -92,7 +92,7 @@ mask_H_high = []
 # =============================================================================
 
 
-for current_min in range(0,tot_min):
+for current_min in range(14,15):
     
     print('\n# ======== Current minute = {}  ----------------------- \n'.format(current_min))
     
@@ -193,7 +193,7 @@ for current_min in range(0,tot_min):
     print('nch ', len(lfp_B_ep_low_s), 'n. min ', len(lfp_B_ep_low_s[0][0]),' size', lfp_B_ep_low_s[0][0].shape)
 
 
-
+#%%
 # =============================================================================
 # Save files in matlab
 # =============================================================================
