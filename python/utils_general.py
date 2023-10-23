@@ -635,50 +635,23 @@ def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_
     # file path to save in matlab 
     out_file = os.path.join(full_dir_path, "lfp_epoch_low_speed.mat")
     
-    out_file_B = os.path.join(full_dir_path, "lfp_B_epoch_low_speed.mat")
-    out_file_L = os.path.join(full_dir_path, "lfp_L_epoch_low_speed.mat")
-    out_file_M = os.path.join(full_dir_path, "lfp_M_epoch_low_speed.mat")
-    out_file_H = os.path.join(full_dir_path, "lfp_H_epoch_low_speed.mat")
-    
-    # create dictionaries to save in matlab
-    mat_lfp_B = {'lfp_B': lfp_B_ep_low_s}
-    mat_lfp_L = {'lfp_L': lfp_L_ep_low_s}
-    mat_lfp_M = {'lfp_M': lfp_M_ep_low_s}
-    mat_lfp_H = {'lfp_H': lfp_H_ep_low_s}
-    
     mat_lfp = {'B': lfp_B_ep_low_s,
                'L': lfp_L_ep_low_s,
                'M': lfp_M_ep_low_s,
                'H': lfp_H_ep_low_s}
                
     data_lfp = {'lfp': mat_lfp}
-    savemat(out_file, data_lfp)
     
     # save lfp for each epoch in matlab format 
-    savemat(out_file_B,mat_lfp_B)
-    savemat(out_file_L,mat_lfp_L)
-    savemat(out_file_M,mat_lfp_M)
-    savemat(out_file_H,mat_lfp_H)
+    savemat(out_file, data_lfp)
     
+
     # =============================================================================
     #     High Speed Lfp 
     # =========================================================================
     
     # file path to save in matlab 
-    
     out_file = os.path.join(full_dir_path, "lfp_epoch_high_speed.mat")
-
-
-    out_file_B = os.path.join(full_dir_path, "lfp_B_epoch_high_speed.mat")
-    out_file_L = os.path.join(full_dir_path, "lfp_L_epoch_high_speed.mat")
-    out_file_M = os.path.join(full_dir_path, "lfp_M_epoch_high_speed.mat")
-    out_file_H = os.path.join(full_dir_path, "lfp_H_epoch_high_speed.mat")
-    
-    # create dictionaries to save in matlab
-    mat_lfp_B = {'lfp_B': lfp_B_ep_high_s}
-    mat_lfp_L = {'lfp_L': lfp_L_ep_high_s}
-    mat_lfp_M = {'lfp_M': lfp_M_ep_high_s}
-    mat_lfp_H = {'lfp_H': lfp_H_ep_high_s}
     
     mat_lfp = {'B': lfp_B_ep_high_s,
                'L': lfp_L_ep_high_s,
@@ -686,13 +659,10 @@ def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_
                'H': lfp_H_ep_high_s}
     
     data_lfp = {'lfp': mat_lfp}
-    savemat(out_file, data_lfp)
     
     # save lfp for each epoch in matlab format 
-    savemat(out_file_B,mat_lfp_B)
-    savemat(out_file_L,mat_lfp_L)
-    savemat(out_file_M,mat_lfp_M)
-    savemat(out_file_H,mat_lfp_H)
+    savemat(out_file, data_lfp)
+    
     
     
 # =============================================================================
@@ -712,82 +682,53 @@ def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep,
     
     if not os.path.exists(full_dir_path):
         os.makedirs(full_dir_path)
+        
     
     # =============================================================================
     #     Lfp all trials 
     # =============================================================================
     
-    # file path to save Lfp in matlab 
-    out_file_B = os.path.join(full_dir_path, "lfp_B_epoch_all_trials.mat")
-    out_file_L = os.path.join(full_dir_path, "lfp_L_epoch_all_trials.mat")
-    out_file_M = os.path.join(full_dir_path, "lfp_M_epoch_all_trials.mat")
-    out_file_H = os.path.join(full_dir_path, "lfp_H_epoch_all_trials.mat")
-
+    # file path to save in matlab 
+    out_file = os.path.join(full_dir_path, "lfp_epoch_all_trials.mat")
     
-    # create dictionaries to save in matlab
-    mat_lfp_B = {'lfp_B_all': np.array(lfp_B_ep)}
-    mat_lfp_L = {'lfp_L_all': np.array(lfp_L_ep)}
-    mat_lfp_M = {'lfp_M_all': np.array(lfp_M_ep)}
-    mat_lfp_H = {'lfp_H_all': np.array(lfp_H_ep)}
-        
+    mat_lfp = {'B': np.array(lfp_B_ep),
+               'L': np.array(lfp_L_ep),
+               'M': np.array(lfp_M_ep),
+               'H': np.array(lfp_H_ep)}
+    
+    data_lfp_all = {'lfp_all': mat_lfp}
+    
     # save lfp for each epoch in matlab format 
-    savemat(out_file_B,mat_lfp_B)
-    savemat(out_file_L,mat_lfp_L)
-    savemat(out_file_M,mat_lfp_M)
-    savemat(out_file_H,mat_lfp_H)
+    savemat(out_file, data_lfp_all)
+    
     
     # =============================================================================
-    #     Mask low speed - no artifact
+    #     Mask low/high speed - no artifact
     # =============================================================================    
     
     # file path to save Masks, low speed-no artifact in matlab 
     
-    out_file_B = os.path.join(full_dir_path, "mask_low_B.mat")
-    out_file_L = os.path.join(full_dir_path, "mask_low_L.mat")
-    out_file_M = os.path.join(full_dir_path, "mask_low_M.mat")
-    out_file_H = os.path.join(full_dir_path, "mask_low_H.mat")
+    out_file = os.path.join(full_dir_path, "mask_low_high_speed.mat")
 
     
     # create dictionaries to save in matlab
-    mat_mask_B = {'mask_B_low': tot_mask_B_low_s}
-    mat_mask_L = {'mask_L_low': tot_mask_L_low_s}
-    mat_mask_M = {'mask_M_low': tot_mask_M_low_s}
-    mat_mask_H = {'mask_H_low': tot_mask_H_low_s}
+    mat_mask = {'B_low': tot_mask_B_low_s,
+                'L_low': tot_mask_L_low_s,
+                'M_low': tot_mask_M_low_s,
+                'H_low': tot_mask_H_low_s,
+                'B_high': tot_mask_B_high_s,
+                'L_high': tot_mask_L_high_s,
+                'M_high': tot_mask_M_high_s,
+                'H_high': tot_mask_H_high_s}
     
         
     # save lfp for each epoch in matlab format 
-    savemat(out_file_B,mat_mask_B)
-    savemat(out_file_L,mat_mask_L)
-    savemat(out_file_M,mat_mask_M)
-    savemat(out_file_H,mat_mask_H)
-
-    # =============================================================================
-    #     Mask low speed - no artifact
-    # =============================================================================
+    data_mask = {'mask': mat_mask}
     
-    # file path to save Masks, low speed-no artifact in matlab 
-    
-    out_file_B = os.path.join(full_dir_path, "mask_high_B.mat")
-    out_file_L = os.path.join(full_dir_path, "mask_high_L.mat")
-    out_file_M = os.path.join(full_dir_path, "mask_high_M.mat")
-    out_file_H = os.path.join(full_dir_path, "mask_high_H.mat")
-
-    
-    # create dictionaries to save in matlab
-    mat_mask_B = {'mask_B_high': tot_mask_B_high_s}
-    mat_mask_L = {'mask_L_high': tot_mask_L_high_s}
-    mat_mask_M = {'mask_M_high': tot_mask_M_high_s}
-    mat_mask_H = {'mask_H_high': tot_mask_H_high_s}
-    
-        
     # save lfp for each epoch in matlab format 
-    savemat(out_file_B,mat_mask_B)
-    savemat(out_file_L,mat_mask_L)
-    savemat(out_file_M,mat_mask_M)
-    savemat(out_file_H,mat_mask_H)
-    
+    savemat(out_file, data_mask)
 
-    
+ 
     
 # =============================================================================
 
