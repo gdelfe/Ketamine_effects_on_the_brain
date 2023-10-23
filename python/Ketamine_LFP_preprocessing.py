@@ -92,7 +92,7 @@ mask_H_high = []
 # =============================================================================
 
 
-for current_min in range(14,15):
+for current_min in range(0,tot_min):
     
     print('\n# ======== Current minute = {}  ----------------------- \n'.format(current_min))
     
