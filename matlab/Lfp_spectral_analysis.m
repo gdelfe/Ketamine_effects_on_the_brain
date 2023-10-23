@@ -78,19 +78,25 @@ spec_par.dn = 0.05; % sliding step
 save_spectrograms(spec_rec, BRAIN_reg_rec_dir)
 
 % load spectrograms whole HPC 
-load_spectrograms(BRAIN_reg_rec_dir)
+load_spectrograms(BRAIN_reg_rec_dir);
 
 title_spec = sprintf('min %d',min);
 step_t = 10;
 step_f = 20;
 epoch = 'high';
 
+% plot single spectrograms:
+% no-normalization
 plot_spectrogram(X, spec, f, ti, fs, step_t, step_f, title_spec, epoch,[]);
+% zscore normalization 
 plot_spectrogram(X, spec, f, ti, fs, step_t, step_f, title_spec, epoch, "zscore");
 
+% plot multiple spectrograms, same epoch 
+X = sq(lfp_all.B(1,start:ends,:))';
+plot_20_min_spectrograms(spec_rec.B, spec_rec, X, fs, step_t, step_f, 1:5,'base')
 
-X = sq(lfp_B_all(min,start:ends,:))';
-plot_20_min_spectrograms(spec_rec.H, spec_rec, X, fs, step_t, step_f, 1:10)
+% plot 1 min spectrogram, all epochs 
+plot_spectrograms_all_epochs(X, spec_rec, fs, step_t, step_f, 10)
 
 
 f_gamma = find(f>20 & f<50);
