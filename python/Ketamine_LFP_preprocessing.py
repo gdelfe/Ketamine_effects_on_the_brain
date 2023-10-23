@@ -12,7 +12,7 @@ from utils_general import *
 
 
 
-sess = 2 # session number 
+sess = 0 # session number 
 tot_min = 20
 qband = 200 # Q factor in the notch filter 
 
@@ -193,7 +193,6 @@ for current_min in range(0,tot_min):
     print('nch ', len(lfp_B_ep_low_s), 'n. min ', len(lfp_B_ep_low_s[0][0]),' size', lfp_B_ep_low_s[0][0].shape)
 
 
-#%%
 # =============================================================================
 # Save files in matlab
 # =============================================================================

@@ -1,5 +1,5 @@
 
-function [spec_B, spec_L, spec_M, spec_H, f] = spectrograms_across_min(lfp_B_all, lfp_L_all, lfp_M_all, lfp_H_all, W, fk)
+function [psd] = spectrograms_across_min(lfp_agg, W, fk)
 
 display(['Computing PSD for the whole recoding  ...'])
 % W = 3; % Frequency resolution for PSD 
@@ -7,16 +7,23 @@ N = 1250; % Lenght of time series
 sampling = 1250; % sampling 
 % fk = 100; % max frequency
 
-spec_B = []; spec_L = []; spec_M = []; spec_H = [];
-for min =1:size(lfp_B_all,1) % for all the min 
-    [spec_B_min, f, err] = dmtspec(lfp_B_all{min},[N/sampling,W],sampling,fk,2,0.05,1);
-    spec_B = [spec_B; spec_B_min];
-    [spec_L_min, f, err] = dmtspec(lfp_L_all{min},[N/sampling,W],sampling,fk,2,0.05,1);
-    spec_L = [spec_L; spec_L_min];
-    [spec_M_min, f, err] = dmtspec(lfp_M_all{min},[N/sampling,W],sampling,fk,2,0.05,1);
-    spec_M = [spec_M; spec_M_min];
-    [spec_H_min, f, err] = dmtspec(lfp_H_all{min},[N/sampling,W],sampling,fk,2,0.05,1);
-    spec_H = [spec_H; spec_H_min];
+psd_B = []; psd_L = []; psd_M = []; psd_H = [];
+for min =1:size(lfp_agg.B,1) % for all the min 
+    [psd_B_min, f, err] = dmtspec(lfp_agg.B{min},[N/sampling,W],sampling,fk,2,0.05,1);
+    psd_B = [psd_B; psd_B_min];
+    [psd_L_min, f, err] = dmtspec(lfp_agg.L{min},[N/sampling,W],sampling,fk,2,0.05,1);
+    psd_L = [psd_L; psd_L_min];
+    [psd_M_min, f, err] = dmtspec(lfp_agg.M{min},[N/sampling,W],sampling,fk,2,0.05,1);
+    psd_M = [psd_M; psd_M_min];
+    [psd_H_min, f, err] = dmtspec(lfp_agg.H{min},[N/sampling,W],sampling,fk,2,0.05,1);
+    psd_H = [psd_H; psd_H_min];
 end
+
+psd.B = psd_B;
+psd.L = psd_L;
+psd.M = psd_M;
+psd.H = psd_H;
+psd.f = f;
+
 
 end 
