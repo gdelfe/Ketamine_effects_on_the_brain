@@ -1,6 +1,6 @@
 % plot several spectrogram together, one for every min of recording
 
-function plot_20_min_spectrograms(spec, spec_rec, X, fs, step_t, step_f, minRange)
+function plot_20_min_spectrograms(spec, spec_rec, X, fs, step_t, step_f, minRange,epoch)
 
 ts = linspace(0,size(X,2)/fs,size(X,2));
 ti = spec_rec.t;
@@ -17,7 +17,7 @@ for min = minRange % numb of minute
     subplot(minRange(end),1,min)
     tvimage(zscore(log10(sq(spec(:,:,min))),1,2))
     colorbar
-    title(sprintf('min = %d',min),'FontSize',8)
+    title(sprintf('%s, min = %d',epoch, min),'FontSize',8)
     set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
     set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
 %     ylim([1 ,max(y_idx)])
