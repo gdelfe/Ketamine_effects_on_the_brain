@@ -1,14 +1,15 @@
 
-function plot_psd_20_min(spec_B, spec_L, spec_M, spec_H, f, main_title)
+function plot_psd_20_min(psd, main_title)
 
 figure('Position', [0, 0, 1000, 3900]);
+f = psd.f;
 
-for min = 1:size(spec_B,1)
+for min = 1:size(psd.B,1)
     subplot(5,4,min)
-    plot(f,log10(spec_B(min,:)),'LineWidth', 2); hold on
-    plot(f,log10(spec_L(min,:)),'LineWidth', 2); hold on
-    plot(f,log10(spec_M(min,:)),'LineWidth', 2); hold on
-    plot(f,log10(spec_H(min,:)),'LineWidth', 2); 
+    plot(f,log10(psd.B(min,:)),'LineWidth', 2); hold on
+    plot(f,log10(psd.L(min,:)),'LineWidth', 2); hold on
+    plot(f,log10(psd.M(min,:)),'LineWidth', 2); hold on
+    plot(f,log10(psd.H(min,:)),'LineWidth', 2); 
     title(sprintf('min = %d',min))
     grid on
     % Adjust subplot spacing for minimal space between them
