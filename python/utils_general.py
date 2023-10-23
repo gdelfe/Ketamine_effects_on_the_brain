@@ -125,7 +125,7 @@ def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
     # =============================================================================
     
     ### Load Speed, x, and y
-    speed_path = r'C:\Users\fentonlab\Desktop\Gino\speed\\'
+    speed_path = r'C:\Users\fentonlab\Desktop\Gino\behaviour'
     # x = np.load(os.path.join(speed_path, "x_aln.npy"), allow_pickle=True)
     # y = np.load(os.path.join(speed_path, "y_aln.npy"), allow_pickle=True)
     speed = np.load(os.path.join(speed_path, "speed_aln.npy"), allow_pickle=True)
@@ -633,6 +633,8 @@ def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_
     # =============================================================================
     
     # file path to save in matlab 
+    out_file = os.path.join(full_dir_path, "lfp_epoch_low_speed.mat")
+    
     out_file_B = os.path.join(full_dir_path, "lfp_B_epoch_low_speed.mat")
     out_file_L = os.path.join(full_dir_path, "lfp_L_epoch_low_speed.mat")
     out_file_M = os.path.join(full_dir_path, "lfp_M_epoch_low_speed.mat")
@@ -643,7 +645,15 @@ def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_
     mat_lfp_L = {'lfp_L': lfp_L_ep_low_s}
     mat_lfp_M = {'lfp_M': lfp_M_ep_low_s}
     mat_lfp_H = {'lfp_H': lfp_H_ep_low_s}
-        
+    
+    mat_lfp = {'B': lfp_B_ep_low_s,
+               'L': lfp_L_ep_low_s,
+               'M': lfp_M_ep_low_s,
+               'H': lfp_H_ep_low_s}
+               
+    data_lfp = {'lfp': mat_lfp}
+    savemat(out_file, data_lfp)
+    
     # save lfp for each epoch in matlab format 
     savemat(out_file_B,mat_lfp_B)
     savemat(out_file_L,mat_lfp_L)
@@ -655,6 +665,10 @@ def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_
     # =========================================================================
     
     # file path to save in matlab 
+    
+    out_file = os.path.join(full_dir_path, "lfp_epoch_high_speed.mat")
+
+
     out_file_B = os.path.join(full_dir_path, "lfp_B_epoch_high_speed.mat")
     out_file_L = os.path.join(full_dir_path, "lfp_L_epoch_high_speed.mat")
     out_file_M = os.path.join(full_dir_path, "lfp_M_epoch_high_speed.mat")
@@ -665,6 +679,14 @@ def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_
     mat_lfp_L = {'lfp_L': lfp_L_ep_high_s}
     mat_lfp_M = {'lfp_M': lfp_M_ep_high_s}
     mat_lfp_H = {'lfp_H': lfp_H_ep_high_s}
+    
+    mat_lfp = {'B': lfp_B_ep_high_s,
+               'L': lfp_L_ep_high_s,
+               'M': lfp_M_ep_high_s,
+               'H': lfp_H_ep_high_s}
+    
+    data_lfp = {'lfp': mat_lfp}
+    savemat(out_file, data_lfp)
     
     # save lfp for each epoch in matlab format 
     savemat(out_file_B,mat_lfp_B)
