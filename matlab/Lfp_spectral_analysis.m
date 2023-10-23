@@ -71,7 +71,7 @@ spec_par.dn = 0.05; % sliding step
 
 
 % compute spectrograms whole HPC
-[spec_rec, spec_tf] = compute_spectrograms_whole_rec(lfp_B_all,lfp_L_all,lfp_M_all,lfp_H_all,start,ends,spec_par);
+[spec_rec] = compute_spectrograms_whole_rec(lfp_B_all,lfp_L_all,lfp_M_all,lfp_H_all,start,ends,spec_par);
 % save spectrograms whole HPC
 save_spectrograms(spec_rec, BRAIN_reg_rec_dir)
 
@@ -88,7 +88,7 @@ plot_spectrogram(X, spec, f, ti, fs, step_t, step_f, title_spec, epoch, "zscore"
 
 
 X = sq(lfp_B_all(min,start:ends,:))';
-plot_20_min_spectrograms(spec_rec_H,X, spec_tf, fs, step_t, step_f, 1:10)
+plot_20_min_spectrograms(spec_rec.H, spec_rec, X, fs, step_t, step_f, 1:10)
 
 
 f_gamma = find(f>20 & f<50);

@@ -2,10 +2,8 @@ function load_lfp_and_masks(BRAIN_reg_rec_dir)
 
 display(['Loading LFP data ...'])
 %
-load(strcat(BRAIN_reg_rec_dir,'\lfp_epoch_low_speed.mat')); % channel x minute x trial x lfp
-lfp.B = lfp_B
+lfp.B = load(strcat(BRAIN_reg_rec_dir,'\lfp_B_epoch_low_speed.mat')); % channel x minute x trial x lfp
 load(strcat(BRAIN_reg_rec_dir,'\lfp_L_epoch_low_speed.mat')); % channel x minute x trial x lfp
-lfp.L = lfp_L
 load(strcat(BRAIN_reg_rec_dir,'\lfp_M_epoch_low_speed.mat')); % channel x minute x trial x lfp
 load(strcat(BRAIN_reg_rec_dir,'\lfp_H_epoch_low_speed.mat')); % channel x minute x trial x lfp
 
