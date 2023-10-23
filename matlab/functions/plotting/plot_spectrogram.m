@@ -43,15 +43,17 @@ ylabel('frequency (Hz)')
 title(str_title)
 grid on 
 
-figure;
-plot(tf_gamma,'LineWidth', 2); hold on
-subplot(2,1,1)
 
-tf_gamma = mean(log10(spec(:,f_gamma)),2);
-
-
-tf_gamma = mean(zscore(log10(spec(:,f_gamma)),1,2),2);
-plot(f,log10(spec_B(min,:)/sum(spec_B(min,:))),'LineWidth', 2); hold on
+% 
+% figure;
+% plot(tf_gamma,'LineWidth', 2); hold on
+% subplot(2,1,1)
+% 
+% tf_gamma = mean(log10(spec(:,f_gamma)),2);
+% 
+% 
+% tf_gamma = mean(zscore(log10(spec(:,f_gamma)),1,2),2);
+% plot(f,log10(spec_B(min,:)/sum(spec_B(min,:))),'LineWidth', 2); hold on
 
 ax = gca; % Get the current axes handle
 ax.Position = [0.1 0.1 0.8 0.8]; % [left, bottom, width, height]

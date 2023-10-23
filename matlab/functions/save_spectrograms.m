@@ -1,4 +1,4 @@
-function save_spectrograms(spec_rec_B, spec_rec_L, spec_rec_M, spec_rec_H, spec_tf, BRAIN_reg_rec_dir)
+function save_spectrograms(spec_rec, BRAIN_reg_rec_dir)
 
 spec_dir = strcat(BRAIN_reg_rec_dir,'\spectrograms');
 if ~exist(spec_dir, 'dir')
