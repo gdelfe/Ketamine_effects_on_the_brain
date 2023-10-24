@@ -95,7 +95,7 @@ def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
     #### Read LFP start/end time, HPC channels - Choose whether loading HPC or PFC here
         
     pd.set_option('display.max_colwidth',100)
-    in_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs\CA1_DG_id', "recid_CA1_DG_id.csv")
+    in_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs\CA1_DG_id', "recid_CA1_DG_id_modified.csv")
     Lfp_aln = pd.read_csv(in_file)
     
 
@@ -107,13 +107,12 @@ def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
     # =============================================================================
     #### Pull Lfp 'start' and 'end' for the specific recording 
     
-    start = Lfp_aln["Lfp start"][sess] # starting of the trial in Lfp data points
-    end = Lfp_aln["Lfp end"][sess] # end of trial
+    start = int(Lfp_aln["Lfp start"][sess]) # starting of the trial in Lfp data points
+    end = int(Lfp_aln["Lfp end"][sess]) # end of trial
     
     # multiply by two to account for the full channel list 
-    ch_start = Lfp_aln["theta_start"][sess]*2  # Hpc first channel
-    ch_end = Lfp_aln["theta_end"][sess]*2  # Hpc last channel
-    
+    ch_start = int(Lfp_aln["theta_start"][sess]*2)  # Hpc first channel
+    ch_end = int(Lfp_aln["theta_end"][sess]*2)  # Hpc last channel
 
     # Trim Lfp to specific channels in the HPC and to specific start/end times 
     Lfp= dataLfp[start:end,ch_start:ch_end]

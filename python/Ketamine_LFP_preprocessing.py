@@ -12,7 +12,7 @@ from utils_general import *
 
 
 
-sess = 0 # session number 
+sess = 2 # session number 
 tot_min = 20
 qband = 200 # Q factor in the notch filter 
 
@@ -27,7 +27,6 @@ PFC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs','PFC_lfp_pa
 
 # ====== Load Lfp and speed data for a specific recording and brain area 
 Lfp, speed, gain, rec = load_data(binFullPath,HPC_path_file,PFC_path_file,"HPC",sess)
-
 
 # ====== Detect bad (silent) Lfp channel (if it exist)
 bad_flag, next_id, bad_id = detect_silent_lfp_channel(Lfp,4,4,2500)
@@ -118,6 +117,7 @@ for current_min in range(0,tot_min):
     # ====== Average Lfp in Neuropixelin a 2x2 channel block (avg 4 electrodes together)
     Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_4_channels(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min)
 
+#%%
     # =============================================================================
     # Filter 1 min LFP (band pass)
     # =============================================================================
