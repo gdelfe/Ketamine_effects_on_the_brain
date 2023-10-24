@@ -22,68 +22,51 @@ main_dir_HPC = 'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC';
 main_dir_PFC = 'C:\Users\fentonlab\Desktop\Gino\LFPs\PFC';
 
 load(HPC_file) 
-Paths_HPC = extract_paths(HPC_file_list);
-BRAIN_reg_rec_dir = strcat(main_dir_HPC,Paths_HPC{sess})
+Paths_HPC = extract_paths(HPC_file_list); 
+BRAIN_reg_rec_dir = strcat(main_dir_HPC,Paths_HPC{sess}) % directory path  for the recording 
 
-display(['Loading LFP data ...'])
-%
-load(strcat(BRAIN_reg_rec_dir,'\lfp_B_epoch_low_speed.mat')); % channel x minute x trial x lfp
-load(strcat(BRAIN_reg_rec_dir,'\lfp_L_epoch_low_speed.mat')); % channel x minute x trial x lfp
-load(strcat(BRAIN_reg_rec_dir,'\lfp_M_epoch_low_speed.mat')); % channel x minute x trial x lfp
-load(strcat(BRAIN_reg_rec_dir,'\lfp_H_epoch_low_speed.mat')); % channel x minute x trial x lfp
-
-% lfp_X_all type of variables 
-load(strcat(BRAIN_reg_rec_dir,'\lfp_B_epoch_all_trials.mat')); % channel x minute x trial x lfp
-load(strcat(BRAIN_reg_rec_dir,'\lfp_L_epoch_all_trials.mat')); % channel x minute x trial x lfp
-load(strcat(BRAIN_reg_rec_dir,'\lfp_M_epoch_all_trials.mat')); % channel x minute x trial x lfp
-load(strcat(BRAIN_reg_rec_dir,'\lfp_H_epoch_all_trials.mat')); % channel x minute x trial x lfp
-
-% low speed masks
-load(strcat(BRAIN_reg_rec_dir,'\mask_low_B.mat')); % channel x minute x trial x lfp
-load(strcat(BRAIN_reg_rec_dir,'\mask_low_L.mat')); % channel x minute x trial x lfp
-load(strcat(BRAIN_reg_rec_dir,'\mask_low_M.mat')); % channel x minute x trial x lfp
-load(strcat(BRAIN_reg_rec_dir,'\mask_low_H.mat')); % channel x minute x trial x lfp
-
-
-% high speed masks
-load(strcat(BRAIN_reg_rec_dir,'\mask_high_B.mat')); % channel x minute x trial x lfp
-load(strcat(BRAIN_reg_rec_dir,'\mask_high_L.mat')); % channel x minute x trial x lfp
-load(strcat(BRAIN_reg_rec_dir,'\mask_high_M.mat')); % channel x minute x trial x lfp
-load(strcat(BRAIN_reg_rec_dir,'\mask_high_H.mat')); % channel x minute x trial x lfp
+% load LFP and masks 
+[lfp, lfp_all, mask] = load_lfp_and_masks(BRAIN_reg_rec_dir);
 
 
 % plot 1 min lfp to check data is loaded correctly 
+ch = 1; min = 13;
 figure;
-plot(lfp_B{1,1}(1,:)); hold on 
-plot(lfp_L{1,1}(1,:)); hold on 
-plot(lfp_M{1,1}(1,:)); hold on 
-plot(lfp_H{1,1}(1,:))
+plot(lfp.B{ch,min}(1,:)); hold on 
+plot(lfp.L{ch,min}(1,:)); hold on 
+plot(lfp.M{ch,min}(1,:)); hold on 
+plot(lfp.H{ch,min}(1,:))
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % PSD  %%%%%%%%%%%%%%%%%%%%%%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % aggregate trials 
-[lfp_B_agg, lfp_L_agg, lfp_M_agg, lfp_H_agg] = aggregate_trials(lfp_B,lfp_L,lfp_M,lfp_H)
+[lfp_agg] = aggregate_trials(lfp);
 
-% compute PSD for each minute 
-[psd_B, psd_L, psd_M, psd_H, f] = psd_across_min(lfp_B_agg, lfp_L_agg, lfp_M_agg, lfp_H_agg, 3, 100);
+% compute PSD for each minute, for 20 min 
+[psd] = psd_across_min(lfp_agg, 3, 100);
+
+% save psd for 20 min 
+save_psd(psd, BRAIN_reg_rec_dir)
 
 % plotting PSD
-plot_psd_20_min(psd_B, psd_L, psd_M, psd_H, f, 'PSD all HPC - Stationary - RS Ketamine')
+plot_psd_20_min(psd, 'PSD all HPC - Stationary - RS Ketamine')
 % plotting PSD normalized 
-plot_psd_20_min_normalize(psd_B, psd_L, psd_M, psd_H, f, 'PSD all HPC normalized - Stationary - RS Ketamine')
+plot_psd_20_min_normalize(psd, 'PSD all HPC normalized - Stationary - RS Ketamine')
 
-save_psd(psd_B, psd_L, psd_M, psd_H, f,BRAIN_reg_rec_dir)
+
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SPECTROGRAMS      %%%%%%%%%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% parameters 
 fs = 1250;
-spec_par.fs = 1250;
-start = 1 % 30*fs;
+start = 1; % 30*fs;
 ends = 60*fs;
+
+spec_par.fs = 1250;
 spec_par.fk = [0 100]; % freq range
 spec_par.tapers = [0.6 5]; % Time resolution, Freq. resoluzion
 k = floor(2*spec_par.tapers(1)*spec_par.tapers(2) - 1) % number of tapers used
@@ -91,23 +74,31 @@ spec_par.dn = 0.05; % sliding step
 
 
 % compute spectrograms whole HPC
-[spec_rec_B, spec_rec_L, spec_rec_M, spec_rec_H, spec_tf] = compute_spectrograms_whole_rec(lfp_B_all,lfp_L_all,lfp_M_all,lfp_H_all,start,ends,spec_par);
+[spec_rec] = compute_spectrograms_whole_rec(lfp_all, start, ends, spec_par);
 % save spectrograms whole HPC
-save_spectrograms(spec_rec_B, spec_rec_L, spec_rec_M, spec_rec_H, spec_tf, BRAIN_reg_rec_dir)
+save_spectrograms(spec_rec, BRAIN_reg_rec_dir)
+
 % load spectrograms whole HPC 
-load_spectrograms(BRAIN_reg_rec_dir)
+load_spectrograms(BRAIN_reg_rec_dir);
 
 title_spec = sprintf('min %d',min);
 step_t = 10;
 step_f = 20;
 epoch = 'high';
 
-X = sq(lfp_B_all(min,start:ends,:))';
+% plot single spectrograms:
+% no-normalization
 plot_spectrogram(X, spec, f, ti, fs, step_t, step_f, title_spec, epoch,[]);
+% zscore normalization 
 plot_spectrogram(X, spec, f, ti, fs, step_t, step_f, title_spec, epoch, "zscore");
 
+% plot multiple spectrograms, same epoch 
+X = sq(lfp_all.B(1,start:ends,:))';
+range = 1:5;
+plot_20_min_spectrograms(spec_rec.B, spec_rec, X, fs, step_t, step_f, range,'base')
 
-plot_20_min_spectrograms(spec_rec,X,ti,f,fs,step_t,step_f)
+% plot 1 min spectrogram, all epochs 
+plot_spectrograms_all_epochs(X, spec_rec, fs, step_t, step_f, 10)
 
 
 f_gamma = find(f>20 & f<50);

@@ -1,6 +1,6 @@
 % plot several spectrogram together, one for every min of recording
 
-function plot_20_min_spectrograms(spec, spec_rec, X, fs, step_t, step_f, minRange,epoch)
+function plot_20_min_spectrograms(spec, spec_rec, X, fs, step_t, step_f, minRange,epoch, dir_rec,save)
 
 ts = linspace(0,size(X,2)/fs,size(X,2));
 ti = spec_rec.t;
@@ -23,6 +23,30 @@ for min = minRange % numb of minute
 %     ylim([1 ,max(y_idx)])
     grid on
 end
+
 xlabel('time (sec)')
+
+
+xlabel('time (sec)')
+
+% Title for the entire figure (the manual way without suptitle)
+fig_title = uicontrol('Style', 'text',...
+    'String', main_title,...
+    'Units', 'normalized',...
+    'Position', [0.3 0.95 0.4 0.04],...
+    'BackgroundColor', get(gcf, 'Color'),...
+    'FontSize', 12,...
+    'FontWeight', 'bold');
+
+% Saving 
+if save
+    dir_out = strcat(dir_rec,'\Figures\spectrograms');
+    if ~exist(dir_out, 'dir')
+        mkdir(dir_out)
+    end
+    saveas(fig, strcat(dir_out,'\20_min_spectrograms.jpg') )
+end
+
+
 
 end

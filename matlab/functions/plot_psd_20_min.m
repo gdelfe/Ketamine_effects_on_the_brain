@@ -1,7 +1,7 @@
 
-function plot_psd_20_min(psd, main_title)
+function plot_psd_20_min(psd, main_title, dir_rec, save)
 
-figure('Position', [0, 0, 1000, 3900]);
+fig = figure('Position', [0, 0, 1000, 3900]);
 f = psd.f;
 
 for min = 1:size(psd.B,1)
@@ -32,5 +32,15 @@ fig_title = uicontrol('Style', 'text',...
     'BackgroundColor', get(gcf, 'Color'),...
     'FontSize', 12,...
     'FontWeight', 'bold');
+
+if save
+    % Saving
+    dir_out = strcat(dir_rec,'\Figures\psd');
+    if ~exist(dir_out, 'dir')
+        mkdir(dir_out)
+    end
+    saveas(fig, strcat(dir_out,'\\20_min_psd.png' ))
+end
+
 
 end 

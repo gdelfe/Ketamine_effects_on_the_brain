@@ -23,18 +23,19 @@ main_dir_PFC = 'C:\Users\fentonlab\Desktop\Gino\LFPs\PFC';
 
 load(HPC_file) 
 Paths_HPC = extract_paths(HPC_file_list); 
-BRAIN_reg_rec_dir = strcat(main_dir_HPC,Paths_HPC{sess}) % directory path  for the recording 
+dir_rec = strcat(main_dir_HPC,Paths_HPC{sess}) % directory path  for the recording 
 
 % load LFP and masks 
-[lfp, lfp_all, mask] = load_lfp_and_masks(BRAIN_reg_rec_dir);
+[lfp, lfp_all, mask] = load_lfp_and_masks(dir_rec);
 
 
 % plot 1 min lfp to check data is loaded correctly 
+ch = 1; min = 13;
 figure;
-plot(lfp.B{1,1}(1,:)); hold on 
-plot(lfp.L{1,1}(1,:)); hold on 
-plot(lfp.M{1,1}(1,:)); hold on 
-plot(lfp.H{1,1}(1,:))
+plot(lfp.B{ch,min}(1,:)); hold on 
+plot(lfp.L{ch,min}(1,:)); hold on 
+plot(lfp.M{ch,min}(1,:)); hold on 
+plot(lfp.H{ch,min}(1,:))
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % PSD  %%%%%%%%%%%%%%%%%%%%%%
@@ -47,12 +48,12 @@ plot(lfp.H{1,1}(1,:))
 [psd] = psd_across_min(lfp_agg, 3, 100);
 
 % save psd for 20 min 
-save_psd(psd, BRAIN_reg_rec_dir)
+save_psd(psd, dir_rec)
 
 % plotting PSD
-plot_psd_20_min(psd, 'PSD all HPC - Stationary - RS Ketamine')
+plot_psd_20_min(psd, 'PSD all HPC - Stationary - RS Ketamine', dir_rec,1)
 % plotting PSD normalized 
-plot_psd_20_min_normalize(psd, 'PSD all HPC normalized - Stationary - RS Ketamine')
+plot_psd_20_min_normalize(psd, 'PSD all HPC normalized - Stationary - RS Ketamine', dir_rec,1)
 
 
 
@@ -75,10 +76,10 @@ spec_par.dn = 0.05; % sliding step
 % compute spectrograms whole HPC
 [spec_rec] = compute_spectrograms_whole_rec(lfp_all, start, ends, spec_par);
 % save spectrograms whole HPC
-save_spectrograms(spec_rec, BRAIN_reg_rec_dir)
+save_spectrograms(spec_rec, dir_rec)
 
 % load spectrograms whole HPC 
-load_spectrograms(BRAIN_reg_rec_dir);
+load_spectrograms(dir_rec);
 
 title_spec = sprintf('min %d',min);
 step_t = 10;
@@ -87,19 +88,21 @@ epoch = 'high';
 
 % plot single spectrograms:
 % no-normalization
-plot_spectrogram(X, spec, f, ti, fs, step_t, step_f, title_spec, epoch,[]);
+plot_spectrogram(X, spec, f, ti, fs, step_t, step_f, title_spec, epoch,[],dir_rec,1);
 % zscore normalization 
-plot_spectrogram(X, spec, f, ti, fs, step_t, step_f, title_spec, epoch, "zscore");
+plot_spectrogram(X, spec, f, ti, fs, step_t, step_f, title_spec, epoch, "zscore",dir_rec,1);
 
 % plot multiple spectrograms, same epoch 
 X = sq(lfp_all.B(1,start:ends,:))';
-plot_20_min_spectrograms(spec_rec.B, spec_rec, X, fs, step_t, step_f, 1:5,'base')
+range = 1:5;
+plot_20_min_spectrograms(spec_rec.B, spec_rec, X, fs, step_t, step_f, range,'base',dir_rec,1)
 
 % plot 1 min spectrogram, all epochs 
-plot_spectrograms_all_epochs(X, spec_rec, fs, step_t, step_f, 10)
+plot_spectrograms_all_epochs(X, spec_rec, mask, fs, step_t, step_f, min,'test',dir_rec,1)
+plot_spectrograms_all_epochs_and_gamma(X, spec_rec, mask, fs, step_t, step_f, min,'test',dir_rec,1)
 
 
-f_gamma = find(f>20 & f<50);
+
 
 
 
