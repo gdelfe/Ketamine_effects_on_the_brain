@@ -2,14 +2,16 @@
 %
 % @ Gino Del Ferraro, NYU, June 2023
 
-function plot_spectrogram(X, spec, f, ti, fs, step_t, step_f, str_title, epoch, norm,save)
+function plot_spectrogram(spec, spec_rec, step_t, step_f, str_title, epoch, norm, dir_rec, save)
 
-ts = linspace(0,size(X,2)/fs,size(X,2));
+ts = spec_rec.ts;
+ti = spec_rec.t;
+f = spec_rec.f;
 
 % generate labels for spectrogram
 [x_idx, xlbl, y_idx, ylbl] = tfspec_labels(ts,ti,f,step_t,step_f);
-[valx_idx, id] = unique(x_idx);
-[valxlbl, id] = unique(xlbl);
+[valx_idx, ~] = unique(x_idx);
+[valxlbl, ~] = unique(xlbl);
 
 % numfreqs = length(f);
 % freqlist = logspace(0,2,numfreqs);
@@ -28,11 +30,14 @@ if isempty(norm)
     tvimage(log10(spec))
     colorbar
     str_title = ['no norm - Epoch: ', epoch,' - ', str_title];
+    fig_title = '\\single_spectrogram.png';
     % zscore along frequency normalization
 elseif strcmp(norm,'zscore')
     tvimage(zscore(log10(spec),1,2))
     colorbar
     str_title = ['zscored - Epoch: ', epoch,' - ', str_title];
+    fig_title = '\\single_spectrogram_nomalized.png';
+    
 end
 
 set(gca, 'XTick',valx_idx, 'XTickLabel',valxlbl)
@@ -61,14 +66,6 @@ ax.Position = [0.1 0.1 0.8 0.8]; % [left, bottom, width, height]
 
 xlabel('time (sec)')
 
-% Title for the entire figure (the manual way without suptitle)
-fig_title = uicontrol('Style', 'text',...
-    'String', main_title,...
-    'Units', 'normalized',...
-    'Position', [0.3 0.95 0.4 0.04],...
-    'BackgroundColor', get(gcf, 'Color'),...
-    'FontSize', 12,...
-    'FontWeight', 'bold');
 
 % Saving
 if save
@@ -76,7 +73,7 @@ if save
     if ~exist(dir_out, 'dir')
         mkdir(dir_out)
     end
-    saveas(fig,strcat(dir_out,'\\single_spectrogram.png' )
+    saveas(fig,strcat(dir_out,fig_title))
 end
 
 

@@ -49,6 +49,7 @@ plot(lfp.H{ch,min}(1,:))
 
 % save psd for 20 min 
 save_psd(psd, dir_rec)
+psd = load_psd(dir_rec);
 
 % plotting PSD
 plot_psd_20_min(psd, 'PSD all HPC - Stationary - RS Ketamine', dir_rec,1)
@@ -70,8 +71,7 @@ spec_par.fs = 1250;
 spec_par.fk = [0 100]; % freq range
 spec_par.tapers = [0.6 5]; % Time resolution, Freq. resoluzion
 k = floor(2*spec_par.tapers(1)*spec_par.tapers(2) - 1) % number of tapers used
-spec_par.dn = 0.05; % sliding step
-
+spec_par.dn = 0.05; % sliding step;
 
 % compute spectrograms whole HPC
 [spec_rec] = compute_spectrograms_whole_rec(lfp_all, start, ends, spec_par);
@@ -79,27 +79,31 @@ spec_par.dn = 0.05; % sliding step
 save_spectrograms(spec_rec, dir_rec)
 
 % load spectrograms whole HPC 
-load_spectrograms(dir_rec);
+spec_rec = load_spectrograms(dir_rec);
 
-title_spec = sprintf('min %d',min);
+
+% %%%%%%%%%%%%%%%%%%%%%%%
+% PLOT SPECTROGRAMS 
+% %%%%%%%%%%%%%%%%%%%%%%%
+
 step_t = 10;
 step_f = 20;
-epoch = 'high';
 
 % plot single spectrograms:
+title_spec = sprintf('min %d',min);
+epoch = 'high';
 % no-normalization
-plot_spectrogram(X, spec, f, ti, fs, step_t, step_f, title_spec, epoch,[],dir_rec,1);
+plot_spectrogram(sq(spec_rec.B(:,:,min)), spec_rec, step_t, step_f, title_spec, epoch,[],dir_rec, 1);
 % zscore normalization 
-plot_spectrogram(X, spec, f, ti, fs, step_t, step_f, title_spec, epoch, "zscore",dir_rec,1);
+plot_spectrogram(sq(spec_rec.B(:,:,min)), spec_rec, step_t, step_f, title_spec, epoch, "zscore",dir_rec, 1);
 
 % plot multiple spectrograms, same epoch 
-X = sq(lfp_all.B(1,start:ends,:))';
-range = 1:5;
-plot_20_min_spectrograms(spec_rec.B, spec_rec, X, fs, step_t, step_f, range,'base',dir_rec,1)
+range = 1:10;
+plot_20_min_spectrograms(spec_rec.H, spec_rec, step_t, step_f, range,'high','RS Ket',dir_rec,1)
 
 % plot 1 min spectrogram, all epochs 
-plot_spectrograms_all_epochs(X, spec_rec, mask, fs, step_t, step_f, min,'test',dir_rec,1)
-plot_spectrograms_all_epochs_and_gamma(X, spec_rec, mask, fs, step_t, step_f, min,'test',dir_rec,1)
+plot_spectrograms_all_epochs(spec_rec, mask, step_t, step_f, min,'RS Ket',dir_rec,1)
+plot_spectrograms_all_epochs_and_gamma(spec_rec, mask, step_t, step_f, min,'RS Ket',dir_rec,1)
 
 
 
