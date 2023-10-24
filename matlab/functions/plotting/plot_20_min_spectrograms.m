@@ -1,8 +1,8 @@
 % plot several spectrogram together, one for every min of recording
 
-function plot_20_min_spectrograms(spec, spec_rec, X, fs, step_t, step_f, minRange,epoch, dir_rec,save)
+function plot_20_min_spectrograms(spec, spec_rec, step_t, step_f, minRange, epoch, main_title, dir_rec, save)
 
-ts = linspace(0,size(X,2)/fs,size(X,2));
+ts = spec_rec.ts;
 ti = spec_rec.t;
 f = spec_rec.f;
 
@@ -11,7 +11,7 @@ f = spec_rec.f;
 [valx_idx, ~] = unique(x_idx);
 [valxlbl, ~] = unique(xlbl);
 
-figure('Position', [0, 0, 1700, 3900]);
+fig = figure('Position', [0, 0, 1700, 3900]);
 
 for min = minRange % numb of minute
     subplot(minRange(end),1,min)
@@ -44,7 +44,7 @@ if save
     if ~exist(dir_out, 'dir')
         mkdir(dir_out)
     end
-    saveas(fig, strcat(dir_out,'\20_min_spectrograms.jpg') )
+    saveas(fig, strcat(dir_out,sprintf('\\20_min_spectrograms_%s_min_%d_%d.jpg',epoch,minRange(1),minRange(end))) ) 
 end
 
 

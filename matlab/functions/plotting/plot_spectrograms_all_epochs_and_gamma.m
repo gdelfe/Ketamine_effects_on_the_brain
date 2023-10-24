@@ -2,10 +2,10 @@
 %
 % @ Gino Del Ferraro, NYU, June 2023
 
-function plot_spectrograms_all_epochs_and_gamma(X, spec_rec, mask, fs, step_t, step_f, min, main_title, dir_rec, save)
+function plot_spectrograms_all_epochs_and_gamma(spec_rec, mask, step_t, step_f, min, main_title, dir_rec, save)
 
 
-ts = linspace(0,size(X,2)/fs,size(X,2));
+ts = spec_rec.ts;
 f = spec_rec.f;
 ti = spec_rec.t ;
 f_gamma = find(f>20 & f<50);
@@ -13,8 +13,8 @@ f_gamma = find(f>20 & f<50);
 
 % generate labels for spectrogram
 [x_idx, xlbl, y_idx, ylbl] = tfspec_labels(ts,ti,f,step_t,step_f);
-[valx_idx, id] = unique(x_idx);
-[valxlbl, id] = unique(xlbl);
+[valx_idx, ~] = unique(x_idx);
+[valxlbl, ~] = unique(xlbl);
 
 % numfreqs = length(f);
 % freqlist = logspace(0,2,numfreqs);
