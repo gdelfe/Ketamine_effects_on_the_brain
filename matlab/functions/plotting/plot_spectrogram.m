@@ -30,13 +30,13 @@ if isempty(norm)
     tvimage(log10(spec))
     colorbar
     str_title = ['no norm - Epoch: ', epoch,' - ', str_title];
-    fig_title = '\\single_spectrogram.png';
+    fig_name = '\\single_spectrogram_all_HPC.png';
     % zscore along frequency normalization
 elseif strcmp(norm,'zscore')
     tvimage(zscore(log10(spec),1,2))
     colorbar
     str_title = ['zscored - Epoch: ', epoch,' - ', str_title];
-    fig_title = '\\single_spectrogram_nomalized.png';
+    fig_name = '\\single_spectrogram_nomalized_all_HPC.png';
     
 end
 
@@ -73,7 +73,7 @@ if save
     if ~exist(dir_out, 'dir')
         mkdir(dir_out)
     end
-    saveas(fig,strcat(dir_out,fig_title))
+    saveas(fig,strcat(dir_out,fig_name))
 end
 
 

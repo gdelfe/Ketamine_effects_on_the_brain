@@ -104,11 +104,26 @@ plot_20_min_spectrograms(spec_rec.M, spec_rec, step_t, step_f, range,'MID','RS K
 
 % plot 1 min spectrogram, all epochs 
 hpc_area = 'all_HPC';
-min = 15;
 plot_spectrograms_all_epochs(spec_rec, mask, step_t, step_f, min,'RS Ket',dir_rec, hpc_area,1)
 plot_spectrograms_all_epochs_and_gamma(spec_rec, mask, step_t, step_f, min,'RS Ket',dir_rec, hpc_area,1)
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+figure;
+plot(f,log10(psd_B(min,:)),'LineWidth', 2); hold on
+plot(f,log10(psd_L(min,:)),'LineWidth', 2); hold on
+plot(f,log10(psd_M(min,:)),'LineWidth', 2); hold on
+plot(f,log10(psd_H(min,:)),'LineWidth', 2); hold on
 

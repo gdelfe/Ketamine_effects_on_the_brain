@@ -5,6 +5,6 @@ if ~exist(spec_dir, 'dir')
     mkdir(spec_dir)
 end
     
-save(strcat(spec_dir,'\spec_rec.mat'),'spec_rec')
+save(strcat(spec_dir,'\spec_rec_all_HPC.mat'),'spec_rec')
 
 end 
