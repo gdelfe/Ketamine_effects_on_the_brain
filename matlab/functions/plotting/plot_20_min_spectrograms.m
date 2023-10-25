@@ -13,8 +13,10 @@ f = spec_rec.f;
 
 fig = figure('Position', [0, 0, 1700, 3900]);
 
+cnt = 1;
+nplots = length(minRange);
 for min = minRange % numb of minute
-    subplot(minRange(end),1,min)
+    subplot(nplots,1,cnt)
     tvimage(zscore(log10(sq(spec(:,:,min))),1,2))
     colorbar
     title(sprintf('%s, min = %d',epoch, min),'FontSize',8)
@@ -22,10 +24,8 @@ for min = minRange % numb of minute
     set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
 %     ylim([1 ,max(y_idx)])
     grid on
+    cnt = cnt + 1;
 end
-
-xlabel('time (sec)')
-
 
 xlabel('time (sec)')
 

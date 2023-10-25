@@ -2,7 +2,7 @@
 %
 % @ Gino Del Ferraro, NYU, June 2023
 
-function plot_spectrograms_all_epochs(spec_rec, mask, step_t, step_f, min, main_title, dir_rec, save)
+function plot_spectrograms_all_epochs(spec_rec, mask, step_t, step_f, min, main_title, dir_rec, hpc_area, save)
 
 
 ts = spec_rec.ts;
@@ -107,7 +107,7 @@ if save
     if ~exist(dir_out, 'dir')
         mkdir(dir_out)
     end
-    saveas(fig,strcat(dir_out,sprintf('\\spec_all_epochs_min_%d.png',min) ) )
+    saveas(fig,strcat(dir_out,sprintf('\\spec_all_epochs_min_%d_%s.png',min,hpc_area) ) )
 end
 
 end

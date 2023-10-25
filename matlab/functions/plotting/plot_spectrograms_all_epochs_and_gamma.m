@@ -2,7 +2,7 @@
 %
 % @ Gino Del Ferraro, NYU, June 2023
 
-function plot_spectrograms_all_epochs_and_gamma(spec_rec, mask, step_t, step_f, min, main_title, dir_rec, save)
+function plot_spectrograms_all_epochs_and_gamma(spec_rec, mask, step_t, step_f, min, main_title, dir_rec, hpc_area, save)
 
 
 ts = spec_rec.ts;
@@ -29,7 +29,7 @@ fig = figure('Position', [0, 0, 1700, 3900]);
 
 % BASELINE 
 subplot(8,1,1)
-tvimage(zscore(log10(spec_rec.B(:,:,min)),1,2)); colorbar; hold on 
+tvimage(zscore(log10(spec_rec.B(:,:,min)),1,2)); colorbar; 
 title(sprintf('BASE, min = %d',min),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
@@ -48,7 +48,7 @@ grid on
 
 % LOW INJECTION 
 subplot(4*2,1,3)
-tvimage(zscore(log10(spec_rec.L(:,:,min)),1,2)); colorbar; hold on 
+tvimage(zscore(log10(spec_rec.L(:,:,min)),1,2)); colorbar; 
 title(sprintf('LOW, min = %d',min),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
@@ -69,7 +69,7 @@ grid on
 % MID INJECTION 
 
 subplot(8,1,5)
-tvimage(zscore(log10(spec_rec.M(:,:,min)),1,2)); colorbar; hold on 
+tvimage(zscore(log10(spec_rec.M(:,:,min)),1,2)); colorbar; 
 title(sprintf('MID, min = %d',min),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
@@ -124,7 +124,7 @@ if save
     if ~exist(dir_out, 'dir')
         mkdir(dir_out)
     end
-    saveas(fig,strcat(dir_out,sprintf('\\spec_all_epochs_min_%d_and_gamma.png',min) ) )
+    saveas(fig,strcat(dir_out,sprintf('\\spec_all_epochs_min_%d_and_gamma_%s.png',min, hpc_area) ) )
 end
 
 

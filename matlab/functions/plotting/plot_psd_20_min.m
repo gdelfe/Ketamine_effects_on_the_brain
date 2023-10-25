@@ -39,7 +39,7 @@ if save
     if ~exist(dir_out, 'dir')
         mkdir(dir_out)
     end
-    saveas(fig, strcat(dir_out,'\\20_min_psd.png' ))
+    saveas(fig, strcat(dir_out,'\\20_min_psd_all_HPC.png' ))
 end
 
 

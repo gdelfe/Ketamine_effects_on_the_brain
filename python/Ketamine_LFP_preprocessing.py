@@ -34,6 +34,7 @@ bad_flag, next_id, bad_id = detect_silent_lfp_channel(Lfp,4,4,2500)
 # ====== Upsample Speed recording
 speed_up = upsample_speed(speed, Lfp, sess, LFP_rate = 2500, speed_rate = 100)
 
+#%%
 # =============================================================================
 # PLOTTING -- sanity checks / data visualization 
 # =============================================================================
@@ -117,7 +118,7 @@ for current_min in range(0,tot_min):
     # ====== Average Lfp in Neuropixelin a 2x2 channel block (avg 4 electrodes together)
     Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_4_channels(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min)
 
-#%%
+
     # =============================================================================
     # Filter 1 min LFP (band pass)
     # =============================================================================
