@@ -35,7 +35,6 @@ h = 100E-6 * pq.m                                 # [m]
 sigma = 0.3 * pq.S / pq.m                         # [S/m] or [1/(ohm*m)]
 sigma_top = 0.3 * pq.S / pq.m                     # [S/m] or [1/(ohm*m)]
 
-#%%
 # Input dictionaries for each method
 delta_input = {
     'lfp' : lfp_data,

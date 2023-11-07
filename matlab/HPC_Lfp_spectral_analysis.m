@@ -68,18 +68,18 @@ plot(lfp.H{ch,min}(1,:))
 [psd.dd] = psd_across_min(lfp_agg.dd, 3, 100);
 
 % save psd for 20 min 
-save_psd(psd, dir_rec,'psd_hpc');
-psd = load_psd(dir_rec, 'psd_hpc');
+save_psd(psd, dir_rec,'psd_hpc_car');
+psd = load_psd(dir_rec, 'psd_hpc_car');
 
 % plotting PSD
 % plot_psd_20_min(psd, 'PSD all HPC - Stationary - RS Ketamine', dir_rec,1)
 % plotting PSD normalized 
-plot_psd_20_min_normalize(psd.CA1, 'CA1 - PSD normalized - RS Ketamine',dir_rec,'CA1',1)
-plot_psd_20_min_normalize(psd.ripple, 'Ripple - PSD normalized  RS Ketamine', dir_rec, 'Ripple',1)
-plot_psd_20_min_normalize(psd.rad, 'Radiatum PSD - normalized - RS Ketamine', dir_rec, 'Radiatum',1)
-plot_psd_20_min_normalize(psd.lm, 'LocMol PSD - normalized - RS Ketamine', dir_rec, 'LocMol',1)
-plot_psd_20_min_normalize(psd.dup, 'Dentate Up PSD - normalized  - RS Ketamine', dir_rec,'DentUp', 1)
-plot_psd_20_min_normalize(psd.dd, 'Dentate Down - PSD - normalized - RS Ketamine', dir_rec, 'DentDown',1)
+plot_psd_20_min_normalize(psd.CA1, 'CA1 CAR - PSD normalized - RS Ketamine',dir_rec,'CA1_CAR',1)
+plot_psd_20_min_normalize(psd.ripple, 'Ripple CAR - PSD normalized  RS Ketamine', dir_rec, 'Ripple_CAR',1)
+plot_psd_20_min_normalize(psd.rad, 'Radiatum  - PSD normalized - RS Ketamine', dir_rec, 'Radiatum_CAR',1)
+plot_psd_20_min_normalize(psd.lm, 'LocMol CAR PSD normalized - RS Ketamine', dir_rec, 'LocMol_CAR',1)
+plot_psd_20_min_normalize(psd.dup, 'Dentate Up CAR - PSD normalized  - RS Ketamine', dir_rec,'DentUp_CAR', 1)
+plot_psd_20_min_normalize(psd.dd, 'Dentate Down CAR - PSD normalized - RS Ketamine', dir_rec, 'DentDown_CAR',1)
 
 
 
@@ -124,9 +124,9 @@ step_f = 20;
 title_spec = sprintf('min %d',min);
 epoch = 'high';
 % no-normalization
-plot_spectrogram(sq(spec_rec.B(:,:,min)), spec_rec, step_t, step_f, title_spec, epoch,[], dir_rec, 1);
+plot_spectrogram(sq(spec_rec.H(:,:,min)), spec_rec, step_t, step_f, title_spec, epoch,[], dir_rec, 1);
 % zscore normalization 
-plot_spectrogram(sq(spec_rec.B(:,:,min)), spec_rec, step_t, step_f, title_spec, epoch, "zscore",dir_rec, 1);
+plot_spectrogram(sq(spec_rec.H(:,:,min)), spec_rec, step_t, step_f, title_spec, epoch, "zscore",dir_rec, 1);
 
 % plot multiple spectrograms, same epoch 
 range = 1:10;

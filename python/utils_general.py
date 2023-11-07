@@ -300,20 +300,23 @@ def average_lfp_4_channels(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min):
         print(f'-- {ch_extra} Lfp channels were removed in order to have the tot number of channels a multiple of 4, for the average in a 2x2 channel block\n')
             
     # baseline
+    # Lfp_B_min = Lfp_B_min - np.mean(Lfp_B_min, axis=1, keepdims=True) # reReferencing (CAR)
     Lfp_RS_B = Lfp_B_min.reshape(Lfp_B_min.shape[0],int(Lfp_B_min.shape[1]/4),4) # reshape Lfp, such that channels in the same 2x2 block are in the same colum dim
     Lfp_avg_B = Lfp_RS_B.mean(axis=2)
     # low injection 
+    # Lfp_L_min = Lfp_L_min - np.mean(Lfp_L_min, axis=1, keepdims=True) # reReferencing (CAR)
     Lfp_RS_L = Lfp_L_min.reshape(Lfp_L_min.shape[0],int(Lfp_L_min.shape[1]/4),4) # reshape Lfp, such that channels in the same 2x2 block are in the same colum dim
     Lfp_avg_L = Lfp_RS_L.mean(axis=2)
     # mid injection 
+    # Lfp_M_min = Lfp_M_min - np.mean(Lfp_M_min, axis=1, keepdims=True) # reReferencing (CAR)
     Lfp_RS_M = Lfp_M_min.reshape(Lfp_M_min.shape[0],int(Lfp_M_min.shape[1]/4),4) # reshape Lfp, such that channels in the same 2x2 block are in the same colum dim
     Lfp_avg_M = Lfp_RS_M.mean(axis=2)
     # high injection 
+    # Lfp_H_min = Lfp_H_min - np.mean(Lfp_H_min, axis=1, keepdims=True) # reReferencing (CAR)
     Lfp_RS_H = Lfp_H_min.reshape(Lfp_H_min.shape[0],int(Lfp_H_min.shape[1]/4),4) # reshape Lfp, such that channels in the same 2x2 block are in the same colum dim
     Lfp_avg_H = Lfp_RS_H.mean(axis=2)
     
     return Lfp_avg_B, Lfp_avg_L, Lfp_avg_M, Lfp_avg_H
-
 
 # =============================================================================
 
@@ -345,7 +348,28 @@ def average_lfp_same_depth(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min):
 
 # =============================================================================
 
+# Compute Current Source Density 
+
+def compute_CSD(Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg):
     
+    h = 20E-6 # Electrode Spacing in [m]
+    
+    # Calculate the second spatial derivative
+    csd_B = (-np.diff(Lfp_B_avg.T, n=2, axis=0)).T
+    csd_L = (-np.diff(Lfp_L_avg.T, n=2, axis=0)).T
+    csd_M = (-np.diff(Lfp_M_avg.T, n=2, axis=0)).T
+    csd_H = (-np.diff(Lfp_H_avg.T, n=2, axis=0)).T
+    
+    return csd_B, csd_L, csd_M, csd_H
+
+# =============================================================================
+
+
+
+
+# =============================================================================
+
+ 
 def decimate_lfp_and_speed(lfp_filt_B,lfp_filt_L,lfp_filt_M,lfp_filt_H,speed_B_min,speed_L_min,speed_M_min,speed_H_min):
     
     
@@ -632,7 +656,7 @@ def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_
     # =============================================================================
     
     # file path to save in matlab 
-    out_file = os.path.join(full_dir_path, "lfp_epoch_low_speed.mat")
+    out_file = os.path.join(full_dir_path, "lfp_epoch_low_speed_CAR.mat")
     
     mat_lfp = {'B': lfp_B_ep_low_s,
                'L': lfp_L_ep_low_s,
@@ -650,7 +674,7 @@ def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_
     # =========================================================================
     
     # file path to save in matlab 
-    out_file = os.path.join(full_dir_path, "lfp_epoch_high_speed.mat")
+    out_file = os.path.join(full_dir_path, "lfp_epoch_high_speed_CAR.mat")
     
     mat_lfp = {'B': lfp_B_ep_high_s,
                'L': lfp_L_ep_high_s,
@@ -688,7 +712,7 @@ def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep,
     # =============================================================================
     
     # file path to save in matlab 
-    out_file = os.path.join(full_dir_path, "lfp_epoch_all_trials.mat")
+    out_file = os.path.join(full_dir_path, "lfp_epoch_all_trials_CAR.mat")
     
     mat_lfp = {'B': np.array(lfp_B_ep),
                'L': np.array(lfp_L_ep),
@@ -707,7 +731,7 @@ def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep,
     
     # file path to save Masks, low speed-no artifact in matlab 
     
-    out_file = os.path.join(full_dir_path, "mask_low_high_speed.mat")
+    out_file = os.path.join(full_dir_path, "mask_low_high_speed_CAR.mat")
 
     
     # create dictionaries to save in matlab
