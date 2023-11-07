@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Tue Nov  7 11:49:25 2023
+
+@author: Gino Del Ferraro
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Spyder Editor
 
 @ Gino Del Ferraro, Fenton lab, Oct 2023
@@ -116,10 +123,10 @@ for current_min in range(0,tot_min):
     # plot_lfp_two_channels(Lfp_L_min,bad_id,next_id,0,60,10,N=2500)
 
     # ====== Average Lfp in Neuropixel at the same depth (avg 2 electrodes together)
-    # Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_same_depth(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min)
+    Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_same_depth(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min)
         
     # ====== Average Lfp in Neuropixelin a 2x2 channel block (avg 4 electrodes together)
-    Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_4_channels(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min)
+    # Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_4_channels(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min)
 
     # =============================================================================
     # Filter 1 min LFP (band pass)
@@ -128,23 +135,33 @@ for current_min in range(0,tot_min):
     # ====== Filter Lfp in each epoch
     lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H = filter_lfp_in_each_epoch(Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg, gain, qband)
     
-          
+    
+#%%
+
+# Compute CSD and filtered CSD 
+csd_B, csd_B_fil  = compute_iCSD(lfp_filt_B)
+csd_L, csd_L_fil  = compute_iCSD(lfp_filt_L)
+csd_M, csd_M_fil  = compute_iCSD(lfp_filt_M)
+csd_H, csd_H_fil  = compute_iCSD(lfp_filt_H)
+
+    # plot_filtered_lfp(lfp_filt_B,0,10,1,36, 2500)
+    
     # ====== Decimate Lfp and speed (subsample)
     lfp_dec_B, lfp_dec_L, lfp_dec_M, lfp_dec_H, speed_dec_B, speed_dec_L, speed_dec_M, speed_dec_H = \
-        decimate_lfp_and_speed(lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H, speed_B_min,speed_L_min,speed_M_min,speed_H_min)
+        decimate_lfp_and_speed(csd_B, csd_L, csd_M, csd_H, speed_B_min,speed_L_min,speed_M_min,speed_H_min)
     
     # ====== Stack lfp all trials for each minute together 
     lfp_B_ep,lfp_L_ep,lfp_M_ep,lfp_H_ep = \
         stack_lfp_1min_all_trials(lfp_B_ep,lfp_L_ep,lfp_M_ep,lfp_H_ep, lfp_dec_B, lfp_dec_L, lfp_dec_M, lfp_dec_H)
 
     # =============================================================================
-    # MASKING SPEED AND LFP ARTIFACTS 
+    # MASKING SPEED AND CSD ARTIFACTS 
     # =============================================================================
     
     tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s, tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s,tot_mask_H_high_s = \
         make_speed_and_lfp_maks(lfp_dec_B,lfp_dec_L, lfp_dec_M, lfp_dec_H, speed_dec_B, speed_dec_L, speed_dec_M, speed_dec_H, win = 1250, th = 30)
   
-    # ====== Stack lfp all trials for each minute toget
+    # ====== Stack lfp all trials for each minute together
     mask_B_low, mask_L_low, mask_M_low, mask_H_low, mask_B_high, mask_L_high, mask_M_high, mask_H_high = \
         stack_mask_1min_(mask_B_low, mask_L_low, mask_M_low, mask_H_low, 
                          mask_B_high, mask_L_high, mask_M_high, mask_H_high,
@@ -194,7 +211,7 @@ for current_min in range(0,tot_min):
     
     print('nch ', len(lfp_B_ep_low_s), 'n. min ', len(lfp_B_ep_low_s[0][0]),' size', lfp_B_ep_low_s[0][0].shape)
 
-#%%
+
 # =============================================================================
 # Save files in matlab
 # =============================================================================

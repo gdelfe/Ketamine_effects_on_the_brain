@@ -656,7 +656,7 @@ def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_
     # =============================================================================
     
     # file path to save in matlab 
-    out_file = os.path.join(full_dir_path, "lfp_epoch_low_speed_CAR.mat")
+    out_file = os.path.join(full_dir_path, "lfp_epoch_low_speed_CSD.mat")
     
     mat_lfp = {'B': lfp_B_ep_low_s,
                'L': lfp_L_ep_low_s,
@@ -674,7 +674,7 @@ def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_
     # =========================================================================
     
     # file path to save in matlab 
-    out_file = os.path.join(full_dir_path, "lfp_epoch_high_speed_CAR.mat")
+    out_file = os.path.join(full_dir_path, "lfp_epoch_high_speed_CSD.mat")
     
     mat_lfp = {'B': lfp_B_ep_high_s,
                'L': lfp_L_ep_high_s,
@@ -712,7 +712,7 @@ def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep,
     # =============================================================================
     
     # file path to save in matlab 
-    out_file = os.path.join(full_dir_path, "lfp_epoch_all_trials_CAR.mat")
+    out_file = os.path.join(full_dir_path, "lfp_epoch_all_trials_CSD.mat")
     
     mat_lfp = {'B': np.array(lfp_B_ep),
                'L': np.array(lfp_L_ep),
@@ -731,7 +731,7 @@ def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep,
     
     # file path to save Masks, low speed-no artifact in matlab 
     
-    out_file = os.path.join(full_dir_path, "mask_low_high_speed_CAR.mat")
+    out_file = os.path.join(full_dir_path, "mask_low_high_speed_CSD.mat")
 
     
     # create dictionaries to save in matlab
