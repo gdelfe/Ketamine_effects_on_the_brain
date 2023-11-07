@@ -181,27 +181,129 @@ def filter_lfp_in_each_epoch(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min,gain,qband)
     print('Filtering Lfp ...')
     
     # baseline
-    lfp_scaled_B = Lfp_B_min*gain*1e6 # scale in mV
+    lfp_scaled_B = Lfp_B_min*gain*1e6 # scale in uV
     lfp_filt_B_bp = bandpass_filter(lfp_scaled_B, lowcut = 1, highcut = 300, fs=2500, order=5) # band pass filter at 1 Hz and 300 Hz
     lfp_filt_B = notch_filter(lfp_filt_B_bp, 60, fs=2500, Q=qband)
     
     # low injection 
-    lfp_scaled_L = Lfp_L_min*gain*1e6 # scale in mV
+    lfp_scaled_L = Lfp_L_min*gain*1e6 # scale in uV
     lfp_filt_L_bp = bandpass_filter(lfp_scaled_L, lowcut = 1, highcut = 300, fs=2500, order=5) # band pass filter at 1 Hz and 300 Hz
     lfp_filt_L = notch_filter(lfp_filt_L_bp, 60, fs=2500, Q=qband)
     
     # mid injection 
-    lfp_scaled_M = Lfp_M_min*gain*1e6 # scale in mV
+    lfp_scaled_M = Lfp_M_min*gain*1e6 # scale in uV
     lfp_filt_M_bp = bandpass_filter(lfp_scaled_M, lowcut = 1, highcut = 300, fs=2500, order=5) # band pass filter at 1 Hz and 300 Hz
     lfp_filt_M = notch_filter(lfp_filt_M_bp, 60, fs=2500, Q=qband)
     
     # high injection 
-    lfp_scaled_H = Lfp_H_min*gain*1e6 # scale in mV
+    lfp_scaled_H = Lfp_H_min*gain*1e6 # scale in uV
     lfp_filt_H_bp = bandpass_filter(lfp_scaled_H, lowcut = 1, highcut = 300, fs=2500, order=5) # band pass filter at 1 Hz and 300 Hz
     lfp_filt_H = notch_filter(lfp_filt_H_bp, 60, fs=2500, Q=qband)
 
     return lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H
 
+# =============================================================================
+
+# Compute Current Source Density.
+# Output: CSD and CSD filtered 
+
+def compute_iCSD(Lfp):
+    
+    
+    '''iCSD toolbox demonstration script'''
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import icsd
+    from scipy import io
+    import neo
+    import quantities as pq
+    
+    lastdefinition = pq.A / pq.V  # This line initializes lastdefinition to the base unit for Siemens.
+    
+    #patch quantities with the SI unit Siemens if it does not exist
+    for symbol, prefix, definition, u_symbol in zip(
+        ['siemens', 'S', 'mS', 'uS', 'nS', 'pS'],
+        ['', '', 'milli', 'micro', 'nano', 'pico'],
+        [pq.A/pq.V, pq.A/pq.V, 'S', 'mS', 'uS', 'nS'],
+        [None, None, None, None, u'µS', None]):
+        if type(definition) is str:
+            definition = lastdefinition / 1000
+        if not hasattr(pq, symbol):
+            setattr(pq, symbol, pq.UnitQuantity(
+                prefix + 'siemens',
+                definition,
+                symbol=symbol,
+                u_symbol=u_symbol))
+        lastdefinition = definition
+    
+    
+    #prepare lfp data for use, by changing the units to SI and append quantities,
+    #along with electrode geometry, conductivities and assumed source geometry
+    lfp_data = Lfp.T * 1E-6 * pq.V        # [uV] -> [V]
+    z_data = np.linspace(20E-6,20E-6*Lfp.shape[1],Lfp.shape[1]) * pq.m  # [m]
+    diam = 500E-6 * pq.m                              # [m]
+    h = 20E-6 * pq.m                                 # [m]
+    sigma = 0.3 * pq.S / pq.m                         # [S/m] or [1/(ohm*m)]
+    sigma_top = 0.3 * pq.S / pq.m                     # [S/m] or [1/(ohm*m)]
+    
+    
+    spline_input = {
+    'lfp' : lfp_data,
+    'coord_electrode' : z_data,
+    'diam' : diam,
+    'sigma' : sigma,
+    'sigma_top' : sigma,
+    'num_steps' : Lfp.shape[1],      # Spatial CSD upsampling to N steps
+    'tol' : 1E-12,
+    'f_type' : 'gaussian',
+    'f_order' : (20, 5),
+    }
+    
+    #Create the different CSD-method class instances. We use the class methods
+    #get_csd() and filter_csd() below to get the raw and spatially filtered
+    #versions of the current-source density estimates.
+    csd_dict = dict(spline_icsd = icsd.SplineiCSD(**spline_input))
+    
+    #plot
+    for method, csd_obj in list(csd_dict.items()):
+        fig, axes = plt.subplots(3,1, figsize=(8,8))
+        
+        #plot LFP signal
+        ax = axes[0]
+        im = ax.imshow(np.array(lfp_data), origin='upper', vmin=-abs(lfp_data).max(), \
+                  vmax=abs(lfp_data).max(), cmap='jet_r', interpolation='nearest')
+        ax.axis(ax.axis('tight'))
+        cb = plt.colorbar(im, ax=ax)
+        cb.set_label('LFP (%s)' % lfp_data.dimensionality.string)
+        ax.set_xticklabels([])
+        ax.set_title('LFP')
+        ax.set_ylabel('ch #')
+        
+        #plot raw csd estimate
+        csd = csd_obj.get_csd()
+        ax = axes[1]
+        im = ax.imshow(np.array(csd), origin='upper', vmin=-abs(csd).max(), \
+              vmax=abs(csd).max(), cmap='jet_r', interpolation='nearest')
+        ax.axis(ax.axis('tight'))
+        ax.set_title(csd_obj.name)
+        cb = plt.colorbar(im, ax=ax)
+        cb.set_label('CSD (%s)' % csd.dimensionality.string)
+        ax.set_xticklabels([])
+        ax.set_ylabel('ch #')
+        
+        #plot spatially filtered csd estimate
+        ax = axes[2]
+        csd_fil = csd_obj.filter_csd(csd)
+        im = ax.imshow(np.array(csd_fil), origin='upper', vmin=-abs(csd_fil).max(), \
+              vmax=abs(csd_fil).max(), cmap='jet_r', interpolation='nearest')
+        ax.axis(ax.axis('tight'))
+        ax.set_title(csd_obj.name + ', filtered')
+        cb = plt.colorbar(im, ax=ax)
+        cb.set_label('CSD (%s)' % csd_fil.dimensionality.string)
+        ax.set_ylabel('ch #')
+        ax.set_xlabel('timestep')
+        
+    return csd.T, csd_fil.T 
 
 
 
