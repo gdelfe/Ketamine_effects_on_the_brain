@@ -13,7 +13,7 @@ from utils_general import *
 
 
 sess = 2 # session number 
-tot_min = 20
+tot_min = 2
 qband = 200 # Q factor in the notch filter 
 
 binFullPath = r'C:\Users\fentonlab\Desktop\Gino\LFPs'
@@ -34,7 +34,7 @@ bad_flag, next_id, bad_id = detect_silent_lfp_channel(Lfp,4,4,2500)
 # ====== Upsample Speed recording
 speed_up = upsample_speed(speed, Lfp, sess, LFP_rate = 2500, speed_rate = 100)
 
-#%%
+
 # =============================================================================
 # PLOTTING -- sanity checks / data visualization 
 # =============================================================================
@@ -48,12 +48,17 @@ speed_up = upsample_speed(speed, Lfp, sess, LFP_rate = 2500, speed_rate = 100)
 # # plot Lfp
 # plot_lfp_two_channels(Lfp,1,2,10,100,100,N=2500)
 # plot_lfp_various_channels(Lfp,0,9,0,60,3,3,10,N=2500)
- 
+
+
+# # RE-REFERENCING 
+# mean_B = Lfp_B_min - np.mean(Lfp_B_min, axis=1, keepdims=True)
+# plot_lfp_two_channels(Lfp_B_min,1,2,10,100,100,N=2500)
+# plot_lfp_two_channels(mean_B,1,2,10,100,100,N=2500)
+
 
 # ====== Split speed and Lfp into injection periods (epochs): baseline, low, mid, and high injection
 Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H = split_into_epochs(Lfp,speed_up,N=2500)
  
-
 
 # ====== Create list to store Lfp for each epoch: (channel, minute, n trial, trial data )
 nch = int(Lfp_B.shape[1]// 4) # number of channel after averaging a 2x2 block 
@@ -110,22 +115,27 @@ for current_min in range(0,tot_min):
    
     # === plot bad channel replaced and nearest neighbor
     # plot_lfp_two_channels(Lfp_L_min,bad_id,next_id,0,60,10,N=2500)
-   
-   
+
+#%% 
     # ====== Average Lfp in Neuropixel at the same depth (avg 2 electrodes together)
-    # Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_same_depth(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min)
+    Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_same_depth(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min)
+#%%
+    Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = compute_CSD(Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg)
+    
+#%%
     
     # ====== Average Lfp in Neuropixelin a 2x2 channel block (avg 4 electrodes together)
-    Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_4_channels(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min)
+    # Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_4_channels(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min)
 
-
+#%%
     # =============================================================================
     # Filter 1 min LFP (band pass)
     # =============================================================================
     
     # ====== Filter Lfp in each epoch
     lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H = filter_lfp_in_each_epoch(Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg, gain, qband)
-    
+
+#%%    
     # plot_filtered_lfp(lfp_filt_B,0,10,1,36, 2500)
     
     # ====== Decimate Lfp and speed (subsample)

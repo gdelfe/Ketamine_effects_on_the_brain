@@ -102,6 +102,8 @@ def plot_speed_histo_regimes(speed_up, th_low = 50,th_mid = 100):
 # PLOT LFP FUNCTIONS
 # =============================================================================
 
+# start and end in seconds 
+
 def plot_lfp_two_channels(Lfp,ch1,ch2,start,end,Xtick,N=2500):
 
     L_start = start*N # start of time series in sec
