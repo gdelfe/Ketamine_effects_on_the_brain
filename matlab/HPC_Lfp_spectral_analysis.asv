@@ -13,7 +13,11 @@ addpath('C:\Users\fentonlab\Desktop\Gino\Gino_codes\');
 iSess = 2; % python session number 
 sess = iSess + 1; % session number 
 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%
+name_lfp = '_CAR';
+name_file_psd = 'psd_hpc_car';
+method = 'CAR';
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % channels for HPC subareas 
 CA1 = 1:5;  % CA1 
 ripple = 6:11; % pyramidal layer 
@@ -21,7 +25,18 @@ rad = 12:17; % Radiatum
 lm = 18:22; % Loc Mol 
 dup = 23:25; % Dentate upper part 
 dd = 26:28; % Dentate lower part
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% % %%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % channels for HPC subareas 
+% CA1 = 1:11;  % CA1 
+% ripple = 13:23; % pyramidal layer 
+% rad = 24:35; % Radiatum 
+% lm = 36:45; % Loc Mol 
+% dup = 46:51; % Dentate upper part 
+% dd = 52:56; % Dentate lower part
+% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % directory and file names for the recording paths 
 main_dir = 'C:\Users\fentonlab\Desktop\Gino\LFPs\';
@@ -36,7 +51,7 @@ Paths_HPC = extract_paths(HPC_file_list);
 dir_rec = strcat(main_dir_HPC,Paths_HPC{sess}) % directory path  for the recording 
 
 % load LFPs and masks 
-[lfp, lfp_all, mask] = load_lfp_and_masks(dir_rec);
+[lfp, lfp_all, mask] = load_lfp_and_masks(dir_rec,name_lfp);
 
 
 % plot 1 min lfp to check data is loaded correctly 
@@ -60,29 +75,29 @@ plot(lfp.H{ch,min}(1,:))
 [lfp_agg.dd] = aggregate_trials_ch_range(lfp,dd);
 
 % compute PSD for each minute, for 20 min 
-[psd.CA1] = psd_across_min(lfp_agg.CA1, 3, 100);
-[psd.ripple] = psd_across_min(lfp_agg.ripple, 3, 100);
-[psd.rad] = psd_across_min(lfp_agg.rad, 3, 100);
-[psd.lm] = psd_across_min(lfp_agg.lm, 3, 100);
-[psd.dup] = psd_across_min(lfp_agg.dup, 3, 100);
-[psd.dd] = psd_across_min(lfp_agg.dd, 3, 100);
+[psd.CA1] = psd_across_min(lfp_agg.CA1, W, fk);
+[psd.ripple] = psd_across_min(lfp_agg.ripple, W, fk);
+[psd.rad] = psd_across_min(lfp_agg.rad, W, fk);
+[psd.lm] = psd_across_min(lfp_agg.lm, W, fk);
+[psd.dup] = psd_across_min(lfp_agg.dup, W, fk);
+[psd.dd] = psd_across_min(lfp_agg.dd, W, fk);
 
 % save psd for 20 min 
-save_psd(psd, dir_rec,'psd_hpc');
-psd = load_psd(dir_rec, 'psd_hpc');
+save_psd(psd, dir_rec, name_file_psd);
+psd = load_psd(dir_rec, name_file_psd);
 
 % plotting PSD
 % plot_psd_20_min(psd, 'PSD all HPC - Stationary - RS Ketamine', dir_rec,1)
 % plotting PSD normalized 
-plot_psd_20_min_normalize(psd.CA1, 'CA1 - PSD normalized - RS Ketamine',dir_rec,'CA1',1)
-plot_psd_20_min_normalize(psd.ripple, 'Ripple - PSD normalized  RS Ketamine', dir_rec, 'Ripple',1)
-plot_psd_20_min_normalize(psd.rad, 'Radiatum PSD - normalized - RS Ketamine', dir_rec, 'Radiatum',1)
-plot_psd_20_min_normalize(psd.lm, 'LocMol PSD - normalized - RS Ketamine', dir_rec, 'LocMol',1)
-plot_psd_20_min_normalize(psd.dup, 'Dentate Up PSD - normalized  - RS Ketamine', dir_rec,'DentUp', 1)
-plot_psd_20_min_normalize(psd.dd, 'Dentate Down - PSD - normalized - RS Ketamine', dir_rec, 'DentDown',1)
+plot_psd_20_min_normalize(psd.CA1, ['CA1 ',method,' - PSD normalized - RS Ketamine'],dir_rec,['CA1_',method],1,method)
+plot_psd_20_min_normalize(psd.ripple, ['Ripple ',method ,' - PSD normalized  RS Ketamine'], dir_rec, ['Ripple_',method],1,method)
+plot_psd_20_min_normalize(psd.rad, ['Radiatum ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['Radiatum_',method],1,method)
+plot_psd_20_min_normalize(psd.lm, ['LocMol ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['LocMol_',method],1,method)
+plot_psd_20_min_normalize(psd.dup, ['Dentate Up ',method,' - PSD normalized  - RS Ketamine'], dir_rec,['DentUp_',method], 1,method)
+plot_psd_20_min_normalize(psd.dd, ['Dentate Down ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['DentDown_',method],1,method)
 
 
-
+keyboard 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SPECTROGRAMS      %%%%%%%%%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -91,6 +106,8 @@ plot_psd_20_min_normalize(psd.dd, 'Dentate Down - PSD - normalized - RS Ketamine
 fs = 1250;
 start = 1; % 30*fs;
 ends = 60*fs;
+min_start = 14;
+min_end = 15;
 
 spec_par.fs = 1250;
 spec_par.fk = [0 100]; % freq range
@@ -99,15 +116,16 @@ k = floor(2*spec_par.tapers(1)*spec_par.tapers(2) - 1) % number of tapers used
 spec_par.dn = 0.05; % sliding step;
 
 % compute spectrograms whole HPC
-[spec_rec.CA1] = compute_spectrograms_whole_rec(lfp_all, fs, start, ends, spec_par, CA1);
-[spec_rec.riplle] = compute_spectrograms_whole_rec(lfp_all, fs, start, ends, spec_par, ripple);
-[spec_rec.rad] = compute_spectrograms_whole_rec(lfp_all, fs, start, ends, spec_par, rad);
-[spec_rec.lm] = compute_spectrograms_whole_rec(lfp_all, fs, start, ends, spec_par, lm);
-[spec_rec.dup] = compute_spectrograms_whole_rec(lfp_all, fs, start, ends, spec_par, dup);
-[spec_rec.dd] = compute_spectrograms_whole_rec(lfp_all, fs, start, ends, spec_par, dd);
+spec_rec = {};
+[spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all, 'CA1', fs, min_start, min_end,start, ends, spec_par, CA1);
+[spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all, 'ripple',fs, min_start, min_end, start, ends, spec_par, ripple);
+[spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all,'rad', fs, min_start, min_end, start, ends, spec_par, rad);
+[spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all,'lm', fs, min_start, min_end, start, ends, spec_par, lm);
+[spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all, 'dup', fs, min_start, min_end, start, ends, spec_par, dup);
+[spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all, 'dd', fs, min_start, min_end, start, ends, spec_par, dd);
 
 % save spectrograms whole HPC
-save_spectrograms(spec_rec, dir_rec)
+save_spectrograms(spec_rec, dir_rec, '\spec_rec_HPC_reg_min_14_15.mat')
 
 % load spectrograms whole HPC 
 spec_rec = load_spectrograms(dir_rec);
@@ -136,8 +154,7 @@ plot_20_min_spectrograms(spec_rec.H, spec_rec, step_t, step_f, range,'high','RS 
 plot_spectrograms_all_epochs(spec_rec, mask, step_t, step_f, min,'RS Ket',dir_rec,1)
 plot_spectrograms_all_epochs_and_gamma(spec_rec, mask, step_t, step_f, min,'RS Ket',dir_rec,1)
 
-
-
+plot_spectrograms_all_regions(spec_rec, 'H', mask, step_t, step_f, 1, 14, main_title, dir_rec, hpc_area, save)
 
 
 

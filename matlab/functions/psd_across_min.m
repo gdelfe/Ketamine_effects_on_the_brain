@@ -1,7 +1,7 @@
 
 function [psd] = spectrograms_across_min(lfp_agg, W, fk)
 
-display(['Computing PSD for the whole recoding  ...'])
+display(['Computing PSD for the whole recording  ...'])
 % W = 3; % Frequency resolution for PSD 
 N = 1250; % Lenght of time series
 sampling = 1250; % sampling 
