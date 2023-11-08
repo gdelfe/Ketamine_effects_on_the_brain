@@ -204,11 +204,40 @@ def filter_lfp_in_each_epoch(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min,gain,qband)
 
 # =============================================================================
 
-# Compute Current Source Density.
-# Output: CSD and CSD filtered 
 
-def compute_iCSD(Lfp):
+# Compute Current Source Density 
+# Method: most classic method via definition. Number of channels = N-2, where
+# N is the nch in the LFP signal 
+
+def compute_CSD(Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg):
     
+    import quantities as pq
+    
+    h = 20E-6 * pq.m  # Electrode Spacing in [m]
+    sigma = 0.3 * pq.S / pq.m
+    
+    Lfp_B_avg = Lfp_B_avg * 1E-6 * pq.V        # [uV] -> [V]
+    Lfp_L_avg = Lfp_L_avg * 1E-6 * pq.V        # [uV] -> [V]
+    Lfp_M_avg = Lfp_M_avg * 1E-6 * pq.V        # [uV] -> [V]
+    Lfp_H_avg = Lfp_H_avg * 1E-6 * pq.V        # [uV] -> [V]
+    
+    # Calculate the second spatial derivative
+    csd_B = - sigma * np.diff(Lfp_B_avg, n=2, axis=1)/ h**2
+    csd_L = - sigma * np.diff(Lfp_L_avg, n=2, axis=1)/ h**2
+    csd_M = - sigma * np.diff(Lfp_M_avg, n=2, axis=1)/ h**2
+    csd_H = - sigma * np.diff(Lfp_H_avg, n=2, axis=1)/ h**2
+    
+    return csd_B, csd_L, csd_M, csd_H
+
+
+# =============================================================================
+
+# Compute Current Source Density with the inverse method (iCSD)
+# Output: CSD and CSD filtered, same number of channels of the LFP signal 
+
+def compute_iCSD(Lfp, plotting = False):
+    
+    print('Compute iCSD ......')
     
     '''iCSD toolbox demonstration script'''
     import matplotlib.pyplot as plt
@@ -263,47 +292,62 @@ def compute_iCSD(Lfp):
     #get_csd() and filter_csd() below to get the raw and spatially filtered
     #versions of the current-source density estimates.
     csd_dict = dict(spline_icsd = icsd.SplineiCSD(**spline_input))
+        
+    if plotting: # If you want to plot iCSD and LFPs
+
+        #plot
+        for method, csd_obj in list(csd_dict.items()):
+            fig, axes = plt.subplots(3,1, figsize=(8,8))
+            
+            #plot LFP signal
+            ax = axes[0]
+            im = ax.imshow(np.array(lfp_data), origin='upper', vmin=-abs(lfp_data).max(), \
+                      vmax=abs(lfp_data).max(), cmap='jet_r', interpolation='nearest')
+            ax.axis(ax.axis('tight'))
+            cb = plt.colorbar(im, ax=ax)
+            cb.set_label('LFP (%s)' % lfp_data.dimensionality.string)
+            ax.set_xticklabels([])
+            ax.set_title('LFP')
+            ax.set_ylabel('ch #')
+            
+            #plot raw csd estimate
+            csd = csd_obj.get_csd()
+            ax = axes[1]
+            im = ax.imshow(np.array(csd), origin='upper', vmin=-abs(csd).max(), \
+                  vmax=abs(csd).max(), cmap='jet_r', interpolation='nearest')
+            ax.axis(ax.axis('tight'))
+            ax.set_title(csd_obj.name)
+            cb = plt.colorbar(im, ax=ax)
+            cb.set_label('CSD (%s)' % csd.dimensionality.string)
+            ax.set_xticklabels([])
+            ax.set_ylabel('ch #')
+            
+            #plot spatially filtered csd estimate
+            ax = axes[2]
+            csd_fil = csd_obj.filter_csd(csd)
+            im = ax.imshow(np.array(csd_fil), origin='upper', vmin=-abs(csd_fil).max(), \
+                  vmax=abs(csd_fil).max(), cmap='jet_r', interpolation='nearest')
+            ax.axis(ax.axis('tight'))
+            ax.set_title(csd_obj.name + ', filtered')
+            cb = plt.colorbar(im, ax=ax)
+            cb.set_label('CSD (%s)' % csd_fil.dimensionality.string)
+            ax.set_ylabel('ch #')
+            ax.set_xlabel('timestep')
+        
+    else: # no plotting 
+        for method, csd_obj in list(csd_dict.items()):
+            csd = csd_obj.get_csd()
+            csd_fil = csd_obj.filter_csd(csd)
+            
+            
+    # average csd for nearest neighbor channels (average two channels together)
+    csd_resh = csd.reshape(-1,2,csd.shape[1])
+    csd_mean = csd_resh.mean(axis=1)
     
-    #plot
-    for method, csd_obj in list(csd_dict.items()):
-        fig, axes = plt.subplots(3,1, figsize=(8,8))
-        
-        #plot LFP signal
-        ax = axes[0]
-        im = ax.imshow(np.array(lfp_data), origin='upper', vmin=-abs(lfp_data).max(), \
-                  vmax=abs(lfp_data).max(), cmap='jet_r', interpolation='nearest')
-        ax.axis(ax.axis('tight'))
-        cb = plt.colorbar(im, ax=ax)
-        cb.set_label('LFP (%s)' % lfp_data.dimensionality.string)
-        ax.set_xticklabels([])
-        ax.set_title('LFP')
-        ax.set_ylabel('ch #')
-        
-        #plot raw csd estimate
-        csd = csd_obj.get_csd()
-        ax = axes[1]
-        im = ax.imshow(np.array(csd), origin='upper', vmin=-abs(csd).max(), \
-              vmax=abs(csd).max(), cmap='jet_r', interpolation='nearest')
-        ax.axis(ax.axis('tight'))
-        ax.set_title(csd_obj.name)
-        cb = plt.colorbar(im, ax=ax)
-        cb.set_label('CSD (%s)' % csd.dimensionality.string)
-        ax.set_xticklabels([])
-        ax.set_ylabel('ch #')
-        
-        #plot spatially filtered csd estimate
-        ax = axes[2]
-        csd_fil = csd_obj.filter_csd(csd)
-        im = ax.imshow(np.array(csd_fil), origin='upper', vmin=-abs(csd_fil).max(), \
-              vmax=abs(csd_fil).max(), cmap='jet_r', interpolation='nearest')
-        ax.axis(ax.axis('tight'))
-        ax.set_title(csd_obj.name + ', filtered')
-        cb = plt.colorbar(im, ax=ax)
-        cb.set_label('CSD (%s)' % csd_fil.dimensionality.string)
-        ax.set_ylabel('ch #')
-        ax.set_xlabel('timestep')
-        
-    return csd.T, csd_fil.T 
+    csd_fil_resh = csd_fil.reshape(-1,2,csd_fil.shape[1])
+    csd_fil_mean = csd_fil_resh.mean(axis=1)
+            
+    return csd_mean.T, csd_fil_mean.T 
 
 
 

@@ -132,10 +132,11 @@ for current_min in range(0,tot_min):
     # ====== Decimate Lfp and speed (subsample)
     lfp_dec_B, lfp_dec_L, lfp_dec_M, lfp_dec_H, speed_dec_B, speed_dec_L, speed_dec_M, speed_dec_H = \
         decimate_lfp_and_speed(lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H, speed_B_min,speed_L_min,speed_M_min,speed_H_min)
-    
+
+
     # ====== Stack lfp all trials for each minute together 
     lfp_B_ep,lfp_L_ep,lfp_M_ep,lfp_H_ep = \
-        stack_lfp_1min_all_trials(lfp_B_ep,lfp_L_ep,lfp_M_ep,lfp_H_ep, lfp_dec_B, lfp_dec_L, lfp_dec_M, lfp_dec_H)
+        stack_lfp_1min_all_trials(lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, lfp_dec_B, lfp_dec_L, lfp_dec_M, lfp_dec_H)
 
     # =============================================================================
     # MASKING SPEED AND LFP ARTIFACTS 
@@ -173,7 +174,7 @@ for current_min in range(0,tot_min):
     
     # =============================================================================
     # LOW SPEED trials 
-    
+
     # ====== keep only good trial for low speed
     lfp_B_low_s_list, lfp_L_low_s_list, lfp_M_low_s_list, lfp_H_low_s_list = \
         keep_only_good_trials(LfpRB, LfpRL, LfpRM, LfpRH, tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s, "low speed")
