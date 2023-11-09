@@ -1,3 +1,8 @@
+% Load Lfp signal from pre-processing done in python.
+% Three types of files: low_speed/high_speed containing only low/high speed
+% trials with no artifacts; all_trials containing all trials regardless of
+% their speed 
+
 function [lfp, lfp_all, mask] = load_lfp_and_masks(BRAIN_reg_rec_dir,file_name)
 
 display(['Loading LFP data ...'])
