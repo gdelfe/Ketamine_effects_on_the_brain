@@ -1,4 +1,6 @@
 
+% Plot PSD from zscored spectrogram by averaging the time-dimension of the
+% spectrogram 
 
 function plot_zscored_psd_from_spectrogram(spec_rec, dir_rec, min, min_lab, save)
 
@@ -22,7 +24,7 @@ plot(f,psd_lm,'LineWidth', 2); hold on
 plot(f,psd_dup,'LineWidth', 2); hold on 
 plot(f,psd_dd,'LineWidth', 2); 
 xlabel('Frequency (Hz)')
-ylabel('Zscored Log PSD ')
+ylabel('Log10 PSD ')
 title('Baseline','FontSize',12)
 xlim([0,50])
 

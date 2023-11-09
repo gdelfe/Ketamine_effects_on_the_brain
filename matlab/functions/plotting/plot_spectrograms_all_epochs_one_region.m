@@ -25,10 +25,14 @@ ti = spec_rec.t ;
 % end
 
 fig = figure('Position', [0, 0, 1700, 700]);
+% color bar limits 
+low_lim = -2.5;
+high_lim = 2.5;
 
 % BASELINE 
 subplot(4,1,1)
 tvimage(zscore(log10(spec_rec.B.(reg)(:,:,min)),1,2)); colorbar; hold on 
+caxis([low_lim, high_lim]);
 title(sprintf('BASE, min = %d',min_lab),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
@@ -45,6 +49,7 @@ end
 % LOW INJECTION 
 subplot(4,1,2)
 tvimage(zscore(log10(spec_rec.L.(reg)(:,:,min)),1,2)); colorbar; hold on 
+caxis([low_lim, high_lim]);
 title(sprintf('LOW, min = %d',min_lab),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
@@ -63,6 +68,7 @@ end
 
 subplot(4,1,3)
 tvimage(zscore(log10(spec_rec.M.(reg)(:,:,min)),1,2)); colorbar; hold on 
+caxis([low_lim, high_lim]);
 title(sprintf('MID, min = %d',min_lab),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
@@ -78,7 +84,8 @@ end
 
 % HIGH INJECTION 
 subplot(4,1,4)
-tvimage(zscore(log10(spec_rec.H.(reg)(:,:,min)),1,2)); colorbar; hold on 
+tvimage(zscore(log10(spec_rec.H.(reg)(:,:,min)),1,2)); colorbar; hold on
+caxis([low_lim, high_lim]);
 title(sprintf('HIGH, min = %d',min_lab),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)

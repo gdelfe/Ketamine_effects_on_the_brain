@@ -32,6 +32,10 @@ from utils_plotting import *
 import pdb
 
 
+"""
+Load LFP data, trim it in order to align it with speed data
+Load speed data 
+"""
 def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
     
     
@@ -140,11 +144,16 @@ def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
 
 # =============================================================================
 
-# detect bad (silent) Lfp channel. The bad Lfp channel has much less activity than 
-# any other channel (about 1 order of magnitude less)
-# Procedure:
-# Scale each lfp channel by its mean, take the abs for each time point, take the min
-# of the abs(lfp), find the channel with the minimum abs(lfp) and flag it as bad channel
+"""
+Detect bad (silent) Lfp channel. 
+
+The bad Lfp channel has much less activity than 
+any other channel (about 1 order of magnitude less)
+Procedure:
+Scale each lfp channel by its mean, take the abs for each time point, take the min
+of the abs(lfp), find the channel with the minimum abs(lfp) and flag it as bad channel
+
+"""
 
 def detect_silent_lfp_channel(Lfp, length = 3, threshold = 4, N = 2500):
     
@@ -199,8 +208,7 @@ def detect_silent_lfp_channel(Lfp, length = 3, threshold = 4, N = 2500):
 
 # =============================================================================
 
-# Split Lfp and speed into 30 min Epochs: baseline, low dose injection, mid dose, high dose
-
+""" Split Lfp and speed into 30 min Epochs: baseline, low dose injection, mid dose, high dose """
 
 def split_into_epochs(Lfp,speed_up,N=2500):
     
@@ -229,7 +237,7 @@ def split_into_epochs(Lfp,speed_up,N=2500):
 
 # =============================================================================
 
-# Select only 1 min data at the time to speed up data processing 
+''' Select only 1 min data at the time to speed up data processing, for both LFP and speed '''
 
 def select_1min_data(Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H, current_min, N=2500):
     
@@ -263,7 +271,11 @@ def select_1min_data(Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, spee
 
 # =============================================================================
 
-# Replace bad lfp channel with the nearest neighbor channel
+''' 
+Replace bad lfp channel with the nearest neighbor channel 
+bad_id = bad channel id
+next_id = nearest neighbor id
+'''
 
 def replace_bad_lfp_channel(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min, bad_id, next_id):
     
@@ -276,11 +288,12 @@ def replace_bad_lfp_channel(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min, bad_id, 
 
 # =============================================================================
 
-
-# Average 4 channels in the Neuropixel together and keep only the average Lfp.
-# Channels averaged together are nearest neighbors in the x and y directions. 
-# They are in the same 2x2 block of channels.
-# The averaging is done for 1 min of data at the time to deal with excessive usage of RAM otherwise 
+"""
+Average 4 channels in the Neuropixel together and keep only the average Lfp.
+Channels averaged together are nearest neighbors in the x and y directions. 
+They are in the same 2x2 block of channels.
+The averaging is done for 1 min of data at the time to deal with excessive usage of RAM otherwise 
+"""
 
 def average_lfp_4_channels(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min):
     
@@ -320,10 +333,10 @@ def average_lfp_4_channels(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min):
 
 # =============================================================================
 
-
-# Average 2 channels in the Neuropixel array which are on the same depth, i.e.
-# average consecutive channels in the Lfp map, for each epoch separately, for 1 min of data at the time 
-
+"""
+Average 2 channels in the Neuropixel array which are on the same depth, same y 
+i.e. average consecutive channels in the Lfp map, for each epoch separately, for 1 min of data at the time 
+"""
 def average_lfp_same_depth(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min):
     
     print("Averaging lfp ...")
@@ -349,7 +362,8 @@ def average_lfp_same_depth(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min):
 
 # =============================================================================
 
- 
+"""" Subsample LFPs and speed to 1250 Hz """ 
+
 def decimate_lfp_and_speed(lfp_filt_B,lfp_filt_L,lfp_filt_M,lfp_filt_H,speed_B_min,speed_L_min,speed_M_min,speed_H_min):
     
     
@@ -367,15 +381,37 @@ def decimate_lfp_and_speed(lfp_filt_B,lfp_filt_L,lfp_filt_M,lfp_filt_H,speed_B_m
     
     return lfp_dec_B, lfp_dec_L, lfp_dec_M, lfp_dec_H, speed_dec_B, speed_dec_L, speed_dec_M, speed_dec_H
 
+
+
+# =============================================================================
+
+""" Stack all the 20 min of recordings for each epoch together, (n_min, T, n_ch) """
+
+def stack_lfp_1min_all_trials(lfp_B_epoch,lfp_L_epoch,lfp_M_epoch,lfp_H_epoch, lfp_dec_B, lfp_dec_L, lfp_dec_M, lfp_dec_H):
+     
+
+    lfp_B_epoch.append(lfp_dec_B) # add one minute lfp: trial num x trial length, for each channel
+    lfp_L_epoch.append(lfp_dec_L)
+    lfp_M_epoch.append(lfp_dec_M)
+    lfp_H_epoch.append(lfp_dec_H)
+    
+    
+    
+    return lfp_B_epoch, lfp_L_epoch, lfp_M_epoch, lfp_H_epoch
+
 # =============================================================================
 
 
-# input: 
-# lfp_dec: lfp (subsampled)
-# win: time length of the window we are looking at in time points, i.e. 1 sec = 1250 points
-# std_th: std threshold
-# period: string for baseline, low, etc..
+""" 
+Create a mask for the LFP trials with artifacts 
 
+input: 
+lfp_dec: lfp (subsampled)
+win: time length of the window we are looking at in time points, i.e. 1 sec = 1250 points
+std_th: std threshold
+period: string for baseline, low, etc..
+
+"""
 def lfp_artifacts_mask(lfp_dec,win,std_th):
 
     zlfp = zscore(lfp_dec,axis=0)
@@ -411,15 +447,18 @@ def lfp_artifacts_mask(lfp_dec,win,std_th):
 
 # =============================================================================
 
-# Create a speed mask. 
+"""
+Create a speed mask. 
 
-# True if speed < threshold at any point in a given time window of length win
-# False if there is at least one value above threshold in the given time window
-# Input: 
-# speed_up: upsampled speed
-# win: amplitude in data points of the win we are looking at for thresholding
-# thresh: speed threshold for speed
-# period: string for baseline, low, mid, high injection 
+True if speed < threshold at any point in a given time window of length win
+False if there is at least one value above threshold in the given time window
+Input: 
+speed_up: upsampled speed
+win: amplitude in data points of the win we are looking at for thresholding
+thresh: speed threshold for speed
+period: string for baseline, low, mid, high injection 
+
+"""
 
 def create_speed_mask(speed_up,win,thresh,level,period):
     mask = []
@@ -444,16 +483,18 @@ def create_speed_mask(speed_up,win,thresh,level,period):
 
 # =============================================================================
 
+"""
+Create mask for:
+    1. Lfp artifacts
+    2. speed (low and high speed)
+    3. Combine them together
 
-# Create mask for:
-#     1. Lfp artifacts
-#     2. speed (low and high speed)
-#     3. Combine them together
+win = window length, e.g. 1250 = 1 sec
+th = speed threshold 
 
-# win = window length, e.g. 1250 = 1 sec
-# th = speed threshold 
+Input: 1 min Lfp in the form: time x channel
 
-# Input: 1 min Lfp in the form: time x channel
+""" 
     
 def make_speed_and_lfp_maks(lfp_dec_B,lfp_dec_L, lfp_dec_M, lfp_dec_H, speed_dec_B, speed_dec_L, speed_dec_M, speed_dec_H, win = 1250, th = 30):
     
@@ -537,9 +578,35 @@ def make_speed_and_lfp_maks(lfp_dec_B,lfp_dec_L, lfp_dec_M, lfp_dec_H, speed_dec
 
 # =============================================================================
 
-# Keep only LFP good trials: those without artifacts
-# Method: mask LFP with the mask-good-trials
- 
+""" Stack mask for low and high speed relative to a given minute, in order to have masks for the whole 20 min period """
+
+def stack_mask_1min(mask_B_low, mask_L_low, mask_M_low, mask_H_low, 
+                     mask_B_high, mask_L_high, mask_M_high, mask_H_high,
+                     tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s,
+                     tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s, tot_mask_H_high_s):
+     
+
+    mask_B_low.append(tot_mask_B_low_s) # add one minute lfp: trial num x trial length, for each channel
+    mask_L_low.append(tot_mask_L_low_s) 
+    mask_M_low.append(tot_mask_M_low_s)
+    mask_H_low.append(tot_mask_H_low_s)
+    
+    mask_B_high.append(tot_mask_B_high_s) # add one minute lfp: trial num x trial length, for each channel
+    mask_L_high.append(tot_mask_L_high_s) 
+    mask_M_high.append(tot_mask_M_high_s)
+    mask_H_high.append(tot_mask_H_high_s)
+    
+    
+    
+    return mask_B_low, mask_L_low, mask_M_low, mask_H_low, mask_B_high, mask_L_high, mask_M_high, mask_H_high
+
+# =============================================================================
+
+"""
+Keep only LFP good trials: those without artifacts
+Method: mask LFP with the mask-good-trials
+"""
+
 def keep_only_good_trials(LfpRB,LfpRL,LfpRM,LfpRH, tot_mask_B,tot_mask_L,tot_mask_M,tot_mask_H, speed_string):
     
     
@@ -567,8 +634,14 @@ def keep_only_good_trials(LfpRB,LfpRL,LfpRM,LfpRH, tot_mask_B,tot_mask_L,tot_mas
         
     return lfp_B_list, lfp_L_list, lfp_M_list, lfp_H_list
 
+
+
 # =============================================================================
 
+""" 
+For each channel, stack all the min recordings together. For each epoch.
+Output: (min, T, channel) 
+"""
 def stack_lfp_1min(lfp_B_epoch,lfp_L_epoch,lfp_M_epoch,lfp_H_epoch,lfp_B_list,lfp_L_list,lfp_M_list,lfp_H_list):
     
     nch = len(lfp_B_list)
@@ -581,43 +654,7 @@ def stack_lfp_1min(lfp_B_epoch,lfp_L_epoch,lfp_M_epoch,lfp_H_epoch,lfp_B_list,lf
 
     return lfp_B_epoch, lfp_L_epoch, lfp_M_epoch, lfp_H_epoch
 
-# =============================================================================
 
-def stack_lfp_1min_all_trials(lfp_B_epoch,lfp_L_epoch,lfp_M_epoch,lfp_H_epoch, lfp_dec_B, lfp_dec_L, lfp_dec_M, lfp_dec_H):
-     
-
-    lfp_B_epoch.append(lfp_dec_B) # add one minute lfp: trial num x trial length, for each channel
-    lfp_L_epoch.append(lfp_dec_L)
-    lfp_M_epoch.append(lfp_dec_M)
-    lfp_H_epoch.append(lfp_dec_H)
-    
-    
-    
-    return lfp_B_epoch, lfp_L_epoch, lfp_M_epoch, lfp_H_epoch
-
-
-# =============================================================================
-
-
-def stack_mask_1min_(mask_B_low, mask_L_low, mask_M_low, mask_H_low, 
-                     mask_B_high, mask_L_high, mask_M_high, mask_H_high,
-                     tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s,
-                     tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s, tot_mask_H_high_s):
-     
-
-    mask_B_low.append(tot_mask_B_low_s) # add one minute lfp: trial num x trial length, for each channel
-    mask_L_low.append(tot_mask_L_low_s) 
-    mask_M_low.append(tot_mask_M_low_s)
-    mask_H_low.append(tot_mask_H_low_s)
-    
-    mask_B_high.append(tot_mask_B_high_s) # add one minute lfp: trial num x trial length, for each channel
-    mask_L_high.append(tot_mask_L_high_s) 
-    mask_M_high.append(tot_mask_M_high_s)
-    mask_H_high.append(tot_mask_H_high_s)
-    
-    
-    
-    return mask_B_low, mask_L_low, mask_M_low, mask_H_low, mask_B_high, mask_L_high, mask_M_high, mask_H_high
 
 
 # =============================================================================

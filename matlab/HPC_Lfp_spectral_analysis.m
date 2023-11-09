@@ -18,7 +18,7 @@ fk = 100; % max frequency PSD
 
 % name files to load/save (depending on the re-referencing technique used)
 name_lfp = '_CSD';
-name_file_psd = 'psd_hpc_c';
+name_file_psd = 'psd_hpc_csd';
 method = 'CSD';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -100,6 +100,9 @@ plot_psd_20_min_normalize(psd.dup, ['Dentate Up ',method,' - PSD normalized  - R
 plot_psd_20_min_normalize(psd.dd, ['Dentate Down ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['DentDown_',method],1,method)
 
 
+plot_psd_all_HPC_region_all_epochs(psd, dir_rec, 14, 1, 'CSD')
+plot_psd_all_HPC_region_all_epochs_normalized(psd, dir_rec, 14, 1, 'CSD')
+
 keyboard 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SPECTROGRAMS      %%%%%%%%%
@@ -128,7 +131,7 @@ spec_rec = {};
 [spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all, 'dd', fs, min_start, min_end, start, ends, spec_par, dd);
 
 % save spectrograms whole HPC
-save_spectrograms(spec_rec, dir_rec, '\spec_rec_HPC_reg_min_14_15.mat')
+save_spectrograms(spec_rec, dir_rec, '\spec_rec_HPC_lfp_CDS_reg_min_14_15.mat')
 
 % load spectrograms whole HPC 
 spec_rec = load_spectrograms(dir_rec);
@@ -163,7 +166,10 @@ plot_spectrograms_all_epochs_and_gamma(spec_rec, mask, step_t, step_f, min,'RS K
 % NEW STUFF 
 % %%%%%%%%%%%%%%%%%%
 
+plot_spectrograms_all_regions(spec_rec, 'B', mask, step_t, step_f, min, min_lab, 'RS Ket - BASELINE', dir_rec, 1)
+plot_spectrograms_all_regions(spec_rec, 'L', mask, step_t, step_f, min, min_lab, 'RS Ket - LOW DOSE', dir_rec, 1)
 plot_spectrograms_all_regions(spec_rec, 'M', mask, step_t, step_f, min, min_lab, 'RS Ket - MID DOSE', dir_rec, 1)
+plot_spectrograms_all_regions(spec_rec, 'H', mask, step_t, step_f, min, min_lab, 'RS Ket - HIGH DOSE', dir_rec, 1)
 
 
 plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min_lab, 'RS Ket - CA1', dir_rec, 'CA1', 1)

@@ -1,5 +1,6 @@
 
-% Aggregate trials relative to the same minute, to compute PSD 
+% Aggregate trials relative to the same minute, to compute PSD for each
+% specific minute. Trials are
 
 function [lfp_agg] = aggregate_trials_ch_range(lfp,ch_range)
 

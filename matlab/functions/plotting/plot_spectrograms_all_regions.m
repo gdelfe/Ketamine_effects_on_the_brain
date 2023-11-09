@@ -27,10 +27,14 @@ ti = spec_rec.t ;
 % end
 
 fig = figure('Position', [0, 0, 1700, 3900]);
+% color bar limits 
+low_lim = -2.5;
+high_lim = 2.5;
 
 % CA1
 subplot(6,1,1)
 tvimage(zscore(log10(spec_rec.(epoch).CA1(:,:,min)),1,2)); colorbar; hold on 
+caxis([low_lim, high_lim]);
 title(sprintf('CA1, min = %d',min_lab),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
@@ -46,7 +50,8 @@ end
 
 % Ripple
 subplot(6,1,2)
-tvimage(zscore(log10(spec_rec.(epoch).ripple(:,:,min)),1,2)); colorbar; hold on 
+tvimage(zscore(log10(spec_rec.(epoch).ripple(:,:,min)),1,2)); colorbar; hold on
+caxis([low_lim, high_lim]);
 title(sprintf('Ripple, min = %d',min_lab),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
@@ -63,6 +68,7 @@ end
 % Radiatum
 subplot(6,1,3)
 tvimage(zscore(log10(spec_rec.(epoch).rad(:,:,min)),1,2)); colorbar; hold on 
+caxis([low_lim, high_lim]);
 title(sprintf('Radiatum, min = %d',min_lab),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
@@ -78,6 +84,7 @@ end
 % LocMol
 subplot(6,1,4)
 tvimage(zscore(log10(spec_rec.(epoch).lm(:,:,min)),1,2)); colorbar; hold on 
+caxis([low_lim, high_lim]);
 title(sprintf('LocMol, min = %d',min_lab),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
@@ -93,6 +100,7 @@ end
 % Dentate Up
 subplot(6,1,5)
 tvimage(zscore(log10(spec_rec.(epoch).dup(:,:,min)),1,2)); colorbar; hold on 
+caxis([low_lim, high_lim]);
 title(sprintf('Dentate Up, min = %d',min_lab),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
@@ -107,6 +115,7 @@ end
 % Dentate Down
 subplot(6,1,6)
 tvimage(zscore(log10(spec_rec.(epoch).dd(:,:,min)),1,2)); colorbar; hold on 
+caxis([low_lim, high_lim]);
 title(sprintf('Dentate Down, min = %d',min_lab),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
