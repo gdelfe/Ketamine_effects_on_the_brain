@@ -14,7 +14,7 @@ plot(f,log10(psd.dup.B(min,:)/sum(psd.dup.B(min,:))),'LineWidth', 2); hold on
 plot(f,log10(psd.dd.B(min,:)/sum(psd.dd.B(min,:))),'LineWidth', 2); hold on
 
 xlabel('Frequency (Hz)')
-ylabel('Zscored Log PSD ')
+ylabel('Log10 PSD ')
 title('Baseline','FontSize',12)
 xlim([0,fmax])
 

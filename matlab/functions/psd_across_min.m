@@ -1,5 +1,5 @@
 
-function [psd] = spectrograms_across_min(lfp_agg, W, fk)
+function [psd] = spectrograms_across_min(lfp_agg, reg, W, fk)
 
 display(['Computing PSD for the whole recording  ...'])
 % W = 3; % Frequency resolution for PSD 

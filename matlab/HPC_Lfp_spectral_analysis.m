@@ -57,7 +57,7 @@ dir_rec = strcat(main_dir_HPC,Paths_HPC{sess}) % directory path  for the recordi
 % load LFPs and masks 
 [lfp, lfp_all, mask] = load_lfp_and_masks(dir_rec,name_lfp);
 
-
+nch = size(lfp_all.B,3);
 % plot 1 min lfp to check data is loaded correctly 
 figure;
 plot(lfp.B{ch,min}(1,:)); hold on 
@@ -70,6 +70,10 @@ plot(lfp.H{ch,min}(1,:))
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % aggregate trials 
+lfp_agg = {};
+[lfp_agg] = aggregate_trials_ch_range(lfp_agg, lfp,'HPC',1:nch); % All HPC
+[lfp_agg] = aggregate_trials_ch_range(lfp_agg, lfp,'CA1',CA1);
+
 [lfp_agg.CA1] = aggregate_trials_ch_range(lfp,CA1);
 [lfp_agg.ripple] = aggregate_trials_ch_range(lfp,ripple);
 [lfp_agg.rad] = aggregate_trials_ch_range(lfp,rad);
@@ -99,9 +103,9 @@ plot_psd_20_min_normalize(psd.lm, ['LocMol ',method,' - PSD normalized - RS Keta
 plot_psd_20_min_normalize(psd.dup, ['Dentate Up ',method,' - PSD normalized  - RS Ketamine'], dir_rec,['DentUp_',method], 1,method)
 plot_psd_20_min_normalize(psd.dd, ['Dentate Down ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['DentDown_',method],1,method)
 
-
-plot_psd_all_HPC_region_all_epochs(psd, dir_rec, 14, 1, 'CSD')
-plot_psd_all_HPC_region_all_epochs_normalized(psd, dir_rec, 14, 1, 'CSD')
+% plot 1 min PSD for each region, each epoch 
+plot_psd_all_HPC_region_all_epochs(psd, dir_rec, 10, 1, 'CSD')
+plot_psd_all_HPC_region_all_epochs_normalized(psd, dir_rec, 10, 1, 'CSD')
 
 keyboard 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -123,6 +127,7 @@ spec_par.dn = 0.05; % sliding step;
 
 % compute spectrograms whole HPC
 spec_rec = {};
+[spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all, 'hpc', fs, min_start, min_end, start, ends, spec_par, 1:nch); % all HPC 
 [spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all, 'CA1', fs, min_start, min_end,start, ends, spec_par, CA1);
 [spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all, 'ripple',fs, min_start, min_end, start, ends, spec_par, ripple);
 [spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all,'rad', fs, min_start, min_end, start, ends, spec_par, rad);
@@ -162,16 +167,17 @@ plot_20_min_spectrograms(spec_rec.H, spec_rec, step_t, step_f, range,'high','RS 
 plot_spectrograms_all_epochs(spec_rec, mask, step_t, step_f, min,'RS Ket',dir_rec,1)
 plot_spectrograms_all_epochs_and_gamma(spec_rec, mask, step_t, step_f, min,'RS Ket',dir_rec,1)
 
-% %%%%%%%%%%%%%%%%%%
-% NEW STUFF 
-% %%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PLOT SPECTROGRAMS FOR SUBREGIONS HPC
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% PLOT SPECTROGRAM FOR EACH EPOCH, EACH SUBREGION 
 plot_spectrograms_all_regions(spec_rec, 'B', mask, step_t, step_f, min, min_lab, 'RS Ket - BASELINE', dir_rec, 1)
 plot_spectrograms_all_regions(spec_rec, 'L', mask, step_t, step_f, min, min_lab, 'RS Ket - LOW DOSE', dir_rec, 1)
 plot_spectrograms_all_regions(spec_rec, 'M', mask, step_t, step_f, min, min_lab, 'RS Ket - MID DOSE', dir_rec, 1)
 plot_spectrograms_all_regions(spec_rec, 'H', mask, step_t, step_f, min, min_lab, 'RS Ket - HIGH DOSE', dir_rec, 1)
 
-
+% PLOT SPECTROGRAM FOR EACH REGION, FOR ALL THE 4 EPOCHS 
 plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min_lab, 'RS Ket - CA1', dir_rec, 'CA1', 1)
 plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min_lab, 'RS Ket - Ripple', dir_rec, 'ripple', 1)
 plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min_lab, 'RS Ket - Radiatum', dir_rec, 'rad', 1)
@@ -179,7 +185,8 @@ plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min
 plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min_lab, 'RS Ket - Dentate Up', dir_rec, 'dup', 1)
 plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min_lab, 'RS Ket - Dentate Down', dir_rec, 'dd', 1)
 
-plot_zscored_psd_from_spectrogram(spec_rec,dir_rec,min,min_lab,1)
+% plot_zscored_psd_from_spectrogram(spec_rec,dir_rec,min,min_lab,1)
+% plot_psd_from_spectrogram(spec_rec,dir_rec,min,min_lab,1)
 
 
 
