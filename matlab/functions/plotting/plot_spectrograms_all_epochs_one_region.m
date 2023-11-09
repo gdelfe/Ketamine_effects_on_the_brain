@@ -115,7 +115,7 @@ if save
     if ~exist(dir_out, 'dir')
         mkdir(dir_out)
     end
-    saveas(fig,strcat(dir_out,sprintf('\\spec_all_epochs_min_%d_%s.png',min,reg) ) )
+    saveas(fig,strcat(dir_out,sprintf('\\spec_all_epochs_min_%d_%s.png',min_lab,reg) ) )
 end
 
 end
