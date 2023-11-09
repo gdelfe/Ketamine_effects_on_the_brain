@@ -78,6 +78,7 @@ def bandstop_filter(data, f_low, f_high, fs=2500, order=4):
 # Speed-related functions 
 # =============================================================================
 
+""" Upsample speed data to 2500 Hz, i.e. same resolution as LFP data """
 
 def upsample_speed(speed, LFP, sess, LFP_rate = 2500, speed_rate = 100):
     
@@ -173,8 +174,10 @@ def lfp_artifacts_mask(lfp_dec,win,std_th):
 
 # =============================================================================
 
-# scale Lfp into mV and band pass it at [1,300] Hz by using a non-causal filter
-# Apply notch filter at 60 Hz to remove power line distortion
+"""
+Scale Lfp into mV and band pass it at [1,300] Hz by using a non-causal filter
+Apply notch filter at 60 Hz to remove power line distortion
+"""
 
 def filter_lfp_in_each_epoch(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min,gain,qband):
 
@@ -205,9 +208,11 @@ def filter_lfp_in_each_epoch(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min,gain,qband)
 # =============================================================================
 
 
-# Compute Current Source Density 
-# Method: most classic method via definition. Number of channels = N-2, where
-# N is the nch in the LFP signal 
+"""
+Compute Current Source Density 
+Method: most classic method via definition. Number of channels = N-2, where
+N is the nch in the LFP signal 
+"""
 
 def compute_CSD(Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg):
     
@@ -232,8 +237,10 @@ def compute_CSD(Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg):
 
 # =============================================================================
 
-# Compute Current Source Density with the inverse method (iCSD)
-# Output: CSD and CSD filtered, same number of channels of the LFP signal 
+"""
+Compute Current Source Density with the inverse method (iCSD)
+Output: CSD and CSD filtered, same number of channels of the LFP signal
+""" 
 
 def compute_iCSD(Lfp, plotting = False):
     
@@ -341,6 +348,7 @@ def compute_iCSD(Lfp, plotting = False):
             
             
     # average csd for nearest neighbor channels (average two channels together)
+    # the number of resulting channels at the end of this process will be Nch/4
     csd_resh = csd.reshape(-1,2,csd.shape[1])
     csd_mean = csd_resh.mean(axis=1)
     

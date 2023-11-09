@@ -7,7 +7,7 @@ Created on Tue Nov  7 11:49:25 2023
 
 # -*- coding: utf-8 -*-
 """
-Spyder Editor
+
 
 @ Gino Del Ferraro, Fenton lab, Oct 2023
 """
@@ -19,7 +19,7 @@ from utils_general import *
 
 
 sess = 2 # session number 
-tot_min = 20
+tot_min = 3
 qband = 200 # Q factor in the notch filter 
 
 binFullPath = r'C:\Users\fentonlab\Desktop\Gino\LFPs'
@@ -67,19 +67,20 @@ Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H = split_into_epoc
  
 
 # ====== Create list to store Lfp for each epoch: (channel, minute, n trial, trial data )
-nch = int(Lfp_B.shape[1]// 2) # number of channel after averaging a 2x2 block 
-# low speed
+nch = int(Lfp_B.shape[1]// 4) # number of channel after averaging a 2x2 block 
+
+# low speed --- list: channel, minute, ntrial, T
 lfp_B_ep_low_s = [[] for ch in range(nch)]
 lfp_L_ep_low_s = [[] for ch in range(nch)]
 lfp_M_ep_low_s = [[] for ch in range(nch)]
 lfp_H_ep_low_s = [[] for ch in range(nch)]
-# high speed
+# high speed --- list: channel, minute, ntrial, T
 lfp_B_ep_high_s = [[] for ch in range(nch)]
 lfp_L_ep_high_s = [[] for ch in range(nch)]
 lfp_M_ep_high_s = [[] for ch in range(nch)]
 lfp_H_ep_high_s = [[] for ch in range(nch)]
 
-# all trials 
+# all trials --- minute, T, channel
 lfp_B_ep = []
 lfp_L_ep = []
 lfp_M_ep = []
@@ -107,9 +108,11 @@ for current_min in range(0,tot_min):
     
     print('\n# ======== Current minute = {}  ----------------------- \n'.format(current_min))
     
-    # =============================================================================
-    # Prepare Lfp data, 1 min 
-    # =============================================================================
+    """ 
+    =============================================================================
+    Prepare Lfp data, 1 min 
+    ============================================================================= 
+    """
     
     # ====== Select 1 min data 
     Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min, speed_B_min, speed_L_min, speed_M_min, speed_H_min = \
@@ -122,28 +125,30 @@ for current_min in range(0,tot_min):
     # === plot bad channel replaced and nearest neighbor
     # plot_lfp_two_channels(Lfp_L_min,bad_id,next_id,0,60,10,N=2500)
 
-    # ====== Average Lfp in Neuropixel at the same depth (avg 2 electrodes together)
+    # ====== Average Lfp in Neuropixel at the same depth, same y (avg 2 electrodes together)
     Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_same_depth(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min)
         
-    # ====== Average Lfp in Neuropixelin a 2x2 channel block (avg 4 electrodes together)
+    # ====== Average Lfp in Neuropixel in a 2x2 channel block (avg 4 electrodes together)
     # Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_4_channels(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min)
 
-    # =============================================================================
-    # Filter 1 min LFP (band pass)
-    # =============================================================================
+    """
+    =============================================================================
+    Filter 1 min LFP (band pass) and compute CSD
+    =============================================================================
+    """
     
-    # ====== Filter Lfp in each epoch
+    # ====== Filter Lfp in each epoch (baseline, low dose, mid dose, high dose)
     lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H = filter_lfp_in_each_epoch(Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg, gain, qband)
     
 
     # plot_filtered_lfp(lfp_filt_B,0,10,1,36, 2500)
     
-    # ====== Decimate Lfp and speed (subsample)
+    # ====== Decimate Lfp and speed (subsample at 1250 Hz)
     lfp_dec_B, lfp_dec_L, lfp_dec_M, lfp_dec_H, speed_dec_B, speed_dec_L, speed_dec_M, speed_dec_H = \
         decimate_lfp_and_speed(lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H, speed_B_min,speed_L_min,speed_M_min,speed_H_min)
              
-        
-    # Compute CSD and filtered CSD 
+   
+    # ====== Compute Current Source Density (CSD) and filtered CSD 
     csd_B, csd_B_fil  = compute_iCSD(lfp_dec_B)
     csd_L, csd_L_fil  = compute_iCSD(lfp_dec_L)
     csd_M, csd_M_fil  = compute_iCSD(lfp_dec_M)
@@ -154,16 +159,19 @@ for current_min in range(0,tot_min):
     lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep = \
         stack_lfp_1min_all_trials(lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, csd_B_fil, csd_L_fil, csd_M_fil, csd_H_fil)
 
-    # =============================================================================
-    # MASKING SPEED AND LFP ARTIFACTS 
-    # =============================================================================
+    """
+    =============================================================================
+    MASKING SPEED AND LFP ARTIFACTS 
+    =============================================================================
+    """  
     
+    # ====== Combine speed mask with LFP artifacts mask 
     tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s, tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s,tot_mask_H_high_s = \
         make_speed_and_lfp_maks(lfp_dec_B,lfp_dec_L, lfp_dec_M, lfp_dec_H, speed_dec_B, speed_dec_L, speed_dec_M, speed_dec_H, win = 1250, th = 30)
   
     # ====== Stack lfp all trials for each minute together
     mask_B_low, mask_L_low, mask_M_low, mask_H_low, mask_B_high, mask_L_high, mask_M_high, mask_H_high = \
-        stack_mask_1min_(mask_B_low, mask_L_low, mask_M_low, mask_H_low, 
+        stack_mask_1min(mask_B_low, mask_L_low, mask_M_low, mask_H_low, 
                          mask_B_high, mask_L_high, mask_M_high, mask_H_high,
                          tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s,
                          tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s, tot_mask_H_high_s)
@@ -173,7 +181,7 @@ for current_min in range(0,tot_min):
     #  Reshape Lfp into: trial number, trial length, channels
     # =============================================================================
     
-    # ====== reshape Lfp in trial x time window x channels
+    # ====== reshape CSD in trial x time window x channels
     win = 1250
     LfpRB = csd_B_fil.reshape(int(csd_B_fil.shape[0]/win),-1,csd_B_fil.shape[1]) # reshape Lfp: trial x win length x channel
     LfpRL = csd_L_fil.reshape(int(csd_L_fil.shape[0]/win),-1,csd_L_fil.shape[1]) # reshape Lfp: trial x win length x channel
@@ -185,12 +193,14 @@ for current_min in range(0,tot_min):
     print('reshaped Lfp, ', LfpRB.shape, LfpRL.shape, LfpRM.shape, LfpRH.shape)
     
     
-    # =============================================================================
-    # Keep good trials only and stack them into a 4D array
-    # =============================================================================
+    """
+    =============================================================================
+    Keep good trials only and stack them into a 4D array, for PSD calculation 
+    =============================================================================
+    """
     
     # =============================================================================
-    # LOW SPEED trials 
+    """LOW SPEED trials""" 
     
     # ====== keep only good trial for low speed (no artifacts)
     lfp_B_low_s_list, lfp_L_low_s_list, lfp_M_low_s_list, lfp_H_low_s_list = \
@@ -200,7 +210,7 @@ for current_min in range(0,tot_min):
         stack_lfp_1min(lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_ep_low_s, lfp_H_ep_low_s, lfp_B_low_s_list, lfp_L_low_s_list, lfp_M_low_s_list, lfp_H_low_s_list)
 
     # =============================================================================
-    # HIGH SPEED trials 
+    """HIGH SPEED trials """
     
     # ====== keep only good trial for high speed (no artifacts)
     lfp_B_high_s_list, lfp_L_high_s_list, lfp_M_high_s_list, lfp_H_high_s_list = \
@@ -213,6 +223,7 @@ for current_min in range(0,tot_min):
     print('nch ', len(lfp_B_ep_low_s), 'n. min ', len(lfp_B_ep_low_s[0][0]),' size', lfp_B_ep_low_s[0][0].shape)
 
 
+#%%
 # =============================================================================
 # Save files in matlab
 # =============================================================================
