@@ -12,10 +12,14 @@ addpath('C:\Users\fentonlab\Desktop\Gino\Gino_codes\');
 
 iSess = 2; % python session number 
 sess = iSess + 1; % session number 
+ch = 1; min = 13; % channel and minute to look at 
+W  = 3; % frequency resolution PSD
+fk = 100; % max frequency PSD
 
-name_lfp = '_CAR';
-name_file_psd = 'psd_hpc_car';
-method = 'CAR';
+% name files to load/save (depending on the re-referencing technique used)
+name_lfp = '_CSD';
+name_file_psd = 'psd_hpc_c';
+method = 'CSD';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % channels for HPC subareas 
@@ -55,7 +59,6 @@ dir_rec = strcat(main_dir_HPC,Paths_HPC{sess}) % directory path  for the recordi
 
 
 % plot 1 min lfp to check data is loaded correctly 
-ch = 1; min = 13;
 figure;
 plot(lfp.B{ch,min}(1,:)); hold on 
 plot(lfp.L{ch,min}(1,:)); hold on 
@@ -137,6 +140,8 @@ spec_rec = load_spectrograms(dir_rec);
 
 step_t = 10;
 step_f = 20;
+min = 1;
+min_lab = 14;
 
 % plot single spectrograms:
 title_spec = sprintf('min %d',min);
@@ -154,9 +159,21 @@ plot_20_min_spectrograms(spec_rec.H, spec_rec, step_t, step_f, range,'high','RS 
 plot_spectrograms_all_epochs(spec_rec, mask, step_t, step_f, min,'RS Ket',dir_rec,1)
 plot_spectrograms_all_epochs_and_gamma(spec_rec, mask, step_t, step_f, min,'RS Ket',dir_rec,1)
 
-plot_spectrograms_all_regions(spec_rec, 'M', mask, step_t, step_f, 1, 14, 'RS Ket - MID DOSE', dir_rec, 1)
+% %%%%%%%%%%%%%%%%%%
+% NEW STUFF 
+% %%%%%%%%%%%%%%%%%%
+
+plot_spectrograms_all_regions(spec_rec, 'M', mask, step_t, step_f, min, min_lab, 'RS Ket - MID DOSE', dir_rec, 1)
 
 
+plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min_lab, 'RS Ket - CA1', dir_rec, 'CA1', 1)
+plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min_lab, 'RS Ket - Ripple', dir_rec, 'ripple', 1)
+plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min_lab, 'RS Ket - Radiatum', dir_rec, 'rad', 1)
+plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min_lab, 'RS Ket - LocMol', dir_rec, 'lm', 1)
+plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min_lab, 'RS Ket - Dentate Up', dir_rec, 'dup', 1)
+plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min_lab, 'RS Ket - Dentate Down', dir_rec, 'dd', 1)
+
+plot_zscored_psd_from_spectrogram(spec_rec,dir_rec,min,min_lab,1)
 
 
 
