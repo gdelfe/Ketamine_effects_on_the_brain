@@ -209,6 +209,60 @@ def filter_lfp_in_each_epoch(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min,gain,qband)
 
 
 """
+Scale Lfp into mV and band pass it at [1,300] Hz by using a non-causal filter
+Apply notch filter at 60 Hz to remove power line distortion
+"""
+
+def filter_lfp_in_each_epoch_and_frequency(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min, lowcut, highcut, gain):
+
+    print('Filtering Lfp ...')
+    
+    # baseline
+    lfp_scaled_B = Lfp_B_min*gain*1e6 # scale in uV
+    lfp_filt_B_bp = bandpass_filter(lfp_scaled_B, lowcut, highcut, fs, order=5) # band pass filter at 1 Hz and 300 Hz
+    
+    # low injection 
+    lfp_scaled_L = Lfp_L_min*gain*1e6 # scale in uV
+    lfp_filt_L_bp = bandpass_filter(lfp_scaled_L, lowcut, highcut, fs, order=5) # band pass filter at 1 Hz and 300 Hz
+    
+    # mid injection 
+    lfp_scaled_M = Lfp_M_min*gain*1e6 # scale in uV
+    lfp_filt_M_bp = bandpass_filter(lfp_scaled_M, lowcut, highcut, fs, order=5) # band pass filter at 1 Hz and 300 Hz
+    
+    # high injection 
+    lfp_scaled_H = Lfp_H_min*gain*1e6 # scale in uV
+    lfp_filt_H_bp = bandpass_filter(lfp_scaled_H, lowcut, highcut, fs, order=5) # band pass filter at 1 Hz and 300 Hz
+
+    return lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H
+
+# =============================================================================
+
+"""
+Apply notch filter at 60 Hz (power line)
+"""
+
+def filter_lfp_notch_filter(lfp_filt_B_bp, lfp_filt_L_bp, lfp_filt_M_bp, lfp_filt_H_bp, qband, fs =2500):
+
+    print('Filtering Lfp ...')
+    
+    # baseline
+    lfp_filt_B = notch_filter(lfp_filt_B_bp, 60, fs, Q=qband)
+    
+    # low injection 
+    lfp_filt_L = notch_filter(lfp_filt_L_bp, 60, fs, Q=qband)
+    
+    # mid injection 
+    lfp_filt_M = notch_filter(lfp_filt_M_bp, 60, fs, Q=qband)
+    
+    # high injection 
+    lfp_filt_H = notch_filter(lfp_filt_H_bp, 60, fs, Q=qband)
+
+    return lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H
+
+# =============================================================================
+
+
+"""
 Compute Current Source Density 
 Method: most classic method via definition. Number of channels = N-2, where
 N is the nch in the LFP signal 

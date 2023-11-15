@@ -19,7 +19,7 @@ from utils_general import *
 
 
 sess = 2 # session number 
-tot_min = 3
+tot_min = 20
 qband = 200 # Q factor in the notch filter 
 
 binFullPath = r'C:\Users\fentonlab\Desktop\Gino\LFPs'
@@ -32,7 +32,7 @@ PFC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs','PFC_lfp_pa
 # =============================================================================
 
 # ====== Load Lfp and speed data for a specific recording and brain area 
-Lfp, speed, gain, rec = load_data(binFullPath,HPC_path_file,PFC_path_file,"HPC",sess)
+Lfp, speed, gain, rec, _ , _ = load_data(binFullPath,HPC_path_file,PFC_path_file,"HPC",sess)
 
 # ====== Detect bad (silent) Lfp channel (if it exist)
 bad_flag, next_id, bad_id = detect_silent_lfp_channel(Lfp,4,4,2500)
@@ -80,7 +80,7 @@ lfp_L_ep_high_s = [[] for ch in range(nch)]
 lfp_M_ep_high_s = [[] for ch in range(nch)]
 lfp_H_ep_high_s = [[] for ch in range(nch)]
 
-# all trials --- minute, T, channel
+# all trials --- minute, T*60, channel
 lfp_B_ep = []
 lfp_L_ep = []
 lfp_M_ep = []
@@ -223,7 +223,7 @@ for current_min in range(0,tot_min):
     print('nch ', len(lfp_B_ep_low_s), 'n. min ', len(lfp_B_ep_low_s[0][0]),' size', lfp_B_ep_low_s[0][0].shape)
 
 
-#%%
+
 # =============================================================================
 # Save files in matlab
 # =============================================================================
