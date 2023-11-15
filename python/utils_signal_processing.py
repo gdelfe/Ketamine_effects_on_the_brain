@@ -213,7 +213,7 @@ Scale Lfp into mV and band pass it at [1,300] Hz by using a non-causal filter
 Apply notch filter at 60 Hz to remove power line distortion
 """
 
-def filter_lfp_in_each_epoch_and_frequency(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min, lowcut, highcut, gain):
+def filter_lfp_in_each_epoch_and_frequency(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min, lowcut, highcut, gain, fs = 250):
 
     print('Filtering Lfp ...')
     
@@ -233,7 +233,7 @@ def filter_lfp_in_each_epoch_and_frequency(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_
     lfp_scaled_H = Lfp_H_min*gain*1e6 # scale in uV
     lfp_filt_H_bp = bandpass_filter(lfp_scaled_H, lowcut, highcut, fs, order=5) # band pass filter at 1 Hz and 300 Hz
 
-    return lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H
+    return lfp_filt_B_bp, lfp_filt_L_bp, lfp_filt_M_bp, lfp_filt_H_bp
 
 # =============================================================================
 
@@ -241,7 +241,7 @@ def filter_lfp_in_each_epoch_and_frequency(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_
 Apply notch filter at 60 Hz (power line)
 """
 
-def filter_lfp_notch_filter(lfp_filt_B_bp, lfp_filt_L_bp, lfp_filt_M_bp, lfp_filt_H_bp, qband, fs =2500):
+def filter_lfp_notch_filter(lfp_filt_B_bp, lfp_filt_L_bp, lfp_filt_M_bp, lfp_filt_H_bp, qband, fs =250):
 
     print('Filtering Lfp ...')
     
