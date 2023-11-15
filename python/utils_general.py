@@ -138,7 +138,7 @@ def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
     print('Length in minutes of Lfp recordings: ',(Lfp.shape[0])/2500/60)
     print('Difference in seconds: ',((Lfp.shape[0])/2500/60 - (speed[sess].size)/100/60)*60)
 
-    return Lfp, speed, gain, rec
+    return Lfp, speed, gain, rec, ch_start, ch_end
 
 
 
