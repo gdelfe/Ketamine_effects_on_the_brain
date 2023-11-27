@@ -12,7 +12,7 @@ from utils_general import *
 
 #%%
 sess = 2 # session number 
-tot_min = 2
+tot_min = 20
 qband = 200 # Q factor in the notch filter 
 
 # CA1 starting and ending channel
@@ -80,7 +80,7 @@ lfp_L_ep_high_s = [[] for ch in range(nch)]
 lfp_M_ep_high_s = [[] for ch in range(nch)]
 lfp_H_ep_high_s = [[] for ch in range(nch)]
 
-# all trials 
+# all trials -- (min id, length T for 60 sec, channel id)
 lfp_B_ep = []
 lfp_L_ep = []
 lfp_M_ep = []
@@ -140,7 +140,7 @@ for current_min in range(0,tot_min):
     lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H = filter_lfp_in_each_epoch(Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg, gain, qband)
     
           
-    # ====== Decimate Lfp and speed (subsample)
+    # ====== Decimate Lfp and speed (subsample): input at 2500 Hz, output at 1250 Hz
     lfp_dec_B, lfp_dec_L, lfp_dec_M, lfp_dec_H, speed_dec_B, speed_dec_L, speed_dec_M, speed_dec_H = \
         decimate_lfp_and_speed(lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H, speed_B_min,speed_L_min,speed_M_min,speed_H_min)
 
@@ -208,7 +208,7 @@ for current_min in range(0,tot_min):
 
 
 
-#%%
+
 # =============================================================================
 # Save files in matlab
 # =============================================================================
@@ -223,6 +223,7 @@ for current_min in range(0,tot_min):
 
 
 # All trials with mask for low/high speed --- ONLY FOR CA1 -- For single LFP-spike cell analysis 
+# (min id, length T for 60 sec, channel id)
 print('Saving lfp whole min recording + masks ...')
 save_matlab_files_all_lfps(rec,sess,'HPC', lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, 
                                mask_B_low, mask_L_low, mask_M_low, mask_H_low, 

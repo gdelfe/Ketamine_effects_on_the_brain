@@ -804,7 +804,7 @@ def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep,
     
     # file path to save Masks, low speed-no artifact in matlab 
     
-    out_file = os.path.join(full_dir_path, "mask_low_high_speed_CA1.mat")
+    out_file = os.path.join(full_dir_path, "mask_low_high_speed.mat")
 
     
     # create dictionaries to save in matlab
