@@ -10,10 +10,14 @@ from utils_signal_processing import *
 from utils_plotting import *
 from utils_general import *
 
-
+#%%
 sess = 2 # session number 
-tot_min = 20
+tot_min = 2
 qband = 200 # Q factor in the notch filter 
+
+# CA1 starting and ending channel
+CA1_start = 0
+CA1_end = 20
 
 binFullPath = r'C:\Users\fentonlab\Desktop\Gino\LFPs'
 HPC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs','HPC_lfp_paths.file')
@@ -25,13 +29,16 @@ PFC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs','PFC_lfp_pa
 # =============================================================================
 
 # ====== Load Lfp and speed data for a specific recording and brain area 
-Lfp, speed, gain, rec = load_data(binFullPath,HPC_path_file,PFC_path_file,"HPC",sess)
+Lfp, speed, gain, rec, _, _ = load_data(binFullPath,HPC_path_file,PFC_path_file,"HPC",sess)
 
 # ====== Detect bad (silent) Lfp channel (if it exist)
-bad_flag, next_id, bad_id = detect_silent_lfp_channel(Lfp,4,4,2500)
+bad_flag, next_id, bad_id = detect_silent_lfp_channel(Lfp, CA1_end, 4,4,2500)
 
 # ====== Upsample Speed recording
 speed_up = upsample_speed(speed, Lfp, sess, LFP_rate = 2500, speed_rate = 100)
+
+# Get Lfp of CA1 only -- Uncomment this only for CA1 analysis 
+Lfp = Lfp[:,CA1_start:CA1_end]
 
 
 # =============================================================================
@@ -60,7 +67,8 @@ Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H = split_into_epoc
  
 
 # ====== Create list to store Lfp for each epoch: (channel, minute, n trial, trial data )
-nch = int(Lfp_B.shape[1]// 4) # number of channel after averaging a 2x2 block 
+# nch = int(Lfp_B.shape[1]// 4) # number of channel after averaging a 2x2 block 
+nch = int(Lfp_B.shape[1]) # number of channel after averaging a 2x2 block 
 # low speed
 lfp_B_ep_low_s = [[] for ch in range(nch)]
 lfp_L_ep_low_s = [[] for ch in range(nch)]
@@ -117,9 +125,12 @@ for current_min in range(0,tot_min):
 
     # ====== Average Lfp in Neuropixel at the same depth (avg 2 electrodes together)
     # Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_same_depth(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min)
-        
+       
     # ====== Average Lfp in Neuropixelin a 2x2 channel block (avg 4 electrodes together)
-    Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_4_channels(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min)
+    # Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_4_channels(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min)
+
+    # ====== Do not perform any average, this is to be used in single cell analysis 
+    Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min 
 
     # =============================================================================
     # Filter 1 min LFP (band pass)
@@ -134,7 +145,7 @@ for current_min in range(0,tot_min):
         decimate_lfp_and_speed(lfp_filt_B, lfp_filt_L, lfp_filt_M, lfp_filt_H, speed_B_min,speed_L_min,speed_M_min,speed_H_min)
 
 
-    # ====== Stack lfp all trials for each minute together 
+    # ====== Stack lfp all trials for each minute together, (min id, length T for 60 sec, channel id) 
     lfp_B_ep,lfp_L_ep,lfp_M_ep,lfp_H_ep = \
         stack_lfp_1min_all_trials(lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, lfp_dec_B, lfp_dec_L, lfp_dec_M, lfp_dec_H)
 
@@ -145,9 +156,9 @@ for current_min in range(0,tot_min):
     tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s, tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s,tot_mask_H_high_s = \
         make_speed_and_lfp_maks(lfp_dec_B,lfp_dec_L, lfp_dec_M, lfp_dec_H, speed_dec_B, speed_dec_L, speed_dec_M, speed_dec_H, win = 1250, th = 30)
   
-    # ====== Stack lfp all trials for each minute toget
+    # ====== Stack masks all trials for each minute toget
     mask_B_low, mask_L_low, mask_M_low, mask_H_low, mask_B_high, mask_L_high, mask_M_high, mask_H_high = \
-        stack_mask_1min_(mask_B_low, mask_L_low, mask_M_low, mask_H_low, 
+        stack_mask_1min(mask_B_low, mask_L_low, mask_M_low, mask_H_low, 
                          mask_B_high, mask_L_high, mask_M_high, mask_H_high,
                          tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s,
                          tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s, tot_mask_H_high_s)
@@ -195,21 +206,25 @@ for current_min in range(0,tot_min):
     
     print('nch ', len(lfp_B_ep_low_s), 'n. min ', len(lfp_B_ep_low_s[0][0]),' size', lfp_B_ep_low_s[0][0].shape)
 
+
+
+#%%
 # =============================================================================
 # Save files in matlab
 # =============================================================================
 
-print('Saving Lfp split into trials ...')
-save_matlab_files(rec, sess, 'HPC', 
-                  lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_ep_low_s, lfp_H_ep_low_s, 
-                  lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s)
+# # low speed and high speed trials 
+# print('Saving Lfp split into trials ...')
+# save_matlab_files(rec, sess, 'HPC', 
+#                   lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_ep_low_s, lfp_H_ep_low_s, 
+#                   lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s)
+
+#%%
 
 
-
-# data_B_low = load_lfp_data(r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC\2022-08-01_04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk\lfp_B_epoch_low_speed.mat')
-# data_L_low = load_lfp_data(r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC\2022-08-01_04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk\lfp_L_epoch_low_speed.mat')
-
+# All trials with mask for low/high speed --- ONLY FOR CA1 -- For single LFP-spike cell analysis 
 print('Saving lfp whole min recording + masks ...')
 save_matlab_files_all_lfps(rec,sess,'HPC', lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, 
                                mask_B_low, mask_L_low, mask_M_low, mask_H_low, 
                                mask_B_high, mask_L_high, mask_M_high, mask_H_high)
+

@@ -30,6 +30,7 @@ import sys
 import pickle
 from utils_plotting import *
 import pdb
+import h5py
 
 
 """
@@ -117,6 +118,10 @@ def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
     # multiply by two to account for the full channel list 
     ch_start = int(Lfp_aln["theta_start"][sess]*2)  # Hpc first channel
     ch_end = int(Lfp_aln["theta_end"][sess]*2)  # Hpc last channel
+    
+    # multiply by two to account for the full channel list 
+    # ch_start = int(Lfp_aln["CA1 start"][sess]*4)  # CA1 first channel
+    # ch_end = int(Lfp_aln["CA1 stop"][sess]*4)  # CA1 last channel
 
     # Trim Lfp to specific channels in the HPC and to specific start/end times 
     Lfp= dataLfp[start:end,ch_start:ch_end]
@@ -144,6 +149,46 @@ def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
 
 # =============================================================================
 
+
+def load_rec_path(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
+    
+    
+    rec = [{"PFC":"path","HPC":"path"} for _ in range(36)] # initialize dictonary for all the paths
+    
+    # =============================================================================
+    #     LOAD file paths 
+    # =============================================================================
+    
+    # if brain region is HPC load HPC paths 
+    if brain_reg == 'HPC':
+    # load HPC file names and store them in rec
+        with open(HPC_path_file,'rb') as f:
+            HPC_file_list = pickle.load(f)
+            
+        for isess, path in enumerate(HPC_file_list):
+            rec[isess]['HPC'] =  str(path)
+    
+    elif brain_reg == 'PFC':
+        # load PFC file names and store them in rec 
+        with open(PFC_path_file,'rb') as f:
+            PFC_file_list = pickle.load(f)
+            
+        for isess, path in enumerate(PFC_file_list):
+            rec[isess]['PFC'] =  str(path)
+        
+    else:
+        sys.exit('Brain region is not HPC or PFC -- exit')
+        
+        
+    # select path for specific session recording 
+    binFullPath = rec[sess][brain_reg] 
+    print('Loading file in: ',binFullPath)
+
+    return rec     
+# =============================================================================
+
+    
+
 """
 Detect bad (silent) Lfp channel. 
 
@@ -155,7 +200,7 @@ of the abs(lfp), find the channel with the minimum abs(lfp) and flag it as bad c
 
 """
 
-def detect_silent_lfp_channel(Lfp, length = 3, threshold = 4, N = 2500):
+def detect_silent_lfp_channel(Lfp, CA1_end, length = 3, threshold = 4, N = 2500):
     
     current_min = 0 # current min to look at 
     offset = 5 # starting of epoch in min
@@ -202,6 +247,11 @@ def detect_silent_lfp_channel(Lfp, length = 3, threshold = 4, N = 2500):
         bad_flag = False 
         next_id = None
         bad_id = None
+    
+    # if bad channel is outside CA1, then ignore it, the analysis is only for CA1
+    if bad_id >= CA1_end:
+        print("Bad channel outside CA1 range\n")
+        bad_flag = False 
     
     return bad_flag, next_id, bad_id
 
@@ -707,6 +757,7 @@ def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_
     
     # save lfp for each epoch in matlab format 
     savemat(out_file, data_lfp)
+
     
     
     
@@ -734,7 +785,7 @@ def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep,
     # =============================================================================
     
     # file path to save in matlab 
-    out_file = os.path.join(full_dir_path, "lfp_epoch_all_trials_CSD.mat")
+    out_file = os.path.join(full_dir_path, "lfp_epoch_all_trials_CA1.mat")
     
     mat_lfp = {'B': np.array(lfp_B_ep),
                'L': np.array(lfp_L_ep),
@@ -745,7 +796,7 @@ def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep,
     
     # save lfp for each epoch in matlab format 
     savemat(out_file, data_lfp_all)
-    
+
     
     # =============================================================================
     #     Mask low/high speed - no artifact
@@ -753,7 +804,7 @@ def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep,
     
     # file path to save Masks, low speed-no artifact in matlab 
     
-    out_file = os.path.join(full_dir_path, "mask_low_high_speed_CSD.mat")
+    out_file = os.path.join(full_dir_path, "mask_low_high_speed_CA1.mat")
 
     
     # create dictionaries to save in matlab
@@ -772,20 +823,179 @@ def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep,
     
     # save lfp for each epoch in matlab format 
     savemat(out_file, data_mask)
-
+    
  
     
 # =============================================================================
 
 
 
-# Example to load the saved MAT files in Python:
-def load_lfp_data(filename):
-    try:
-        data = loadmat(filename)
-        return data
-    except Exception as e:
-        print(f"Error loading {filename}: {e}")
-        return None
+"""
+FOR HIGH LARGE MATRICES: i.e. All lfp channels 
+
+Save low and high speed LFP trials (only good trials, i.e. without artifact),
+shaped into a 4D array nch, min id, id trial, length trial
+"""
+
+
+def save_h5_files(rec, sess, brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_ep_low_s, lfp_H_ep_low_s, 
+                  lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s):
+    
+    main_dir = r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC'
+    path = rec[sess][brain_reg]
+    
+    dir_sess = path.split('\\')[-3] # path for session directory
+    full_dir_path = os.path.join(main_dir, dir_sess)
+    
+    if not os.path.exists(full_dir_path):
+        os.makedirs(full_dir_path)
+    
+    # =============================================================================
+    #     Low Speed Lfp 
+    # =============================================================================
+    
+    # file path to save in hdf5 
+    lfp_low_speed_file = os.path.join(full_dir_path, "lfp_epoch_low_speed_all_ch.h5")
+    
+    with h5py.File(lfp_low_speed_file, 'w') as f:
+        f.create_dataset('B', data=np.array(lfp_B_ep_low_s, dtype=np.float64))
+        f.create_dataset('L', data=np.array(lfp_L_ep_low_s, dtype=np.float64))
+        f.create_dataset('M', data=np.array(lfp_M_ep_low_s, dtype=np.float64))
+        f.create_dataset('H', data=np.array(lfp_H_ep_low_s, dtype=np.float64))
+    
+    # =============================================================================
+    #     High Speed Lfp 
+    # =============================================================================
+    
+    # file path to save in hdf5 
+    lfp_high_speed_file = os.path.join(full_dir_path, "lfp_epoch_high_speed_all_ch.h5")
+    
+    with h5py.File(lfp_high_speed_file, 'w') as f:
+        f.create_dataset('B', data=np.array(lfp_B_ep_high_s, dtype=np.float64))
+        f.create_dataset('L', data=np.array(lfp_L_ep_high_s, dtype=np.float64))
+        f.create_dataset('M', data=np.array(lfp_M_ep_high_s, dtype=np.float64))
+        f.create_dataset('H', data=np.array(lfp_H_ep_high_s, dtype=np.float64))
+
+# Usage example:
+# save_h5_files(rec, sess, brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_ep_low_s, lfp_H_ep_low_s, 
+#               lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s)
+
+
+# =============================================================================
+
+def save_hdf5_files(rec, sess, brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_ep_low_s, lfp_H_ep_low_s, 
+                    lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s):
+    
+    main_dir = r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC'
+    path = rec[sess][brain_reg]
+    
+    dir_sess = path.split('\\')[-3] # path for session directory
+    full_dir_path = os.path.join(main_dir, dir_sess)
+    
+    if not os.path.exists(full_dir_path):
+        os.makedirs(full_dir_path)
+    
+    def save_list_of_arrays(h5file, group_name, list_of_arrays):
+        group = h5file.create_group(group_name)
+        for i, arr in enumerate(list_of_arrays):
+            group.create_dataset(str(i), data=arr)
+
+    # =============================================================================
+    #     Low Speed Lfp 
+    # =============================================================================
+    
+    lfp_low_speed_file = os.path.join(full_dir_path, "lfp_epoch_low_speed_all_ch.h5")
+    with h5py.File(lfp_low_speed_file, 'w') as h5f:
+        save_list_of_arrays(h5f, 'B', lfp_B_ep_low_s)
+        save_list_of_arrays(h5f, 'L', lfp_L_ep_low_s)
+        save_list_of_arrays(h5f, 'M', lfp_M_ep_low_s)
+        save_list_of_arrays(h5f, 'H', lfp_H_ep_low_s)
+
+    # =============================================================================
+    #     High Speed Lfp 
+    # =============================================================================
+    
+    lfp_high_speed_file = os.path.join(full_dir_path, "lfp_epoch_high_speed_all_ch.h5")
+    with h5py.File(lfp_high_speed_file, 'w') as h5f:
+        save_list_of_arrays(h5f, 'B', lfp_B_ep_high_s)
+        save_list_of_arrays(h5f, 'L', lfp_L_ep_high_s)
+        save_list_of_arrays(h5f, 'M', lfp_M_ep_high_s)
+        save_list_of_arrays(h5f, 'H', lfp_H_ep_high_s)
+
+
+# ============================================================================
+
+"""
+FOR HIGH LARGE MATRICES: i.e. All lfp channels 
+
+Save files lfps (all trials) and masks to be opened in matlab. 
+This function uses h5py in order to save large files
+"""
+
+def save_matlab_files_all_lfps_h5(rec, sess, brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, 
+                               tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s,
+                               tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s, tot_mask_H_high_s):
+    
+    main_dir = r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC'
+    path = rec[sess][brain_reg]
+    
+    dir_sess = path.split('\\')[-3]  # path for session directory
+    full_dir_path = os.path.join(main_dir, dir_sess)
+    
+    if not os.path.exists(full_dir_path):
+        os.makedirs(full_dir_path)
+    
+    # Save LFPs
+    lfp_file = os.path.join(full_dir_path, "lfp_epoch_all_trials_all_ch.h5")
+    with h5py.File(lfp_file, 'w') as f:
+        f.create_dataset('B', data=np.array(lfp_B_ep, dtype=np.float64))
+        f.create_dataset('L', data=np.array(lfp_L_ep, dtype=np.float64))
+        f.create_dataset('M', data=np.array(lfp_M_ep, dtype=np.float64))
+        f.create_dataset('H', data=np.array(lfp_H_ep, dtype=np.float64))
+    
+    # Save Masks
+    mask_file = os.path.join(full_dir_path, "mask_low_high_speed_all_ch.h5")
+    with h5py.File(mask_file, 'w') as f:
+        f.create_dataset('B_low', data=np.array(tot_mask_B_low_s, dtype=np.bool_))
+        f.create_dataset('L_low', data=np.array(tot_mask_L_low_s, dtype=np.bool_))
+        f.create_dataset('M_low', data=np.array(tot_mask_M_low_s, dtype=np.bool_))
+        f.create_dataset('H_low', data=np.array(tot_mask_H_low_s, dtype=np.bool_))
+        f.create_dataset('B_high', data=np.array(tot_mask_B_high_s, dtype=np.bool_))
+        f.create_dataset('L_high', data=np.array(tot_mask_L_high_s, dtype=np.bool_))
+        f.create_dataset('M_high', data=np.array(tot_mask_M_high_s, dtype=np.bool_))
+        f.create_dataset('H_high', data=np.array(tot_mask_H_high_s, dtype=np.bool_))
+
+# =============================================================================
+
+
+"""
+Convert a list of lists of arrays (channels, minutes, M, T) into a 3D array (nch, N, T).
+
+:param lfp_data: A list (channels) of lists (minutes) of arrays (M x T) with M variable.
+:return: A 3D NumPy array with shape (nch, N, T).
+"""
+    
+
+def stack_lfp_data_to_array(lfp_data):
+
+    channel_arrays = []
+
+    # Calculate the total size N for each channel
+    for channel_data in lfp_data:
+        # Concatenate all arrays from all minutes for the current channel
+        concatenated_data = np.concatenate([array for minute_data in channel_data for array in minute_data], axis=0)
+        channel_arrays.append(concatenated_data)
+
+    # Stack along a new axis to get a 3D array (nch, N, T)
+    return np.stack(channel_arrays, axis=0)
+
+# Example usage:
+# Assuming `lfp_data` is your list of lists of arrays with the structure (ch, min, M, T)
+# lfp_array = stack_lfp_data_to_array(lfp_data)
+# Now `lfp_array` is a 3D NumPy array with shape (nch, N, T)
+
+
+
+# =============================================================================
 
 

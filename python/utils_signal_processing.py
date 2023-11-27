@@ -6,7 +6,8 @@ Spyder Editor
 
 import numpy as np
 
-from scipy.signal import butter, lfilter, freqz, iirnotch, welch, filtfilt, iirfilter, iirfilter 
+from scipy.signal import butter, lfilter, freqz, iirnotch, welch, filtfilt, iirfilter, iirfilter, hilbert 
+from scipy.ndimage import gaussian_filter
 from scipy.interpolate import interp1d
 from scipy.stats import zscore
 import sys
