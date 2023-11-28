@@ -652,6 +652,30 @@ def stack_mask_1min(mask_B_low, mask_L_low, mask_M_low, mask_H_low,
 
 # =============================================================================
 
+""" Stack mask for low and high speed relative to a given minute, in order to have masks for the whole 20 min period """
+
+def stack_mask_1min(mask_B_low, mask_L_low, mask_M_low, mask_H_low, 
+                     mask_B_high, mask_L_high, mask_M_high, mask_H_high,
+                     tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s,
+                     tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s, tot_mask_H_high_s):
+     
+
+    mask_B_low.append(tot_mask_B_low_s) # add one minute lfp: trial num x trial length, for each channel
+    mask_L_low.append(tot_mask_L_low_s) 
+    mask_M_low.append(tot_mask_M_low_s)
+    mask_H_low.append(tot_mask_H_low_s)
+    
+    mask_B_high.append(tot_mask_B_high_s) # add one minute lfp: trial num x trial length, for each channel
+    mask_L_high.append(tot_mask_L_high_s) 
+    mask_M_high.append(tot_mask_M_high_s)
+    mask_H_high.append(tot_mask_H_high_s)
+    
+    
+    
+    return mask_B_low, mask_L_low, mask_M_low, mask_H_low, mask_B_high, mask_L_high, mask_M_high, mask_H_high
+
+# =============================================================================
+
 """
 Keep only LFP good trials: those without artifacts
 Method: mask LFP with the mask-good-trials
@@ -744,6 +768,44 @@ def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_
     # =============================================================================
     #     High Speed Lfp 
     # =========================================================================
+    
+    # file path to save in matlab 
+    out_file = os.path.join(full_dir_path, "lfp_epoch_high_speed_CSD.mat")
+    
+    mat_lfp = {'B': lfp_B_ep_high_s,
+               'L': lfp_L_ep_high_s,
+               'M': lfp_M_ep_high_s,
+               'H': lfp_H_ep_high_s}
+    
+    data_lfp = {'lfp': mat_lfp}
+    
+    # save lfp for each epoch in matlab format 
+    savemat(out_file, data_lfp)
+    
+    
+    
+# =============================================================================
+
+# Save the whole Lfp in the form: min x time x channel
+# Save masks for low speed-no artifact and high speed-no artifcats
+
+def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, 
+                               tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s,
+                               tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s, tot_mask_H_high_s):
+    
+    main_dir = r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC'
+    path = rec[sess][brain_reg]
+    
+    dir_sess = path.split('\\')[-3] # path for session directory
+    full_dir_path = os.path.join(main_dir,dir_sess)
+    
+    if not os.path.exists(full_dir_path):
+        os.makedirs(full_dir_path)
+        
+    
+    # =============================================================================
+    #     Lfp all trials 
+    # =============================================================================
     
     # file path to save in matlab 
     out_file = os.path.join(full_dir_path, "lfp_epoch_high_speed_CSD.mat")
