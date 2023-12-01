@@ -1,6 +1,6 @@
 # Ketamine effects on the brain, with focus on the Hippocampus and the Pre-Frontal Cortex 
 
-This repo contains Python and Matlab code for the analysis of the Ketamine's effects on the brain a mouse model, work done within And&eacute; Fenton Lab at NYU.
+This repo contains Python and Matlab code for the analysis of the Ketamine's effects on the brain a mouse model, work done within Andr&eacute; Fenton Lab, at NYU.
 
 The mice receive 3 subsequent and increasing doses of Ketamine, one every 30 min, in a resting state dynamics (no specific task). The animals are free to move without restrictions in a 2D arena. </br>
 
