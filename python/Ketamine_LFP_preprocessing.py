@@ -41,7 +41,7 @@ speed_up = upsample_speed(speed, Lfp, sess, LFP_rate = 2500, speed_rate = 100)
 Lfp = Lfp[:,CA1_start:CA1_end]
 
 
-
+#%%
 # =============================================================================
 # PLOTTING -- sanity checks / data visualization 
 # =============================================================================

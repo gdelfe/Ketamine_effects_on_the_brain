@@ -226,6 +226,15 @@ def detect_silent_lfp_channel(Lfp, CA1_end, length = 3, threshold = 4, N = 2500)
     min_val = np.min(mean_abs)
     bad_id = np.argmin(mean_abs)
     
+    # if bad channel is outside CA1, then ignore it, the analysis is only for CA1
+    if bad_id >= CA1_end:
+        print("Bad channel outside CA1 range\n")
+        bad_flag = False
+        next_id = None
+        bad_id = None
+        
+        return bad_flag, next_id, bad_id
+    
     # if bad channel detected
     if min_val < mean_tot/threshold: 
         bad_flag = True
@@ -248,10 +257,7 @@ def detect_silent_lfp_channel(Lfp, CA1_end, length = 3, threshold = 4, N = 2500)
         next_id = None
         bad_id = None
     
-    # if bad channel is outside CA1, then ignore it, the analysis is only for CA1
-    if bad_id >= CA1_end:
-        print("Bad channel outside CA1 range\n")
-        bad_flag = False 
+     
     
     return bad_flag, next_id, bad_id
 
@@ -736,7 +742,9 @@ def stack_lfp_1min(lfp_B_epoch,lfp_L_epoch,lfp_M_epoch,lfp_H_epoch,lfp_B_list,lf
 # Save low and high speed LFP trials (only good trials, i.e. without artifact),
 # shaped into a 4D array nch, min id, id trial, length trial
 
-def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_ep_low_s, lfp_H_ep_low_s, lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s):
+def save_matlab_files(rec, sess, brain_reg, 
+                      lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_ep_low_s,lfp_H_ep_low_s, 
+                      lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s, save_var):
     
     main_dir = r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC'
     path = rec[sess][brain_reg]
@@ -752,7 +760,7 @@ def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_
     # =============================================================================
     
     # file path to save in matlab 
-    out_file = os.path.join(full_dir_path, "lfp_epoch_low_speed_CSD.mat")
+    out_file = os.path.join(full_dir_path, "lfp_epoch_low_speed_{}.mat".format(save_var))
     
     mat_lfp = {'B': lfp_B_ep_low_s,
                'L': lfp_L_ep_low_s,
@@ -770,7 +778,7 @@ def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_
     # =========================================================================
     
     # file path to save in matlab 
-    out_file = os.path.join(full_dir_path, "lfp_epoch_high_speed_CSD.mat")
+    out_file = os.path.join(full_dir_path, "lfp_epoch_high_speed_{}.mat".format(save_var))
     
     mat_lfp = {'B': lfp_B_ep_high_s,
                'L': lfp_L_ep_high_s,
@@ -789,36 +797,36 @@ def save_matlab_files(rec,sess,brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_
 # Save the whole Lfp in the form: min x time x channel
 # Save masks for low speed-no artifact and high speed-no artifcats
 
-def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, 
-                               tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s,
-                               tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s, tot_mask_H_high_s):
+# def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, 
+#                                tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s,
+#                                tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s, tot_mask_H_high_s):
     
-    main_dir = r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC'
-    path = rec[sess][brain_reg]
+#     main_dir = r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC'
+#     path = rec[sess][brain_reg]
     
-    dir_sess = path.split('\\')[-3] # path for session directory
-    full_dir_path = os.path.join(main_dir,dir_sess)
+#     dir_sess = path.split('\\')[-3] # path for session directory
+#     full_dir_path = os.path.join(main_dir,dir_sess)
     
-    if not os.path.exists(full_dir_path):
-        os.makedirs(full_dir_path)
+#     if not os.path.exists(full_dir_path):
+#         os.makedirs(full_dir_path)
         
     
-    # =============================================================================
-    #     Lfp all trials 
-    # =============================================================================
+#     # =============================================================================
+#     #     Lfp all trials 
+#     # =============================================================================
     
-    # file path to save in matlab 
-    out_file = os.path.join(full_dir_path, "lfp_epoch_high_speed_CSD.mat")
+#     # file path to save in matlab 
+#     out_file = os.path.join(full_dir_path, "lfp_epoch_high_speed_CSD.mat")
     
-    mat_lfp = {'B': lfp_B_ep_high_s,
-               'L': lfp_L_ep_high_s,
-               'M': lfp_M_ep_high_s,
-               'H': lfp_H_ep_high_s}
+#     mat_lfp = {'B': lfp_B_ep_high_s,
+#                'L': lfp_L_ep_high_s,
+#                'M': lfp_M_ep_high_s,
+#                'H': lfp_H_ep_high_s}
     
-    data_lfp = {'lfp': mat_lfp}
+#     data_lfp = {'lfp': mat_lfp}
     
-    # save lfp for each epoch in matlab format 
-    savemat(out_file, data_lfp)
+#     # save lfp for each epoch in matlab format 
+#     savemat(out_file, data_lfp)
 
     
     
@@ -830,7 +838,7 @@ def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep,
 
 def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, 
                                tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s,
-                               tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s, tot_mask_H_high_s):
+                               tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s, tot_mask_H_high_s, save_var):
     
     main_dir = r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC'
     path = rec[sess][brain_reg]
@@ -847,7 +855,7 @@ def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep,
     # =============================================================================
     
     # file path to save in matlab 
-    out_file = os.path.join(full_dir_path, "lfp_epoch_all_trials_CA1.mat")
+    out_file = os.path.join(full_dir_path, "lfp_epoch_all_trials_{}.mat".format(save_var))
     
     mat_lfp = {'B': np.array(lfp_B_ep),
                'L': np.array(lfp_L_ep),
