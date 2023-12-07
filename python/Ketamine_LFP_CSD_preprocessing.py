@@ -21,6 +21,7 @@ from utils_general import *
 sess = 2 # session number 
 tot_min = 20
 qband = 200 # Q factor in the notch filter 
+save_var = "CSD" # saving file name, Current Source Density
 
 binFullPath = r'C:\Users\fentonlab\Desktop\Gino\LFPs'
 HPC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs','HPC_lfp_paths.file')
@@ -155,6 +156,7 @@ for current_min in range(0,tot_min):
     csd_H, csd_H_fil  = compute_iCSD(lfp_dec_H)
     
 
+#%%
     # ====== Stack lfp all trials for each minute together 
     lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep = \
         stack_lfp_1min_all_trials(lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, csd_B_fil, csd_L_fil, csd_M_fil, csd_H_fil)
@@ -228,7 +230,8 @@ for current_min in range(0,tot_min):
 # Save files in matlab
 # =============================================================================
 
-# Save LFP trials without artifacts for low and high speed - usage: PSD calculation 
+"""  Save LFP trials without artifacts for low and high speed - usage: PSD calculation """
+
 print('Saving Lfp split into trials ...')
 save_matlab_files(rec, sess, 'HPC', 
                   lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_ep_low_s, lfp_H_ep_low_s, 
@@ -239,7 +242,8 @@ save_matlab_files(rec, sess, 'HPC',
 # data_B_low = load_lfp_data(r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC\2022-08-01_04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk\lfp_B_epoch_low_speed.mat')
 # data_L_low = load_lfp_data(r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC\2022-08-01_04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk\lfp_L_epoch_low_speed.mat')
 
-# Save all LFP trials and total mask - usage: Spectrograms, and other signal processing analysis
+""" Save all LFP trials and total mask - usage: Spectrograms, and other signal processing analysis """
+
 print('Saving lfp whole min recording + masks ...')
 save_matlab_files_all_lfps(rec,sess,'HPC', lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, 
                                mask_B_low, mask_L_low, mask_M_low, mask_H_low, 

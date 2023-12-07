@@ -401,7 +401,8 @@ def compute_iCSD(Lfp, plotting = False):
             csd = csd_obj.get_csd()
             csd_fil = csd_obj.filter_csd(csd)
             
-            
+    
+    print(csd.shape)
     # average csd for nearest neighbor channels (average two channels together)
     # the number of resulting channels at the end of this process will be Nch/4
     csd_resh = csd.reshape(-1,2,csd.shape[1])

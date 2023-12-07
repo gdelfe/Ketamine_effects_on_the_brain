@@ -10,11 +10,11 @@ from utils_signal_processing import *
 from utils_plotting import *
 from utils_general import *
 
-#%%
 
-sess = 2 # session number 
+sess = 3 # session number 
 tot_min = 20
 qband = 200 # Q factor in the notch filter 
+save_var = "all_ch" # saving file name, all lfp
 
 # CA1 starting and ending channel
 CA1_start = 0
@@ -41,7 +41,6 @@ speed_up = upsample_speed(speed, Lfp, sess, LFP_rate = 2500, speed_rate = 100)
 Lfp = Lfp[:,CA1_start:CA1_end]
 
 
-#%%
 # =============================================================================
 # PLOTTING -- sanity checks / data visualization 
 # =============================================================================
@@ -99,7 +98,6 @@ mask_M_high = []
 mask_H_high = []
 
 
-#%%
 # =============================================================================
 # SELECT ONE MINUTE DATA and iterate for 20 min
 # =============================================================================

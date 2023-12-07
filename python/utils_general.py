@@ -228,7 +228,7 @@ def detect_silent_lfp_channel(Lfp, CA1_end, length = 3, threshold = 4, N = 2500)
     
     # if bad channel is outside CA1, then ignore it, the analysis is only for CA1
     if bad_id >= CA1_end:
-        print("Bad channel outside CA1 range\n")
+        print("Bad channel outside CA1 range,\n Bad channel ID: ", bad_id, "CA1 end ", CA1_end)
         bad_flag = False
         next_id = None
         bad_id = None
@@ -259,7 +259,7 @@ def detect_silent_lfp_channel(Lfp, CA1_end, length = 3, threshold = 4, N = 2500)
     
      
     
-    return bad_flag, next_id, bad_id
+    return bad_flag, next_id, bad_id 
 
 
 # =============================================================================
