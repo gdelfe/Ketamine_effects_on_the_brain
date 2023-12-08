@@ -2,7 +2,7 @@
 %
 % @ Gino Del Ferraro, NYU, June 2023
 
-function plot_spectrograms_all_epochs(spec_rec, mask, step_t, step_f, min, main_title, dir_rec, hpc_area, save)
+function plot_spectrograms_all_epochs(spec_rec, mask, step_t, step_f, min, main_title, dir_rec, save)
 
 
 ts = spec_rec.ts;
@@ -27,7 +27,7 @@ fig = figure('Position', [0, 0, 1700, 3900]);
 
 % BASELINE 
 subplot(4,1,1)
-tvimage(zscore(log10(spec_rec.B(:,:,min)),1,2)); colorbar; hold on 
+tvimage(zscore(log10(spec_rec.B.HPC(:,:,min)),1,2)); colorbar; hold on 
 title(sprintf('BASE, min = %d',min),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
@@ -43,7 +43,7 @@ end
 
 % LOW INJECTION 
 subplot(4,1,2)
-tvimage(zscore(log10(spec_rec.L(:,:,min)),1,2)); colorbar; hold on 
+tvimage(zscore(log10(spec_rec.L.HPC(:,:,min)),1,2)); colorbar; hold on 
 title(sprintf('LOW, min = %d',min),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
@@ -61,7 +61,7 @@ end
 % MID INJECTION 
 
 subplot(4,1,3)
-tvimage(zscore(log10(spec_rec.M(:,:,min)),1,2)); colorbar; hold on 
+tvimage(zscore(log10(spec_rec.M.HPC(:,:,min)),1,2)); colorbar; hold on 
 title(sprintf('MID, min = %d',min),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
@@ -77,7 +77,7 @@ end
 
 % HIGH INJECTION 
 subplot(4,1,4)
-tvimage(zscore(log10(spec_rec.H(:,:,min)),1,2)); colorbar; hold on 
+tvimage(zscore(log10(spec_rec.H.HPC(:,:,min)),1,2)); colorbar; hold on 
 title(sprintf('HIGH, min = %d',min),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
@@ -107,7 +107,7 @@ if save
     if ~exist(dir_out, 'dir')
         mkdir(dir_out)
     end
-    saveas(fig,strcat(dir_out,sprintf('\\spec_all_epochs_min_%d_%s.png',min,hpc_area) ) )
+    saveas(fig,strcat(dir_out,sprintf('\\spec_all_epochs_HPC_min_%d_%s.png',min) ) )
 end
 
 end

@@ -2,7 +2,7 @@
 %
 % @ Gino Del Ferraro, NYU, June 2023
 
-function plot_spectrogram(spec, spec_rec, step_t, step_f, str_title, epoch, norm, dir_rec, save)
+function plot_spectrogram(spec, reg, spec_rec, min, step_t, step_f, str_title, epoch, norm, dir_rec, save)
 
 ts = spec_rec.ts;
 ti = spec_rec.t;
@@ -27,13 +27,13 @@ fig = figure('Position', [50, 100, 1700, 200]);
 subplot(2,1,1)
 % no normalization
 if isempty(norm)
-    tvimage(log10(spec))
+    tvimage(log10(spec.(reg)(:,:,min)))
     colorbar
     str_title = ['no norm - Epoch: ', epoch,' - ', str_title];
     fig_name = '\\single_spectrogram_all_HPC.png';
     % zscore along frequency normalization
 elseif strcmp(norm,'zscore')
-    tvimage(zscore(log10(spec),1,2))
+    tvimage(zscore(log10(spec.(reg)(:,:,min)),1,2))
     colorbar
     str_title = ['zscored - Epoch: ', epoch,' - ', str_title];
     fig_name = '\\single_spectrogram_nomalized_all_HPC.png';

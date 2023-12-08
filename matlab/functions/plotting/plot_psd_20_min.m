@@ -20,6 +20,13 @@ for min = 1:size(psd.B,1) % numb of minute
     xticks(x_ticks);
 end
 
+ax = gca;
+% Retrieve the color order matrix
+defaultColors = ax.ColorOrder;
+
+% Display the default colors
+disp(defaultColors);
+
 h_legend = legend('base', 'low','mid','high'); 
 set(h_legend, 'Position', [0.92 0.85 0.07 0.03])
 

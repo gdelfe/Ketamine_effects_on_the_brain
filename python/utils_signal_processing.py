@@ -403,13 +403,30 @@ def compute_iCSD(Lfp, plotting = False):
             
     
     print(csd.shape)
+    
     # average csd for nearest neighbor channels (average two channels together)
     # the number of resulting channels at the end of this process will be Nch/4
-    csd_resh = csd.reshape(-1,2,csd.shape[1])
-    csd_mean = csd_resh.mean(axis=1)
+    # last_element = None
+    if csd.shape[0] % 2 == 1: # if the number of channels in CSD is odd 
+        # last_element = csd[-1]
+        csd = csd[:-1]
+        
+    if csd_fil.shape[0] % 2 == 1: # if the number of channels in CSD_fil is odd 
+        csd_fil = csd_fil[:-1]
     
+    # Reshape the array to group elements in pairs along the first dimension
+    csd_resh = csd.reshape(-1, 2, csd.shape[1])
     csd_fil_resh = csd_fil.reshape(-1,2,csd_fil.shape[1])
+    
+    # Compute the average along the new second dimension
+    csd_mean = csd_resh.mean(axis=1)
     csd_fil_mean = csd_fil_resh.mean(axis=1)
+    
+    # # If there was an odd number of elements, append the last element back
+    # if last_element is not None:
+    #     csd_avg = np.vstack((csd_avg, last_element))
+    
+
             
     return csd_mean.T, csd_fil_mean.T 
 

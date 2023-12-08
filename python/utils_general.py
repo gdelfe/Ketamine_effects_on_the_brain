@@ -200,17 +200,14 @@ of the abs(lfp), find the channel with the minimum abs(lfp) and flag it as bad c
 
 """
 
-def detect_silent_lfp_channel(Lfp, CA1_end, length = 3, threshold = 4, N = 2500):
+def detect_silent_lfp_channel(Lfp, CA1_end, length = 3, threshold = 4, fs = 2500):
     
     current_min = 0 # current min to look at 
     offset = 5 # starting of epoch in min
 
-    start = (offset + current_min)*60*N - 1    # start point in time points
-    end = (offset + current_min + length)*60*N - 1   # stop point in time points
-
-    # Lfp trim: 3 minute, one every M channel
-    Lfp_B_3min = Lfp[start:end,:]  # base line period
-    
+    start = (offset + current_min)*60*fs - 1    # start point in time points, starting at min 5
+    end = (offset + current_min + length)*60*fs - 1   # stop point in time points, length is duration in minutes
+  
 
     # remove mean from Lfp for each channel
     lfp_ms = Lfp[start:end,:] - np.mean(Lfp[start:end,:],axis=0)
@@ -228,7 +225,7 @@ def detect_silent_lfp_channel(Lfp, CA1_end, length = 3, threshold = 4, N = 2500)
     
     # if bad channel is outside CA1, then ignore it, the analysis is only for CA1
     if bad_id >= CA1_end:
-        print("Bad channel outside CA1 range,\n Bad channel ID: ", bad_id, "CA1 end ", CA1_end)
+        print("Bad channel outside range of interest,\n Bad channel ID: ", bad_id, "range end ", CA1_end)
         bad_flag = False
         next_id = None
         bad_id = None
@@ -248,7 +245,7 @@ def detect_silent_lfp_channel(Lfp, CA1_end, length = 3, threshold = 4, N = 2500)
         print('Nearest neighbor channel to bad channel: ',next_id)
         
         # plot bad channel and channel next to it
-        plot_lfp_two_channels_together(Lfp,next_id,bad_id,10,200,20,N=2500)
+        plot_lfp_two_channels_together(Lfp,next_id,bad_id,10,200,20, N=2500)
     
     # if there is no bad channel
     else:
@@ -874,7 +871,7 @@ def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep,
     
     # file path to save Masks, low speed-no artifact in matlab 
     
-    out_file = os.path.join(full_dir_path, "mask_low_high_speed.mat")
+    out_file = os.path.join(full_dir_path, "mask_low_high_speed_{}.mat".format(save_var))
 
     
     # create dictionaries to save in matlab

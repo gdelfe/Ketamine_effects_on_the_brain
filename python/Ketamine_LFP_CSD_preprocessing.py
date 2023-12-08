@@ -7,7 +7,14 @@ Created on Tue Nov  7 11:49:25 2023
 
 # -*- coding: utf-8 -*-
 """
+Code used to generate processed LFP for teh computation of the PSD and Spectrogram
+for each of the HPC subregions (e.g. CA1, Ripple band, Radiatum, ....).
+The code used CSD (Current Source Density) to reduce the contribution of volume condution
+in the LFP signal. 
 
+The input signal is Neuropixel LFP (2 x N) channels in the (x, y) dimensions. 
+Channels along x are averaged together after pre-processing. Channels in the y dimension
+are averaged together 2-by-2. The resulting number of CSD channels is (2 x N / 4)
 
 @ Gino Del Ferraro, Fenton lab, Oct 2023
 """
@@ -18,10 +25,12 @@ from utils_plotting import *
 from utils_general import *
 
 
-sess = 2 # session number 
+sess = 3 # session number 
 tot_min = 20
 qband = 200 # Q factor in the notch filter 
 save_var = "CSD" # saving file name, Current Source Density
+
+
 
 binFullPath = r'C:\Users\fentonlab\Desktop\Gino\LFPs'
 HPC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs','HPC_lfp_paths.file')
@@ -33,10 +42,10 @@ PFC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs','PFC_lfp_pa
 # =============================================================================
 
 # ====== Load Lfp and speed data for a specific recording and brain area 
-Lfp, speed, gain, rec, _ , _ = load_data(binFullPath,HPC_path_file,PFC_path_file,"HPC",sess)
+Lfp, speed, gain, rec, _ , CH_end = load_data(binFullPath,HPC_path_file,PFC_path_file,"HPC",sess)
 
 # ====== Detect bad (silent) Lfp channel (if it exist)
-bad_flag, next_id, bad_id = detect_silent_lfp_channel(Lfp,4,4,2500)
+bad_flag, next_id, bad_id = detect_silent_lfp_channel(Lfp, CH_end, 4, 4, 2500)
 
 # ====== Upsample Speed recording
 speed_up = upsample_speed(speed, Lfp, sess, LFP_rate = 2500, speed_rate = 100)
@@ -156,7 +165,7 @@ for current_min in range(0,tot_min):
     csd_H, csd_H_fil  = compute_iCSD(lfp_dec_H)
     
 
-#%%
+
     # ====== Stack lfp all trials for each minute together 
     lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep = \
         stack_lfp_1min_all_trials(lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, csd_B_fil, csd_L_fil, csd_M_fil, csd_H_fil)
@@ -235,7 +244,7 @@ for current_min in range(0,tot_min):
 print('Saving Lfp split into trials ...')
 save_matlab_files(rec, sess, 'HPC', 
                   lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_ep_low_s, lfp_H_ep_low_s, 
-                  lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s)
+                  lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s, save_var)
 
 
 
@@ -247,4 +256,4 @@ save_matlab_files(rec, sess, 'HPC',
 print('Saving lfp whole min recording + masks ...')
 save_matlab_files_all_lfps(rec,sess,'HPC', lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, 
                                mask_B_low, mask_L_low, mask_M_low, mask_H_low, 
-                               mask_B_high, mask_L_high, mask_M_high, mask_H_high)
+                               mask_B_high, mask_L_high, mask_M_high, mask_H_high, save_var)

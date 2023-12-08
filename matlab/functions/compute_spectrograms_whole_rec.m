@@ -12,18 +12,22 @@ end
 for min = min_start:min_end
 
     X = sq(lfp_all.B(min,sec_start:sec_ends,ch_range))';
+    if length(ch_range) == 1 ; X = X'; end   
     [spec, ~, ~] = tfspec(X, spec_par.tapers, spec_par.fs, spec_par.dn, spec_par.fk, pad, 0.05,1);
     spec_rec_B = cat(3,spec_rec_B,spec);
     
     X = sq(lfp_all.L(min,sec_start:sec_ends,ch_range))';
+    if length(ch_range) == 1 ; X = X'; end
     [spec, ~, ~] = tfspec(X, spec_par.tapers, spec_par.fs, spec_par.dn, spec_par.fk, pad, 0.05,1);
     spec_rec_L = cat(3,spec_rec_L,spec);
     
     X = sq(lfp_all.M(min,sec_start:sec_ends,ch_range))';
+    if length(ch_range) == 1 ; X = X'; end
     [spec, ~, ~] = tfspec(X, spec_par.tapers, spec_par.fs, spec_par.dn, spec_par.fk, pad, 0.05,1);
     spec_rec_M = cat(3,spec_rec_M,spec);
     
     X = sq(lfp_all.H(min,sec_start:sec_ends,ch_range))';
+    if length(ch_range) == 1 ; X = X'; end
     [spec, f, ti] = tfspec(X, spec_par.tapers, spec_par.fs, spec_par.dn, spec_par.fk, pad, 0.05,1);
     spec_rec_H = cat(3,spec_rec_H,spec);
     

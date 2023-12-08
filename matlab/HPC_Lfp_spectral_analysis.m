@@ -22,25 +22,29 @@ name_file_psd = 'psd_hpc_csd';
 method = 'CSD';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
-% channels for HPC subareas 
+% channels for HPC subareas -- Copy/Pase the values on the excel file
+% Session 2
 CA1 = 1:5;  % CA1 
 ripple = 6:11; % pyramidal layer 
 rad = 12:17; % Radiatum 
 lm = 18:22; % Loc Mol 
 dup = 23:25; % Dentate upper part 
 dd = 26:28; % Dentate lower part
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% channels for HPC subareas -- Copy/Pase the values on the excel file
+% Session 3
+% CA1 = 1:9;  % CA1 
+% ripple = 10:14; % pyramidal layer 
+% rad = 15:15; % Radiatum 
+% lm = 16:17; % Loc Mol 
+% dup = 18:20 % Dentate upper part 
+% dd = 21:23; % Dentate lower part
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % channels for HPC subareas 
-% CA1 = 1:11;  % CA1 
-% ripple = 13:23; % pyramidal layer 
-% rad = 24:35; % Radiatum 
-% lm = 36:45; % Loc Mol 
-% dup = 46:51; % Dentate upper part 
-% dd = 52:56; % Dentate lower part
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % directory and file names for the recording paths 
 main_dir = 'C:\Users\fentonlab\Desktop\Gino\LFPs\';
@@ -89,7 +93,9 @@ plot(lfp.H{ch,min}(1,:))
 
 % save psd for 20 min 
 save_psd(psd, dir_rec, name_file_psd);
-psd = load_psd(dir_rec, name_file_psd);
+% psd = load_psd(dir_rec, name_file_psd);
+
+keyboard 
 
 % plotting PSD
 % plot_psd_20_min(psd, 'PSD all HPC - Stationary - RS Ketamine', dir_rec,1)
@@ -106,8 +112,9 @@ plot_psd_20_min_normalize(psd.dup, ['Dentate Up ',method,' - PSD normalized  - R
 plot_psd_20_min_normalize(psd.dd, ['Dentate Down ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['DentDown_',method],1,method)
 
 % plot 1 min PSD for each region, each epoch 
-plot_psd_all_HPC_region_all_epochs(psd, dir_rec, 10, 1, 'CSD')
-plot_psd_all_HPC_region_all_epochs_normalized(psd, dir_rec, 10, 1, 'CSD')
+minute = 10;
+plot_psd_all_HPC_region_all_epochs(psd, dir_rec, minute, 1, 'CSD')
+plot_psd_all_HPC_region_all_epochs_normalized(psd, dir_rec, minute, 1, 'CSD')
 
 keyboard 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -141,7 +148,7 @@ spec_rec = {};
 save_spectrograms(spec_rec, dir_rec, '\spec_rec_HPC_lfp_CDS_reg_min_14_15.mat')
 
 % load spectrograms whole HPC 
-spec_rec = load_spectrograms(dir_rec);
+% spec_rec = load_spectrograms(dir_rec);
 
 
 % %%%%%%%%%%%%%%%%%%%%%%%
@@ -150,24 +157,24 @@ spec_rec = load_spectrograms(dir_rec);
 
 step_t = 10;
 step_f = 20;
-min = 1;
-min_lab = 14;
+min = 1;       % This is the min in spec, depends on what min you are looking at 
+min_lab = 14;  % this depends on min_lab above
 
 % plot single spectrograms:
 title_spec = sprintf('min %d',min);
 epoch = 'high';
 % no-normalization
-plot_spectrogram(sq(spec_rec.H(:,:,min)), spec_rec, step_t, step_f, title_spec, epoch,[], dir_rec, 1);
+plot_spectrogram(sq(spec_rec.H), 'HPC', spec_rec, min, step_t, step_f, title_spec, epoch,[], dir_rec, 1);
 % zscore normalization 
-plot_spectrogram(sq(spec_rec.H(:,:,min)), spec_rec, step_t, step_f, title_spec, epoch, "zscore",dir_rec, 1);
+plot_spectrogram(sq(spec_rec.H),'HPC', spec_rec, min, step_t, step_f, title_spec, epoch, "zscore",dir_rec, 1);
 
 % plot multiple spectrograms, same epoch 
 range = 1:10;
-plot_20_min_spectrograms(spec_rec.H, spec_rec, step_t, step_f, range,'high','RS Ket',dir_rec,1)
+% plot_20_min_spectrograms(spec_rec.H.HPC, spec_rec, step_t, step_f, range,'high','RS Ket',dir_rec,1)
 
 % plot 1 min spectrogram, all epochs 
 plot_spectrograms_all_epochs(spec_rec, mask, step_t, step_f, min,'RS Ket',dir_rec,1)
-plot_spectrograms_all_epochs_and_gamma(spec_rec, mask, step_t, step_f, min,'RS Ket',dir_rec,1)
+% plot_spectrograms_all_epochs_and_gamma(spec_rec, mask, step_t, step_f, min,'RS Ket',dir_rec,1)
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % PLOT SPECTROGRAMS FOR SUBREGIONS HPC
