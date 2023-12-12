@@ -263,8 +263,7 @@ def filter_lfp_notch_filter(lfp_filt_B_bp, lfp_filt_L_bp, lfp_filt_M_bp, lfp_fil
 # =============================================================================
 
 
-"""
-Compute Current Source Density 
+""" Current Source Density 
 Method: most classic method via definition. Number of channels = N-2, where
 N is the nch in the LFP signal 
 """
@@ -297,7 +296,7 @@ Compute Current Source Density with the inverse method (iCSD)
 Output: CSD and CSD filtered, same number of channels of the LFP signal
 """ 
 
-def compute_iCSD(Lfp, plotting = False):
+def compute_iCSD(Lfp, average_y = True, plot_CSD = False):
     
     print('Compute iCSD ......')
     
@@ -355,7 +354,7 @@ def compute_iCSD(Lfp, plotting = False):
     #versions of the current-source density estimates.
     csd_dict = dict(spline_icsd = icsd.SplineiCSD(**spline_input))
         
-    if plotting: # If you want to plot iCSD and LFPs
+    if plot_CSD: # If you want to plot iCSD and LFPs
 
         #plot
         for method, csd_obj in list(csd_dict.items()):
@@ -404,29 +403,32 @@ def compute_iCSD(Lfp, plotting = False):
     
     print(csd.shape)
     
-    # average csd for nearest neighbor channels (average two channels together)
-    # the number of resulting channels at the end of this process will be Nch/4
-    # last_element = None
-    if csd.shape[0] % 2 == 1: # if the number of channels in CSD is odd 
-        # last_element = csd[-1]
-        csd = csd[:-1]
+    if average_y: # if you want to average neighboring electrodes on the y axis (2 by 2)
         
-    if csd_fil.shape[0] % 2 == 1: # if the number of channels in CSD_fil is odd 
-        csd_fil = csd_fil[:-1]
-    
-    # Reshape the array to group elements in pairs along the first dimension
-    csd_resh = csd.reshape(-1, 2, csd.shape[1])
-    csd_fil_resh = csd_fil.reshape(-1,2,csd_fil.shape[1])
-    
-    # Compute the average along the new second dimension
-    csd_mean = csd_resh.mean(axis=1)
-    csd_fil_mean = csd_fil_resh.mean(axis=1)
-    
-    # # If there was an odd number of elements, append the last element back
-    # if last_element is not None:
-    #     csd_avg = np.vstack((csd_avg, last_element))
-    
-
+        # average csd for nearest neighbor channels (average two channels together)
+        # the number of resulting channels at the end of this process will be Nch/4
+        # last_element = None
+        if csd.shape[0] % 2 == 1: # if the number of channels in CSD is odd 
+            # last_element = csd[-1]
+            csd = csd[:-1]
+            
+        if csd_fil.shape[0] % 2 == 1: # if the number of channels in CSD_fil is odd 
+            csd_fil = csd_fil[:-1]
+        
+        # Reshape the array to group elements in pairs along the first dimension
+        csd_resh = csd.reshape(-1, 2, csd.shape[1])
+        csd_fil_resh = csd_fil.reshape(-1,2,csd_fil.shape[1])
+        
+        # Compute the average along the new second dimension
+        csd_mean = csd_resh.mean(axis=1)
+        csd_fil_mean = csd_fil_resh.mean(axis=1)
+        
+        # # If there was an odd number of elements, append the last element back
+        # if last_element is not None:
+        #     csd_avg = np.vstack((csd_avg, last_element))
+    else:
+        csd_mean = csd
+        csd_fil_mean = csd_fil
             
     return csd_mean.T, csd_fil_mean.T 
 

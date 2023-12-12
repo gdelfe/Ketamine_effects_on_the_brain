@@ -2,13 +2,13 @@
 """
 Created on Tue Nov  7 11:49:25 2023
 
-@author: Gino Del Ferraro
+@author: Gino Del Ferraro, Fenton Lab, NYU, CNS
 """
 
 # -*- coding: utf-8 -*-
 """
-Code used to generate processed LFP for teh computation of the PSD and Spectrogram
-for each of the HPC subregions (e.g. CA1, Ripple band, Radiatum, ....).
+Code used to generate processed LFP for the computation of the PSD and Spectrogram
+for each of the HPC subregions (e.g. Stratum Oriens, Stratum Pyramidale (Ripple band), S. Radiatum, ....).
 The code used CSD (Current Source Density) to reduce the contribution of volume condution
 in the LFP signal. 
 
@@ -24,12 +24,20 @@ from utils_signal_processing import *
 from utils_plotting import *
 from utils_general import *
 
-
+""" Input parameters """
 sess = 3 # session number 
-tot_min = 20
-qband = 200 # Q factor in the notch filter 
-save_var = "CSD" # saving file name, Current Source Density
 
+offset = 5 # starting min for each epoch
+tot_min = 12 - 2*offset # tot numb of minutes in each epoch. Each epoch starts at offset and ends at '30 min - offset'
+save_var = "CSD_all_ch" # saving file name, Current Source Density
+
+average_x = False # average electrodes along the x direction in the Neuropixel
+average_y = False # average electrodes 2-by-2 in the y direction in the Neuropixel
+n_el_block = 1 # diving factor to get the tot numb of electrode.  n_el_block = 1 if both avg_x and avg_y are False, it's 4 if both are true, it's 2 if only one of them is True
+
+plot_CSD = True # plot CSD and LFP for comparison
+qband = 200 # Q factor in the notch filter 
+" ------------------- "
 
 
 binFullPath = r'C:\Users\fentonlab\Desktop\Gino\LFPs'
@@ -73,11 +81,11 @@ speed_up = upsample_speed(speed, Lfp, sess, LFP_rate = 2500, speed_rate = 100)
 
 
 # ====== Split speed and Lfp into injection periods (epochs): baseline, low, mid, and high injection
-Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H = split_into_epochs(Lfp,speed_up,N=2500)
+Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H = split_into_epochs(Lfp,speed_up,fs=2500)
  
 
 # ====== Create list to store Lfp for each epoch: (channel, minute, n trial, trial data )
-nch = int(Lfp_B.shape[1]// 4) # number of channel after averaging a 2x2 block 
+nch = int(Lfp_B.shape[1]// n_el_block) # number of channel after averaging a 2x2 block 
 
 # low speed --- list: channel, minute, ntrial, T
 lfp_B_ep_low_s = [[] for ch in range(nch)]
@@ -126,7 +134,7 @@ for current_min in range(0,tot_min):
     
     # ====== Select 1 min data 
     Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min, speed_B_min, speed_L_min, speed_M_min, speed_H_min = \
-        select_1min_data(Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H, current_min, N=2500)
+        select_1min_data(Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H, current_min, offset = 5, fs=2500)
     
     # ====== Replace Lfp bad channel with nearest neighbor (if bad channel exists)
     if bad_flag:
@@ -134,10 +142,10 @@ for current_min in range(0,tot_min):
    
     # === plot bad channel replaced and nearest neighbor
     # plot_lfp_two_channels(Lfp_L_min,bad_id,next_id,0,60,10,N=2500)
-
+    if average_x:
     # ====== Average Lfp in Neuropixel at the same depth, same y (avg 2 electrodes together)
-    Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_same_depth(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min)
-        
+        Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_same_depth(Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min)
+    else:  Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min
     # ====== Average Lfp in Neuropixel in a 2x2 channel block (avg 4 electrodes together)
     # Lfp_B_avg, Lfp_L_avg, Lfp_M_avg, Lfp_H_avg = average_lfp_4_channels(Lfp_B_min,Lfp_L_min,Lfp_M_min,Lfp_H_min)
 
@@ -159,13 +167,13 @@ for current_min in range(0,tot_min):
              
    
     # ====== Compute Current Source Density (CSD) and filtered CSD 
-    csd_B, csd_B_fil  = compute_iCSD(lfp_dec_B)
-    csd_L, csd_L_fil  = compute_iCSD(lfp_dec_L)
-    csd_M, csd_M_fil  = compute_iCSD(lfp_dec_M)
-    csd_H, csd_H_fil  = compute_iCSD(lfp_dec_H)
+    csd_B, csd_B_fil  = compute_iCSD(lfp_dec_B, average_y, plot_CSD)
+    csd_L, csd_L_fil  = compute_iCSD(lfp_dec_L, average_y, plot_CSD)
+    csd_M, csd_M_fil  = compute_iCSD(lfp_dec_M, average_y, plot_CSD)
+    csd_H, csd_H_fil  = compute_iCSD(lfp_dec_H, average_y, plot_CSD)
     
 
-
+#%%
     # ====== Stack lfp all trials for each minute together 
     lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep = \
         stack_lfp_1min_all_trials(lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, csd_B_fil, csd_L_fil, csd_M_fil, csd_H_fil)

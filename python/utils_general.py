@@ -36,8 +36,11 @@ import h5py
 """
 Load LFP data, trim it in order to align it with speed data
 Load speed data 
+Output: 
+    Lfp, speed, gain (Lfp scaling factor), rec (list of session names), 
+    ch_start (start channel for HPC), ch_end (end channel for HPC)
 """
-def load_data(binFullPath,HPC_path_file,PFC_path_file,brain_reg,sess):
+def load_data(binFullPath, HPC_path_file, PFC_path_file, brain_reg, sess):
     
     
     rec = [{"PFC":"path","HPC":"path"} for _ in range(36)] # initialize dictonary for all the paths
@@ -263,17 +266,17 @@ def detect_silent_lfp_channel(Lfp, CA1_end, length = 3, threshold = 4, fs = 2500
 
 """ Split Lfp and speed into 30 min Epochs: baseline, low dose injection, mid dose, high dose """
 
-def split_into_epochs(Lfp,speed_up,N=2500):
+def split_into_epochs(Lfp,speed_up,fs=2500):
     
     # cut Lfp and speed up to 2 h time window (disregard data above 2 h)
-    L = N*60*30*4 # time points in a 2 h time window
+    L = fs*60*30*4 # time points in a 2 h time window
     # trim Lfp and speed 
     speed = speed_up[0:L]
     lfp = Lfp[0:L,:]
     
     speed_periods = speed.reshape(-1,int(speed.size/4))  # reshape speed in baseline, low, mid, high injection time periods
     
-    win_30 = N*60*30 # 30 min window 
+    win_30 = fs*60*30 # 30 min window 
     Lfp_B = lfp[0:win_30,:]  # base line period
     Lfp_L = lfp[win_30:2*win_30,:]  # low injection 
     Lfp_M = lfp[2*win_30:3*win_30,:]  # mid injection 
@@ -284,7 +287,7 @@ def split_into_epochs(Lfp,speed_up,N=2500):
     speed_M = speed_periods[2,:]
     speed_H = speed_periods[3,:]
     
-    print('min in each epoch: ',speed_B.size/N/60)
+    print('min in each epoch: ',speed_B.size/fs/60)
     
     return Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H
 
@@ -292,18 +295,17 @@ def split_into_epochs(Lfp,speed_up,N=2500):
 
 ''' Select only 1 min data at the time to speed up data processing, for both LFP and speed '''
 
-def select_1min_data(Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H, current_min, N=2500):
+def select_1min_data(Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H, current_min, offset, fs=2500):
     
     #### 3. Select 1 min of data for each Epoch, for both Lfp and speed
     ##### Select 1 every M channels for the Lfp
-
+    # offset is the starting minute of epoch 
 
     M = 1 # keep every M channel
     length = 1 # length of period to look at, i.e. 1 = 1 min 
-    offset = 5 # starting of epoch in min
 
-    start = (offset + current_min)*60*N - 1    # start point in time points
-    end = (offset + current_min + length)*60*N - 1   # stop point in time points
+    start = (offset + current_min)*60*fs - 1    # start point in time points
+    end = (offset + current_min + length)*60*fs - 1   # stop point in time points
 
     # Lfp trim: 1 minute, one every M channel and tranform memap to numpy array
     Lfp_B_min = np.array(Lfp_B[start:end,::M])  # base line period
@@ -317,7 +319,7 @@ def select_1min_data(Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, spee
     speed_M_min = speed_M[start:end]
     speed_H_min = speed_H[start:end]
 
-    print('1 min data: Lfp shape {}, speed shape {}, length in sec: {}\n'.format(Lfp_B_min.shape, speed_B_min.shape, speed_B_min.size/N))
+    print('1 min data: Lfp shape {}, speed shape {}, length in sec: {}\n'.format(Lfp_B_min.shape, speed_B_min.shape, speed_B_min.size/fs))
     
     return Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min, speed_B_min, speed_L_min, speed_M_min, speed_H_min
          
