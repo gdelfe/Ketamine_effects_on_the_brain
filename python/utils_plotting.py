@@ -233,4 +233,41 @@ def plot_filtered_lfp(lfp_filt, start, end, Xtick, ch, N = 2500):
     plt.tight_layout()
     plt.show()
     
+ # =============================================================================
+  
+def plot_lfp_csd_channels(Lfp,csd,ch1,ch2,scaling,start,end,Xtick,fs=2500):
+
+    L_start = start*fs # start of time series in sec
+    L_end = end*fs # end of time series 
+    T = Xtick*fs # xtick period 
+    
+    
+    plt.figure(figsize=(10,5))
+    plt.plot(Lfp[L_start:L_end,ch1],linewidth=0.5)
+    plt.title(f'LFP for channel {ch1}',fontsize=12)
+    plt.xlabel('time (sec)',fontsize=12)
+    plt.ylabel('Unknown UOM',fontsize=12)
+    
+    
+    xticks = np.arange(0,L_end-L_start, step=T)
+    plt.xticks(ticks=xticks, labels=[str(i/fs) for i in xticks],fontsize=10)
+    plt.yticks(fontsize=10)
+    # print(xticks)
+    plt.tight_layout()
+    plt.show()
+    
+    
+    plt.figure(figsize=(10,5))
+    plt.plot(csd[L_start:L_end,ch2]*scaling,linewidth=0.5)
+    plt.title(f'CSD for channel {ch2}',fontsize=12)
+    plt.xlabel('time (sec)',fontsize=12)
+    plt.ylabel('Unknown UOM',fontsize=12)
+    
+    
+    xticks = np.arange(0,L_end-L_start, step=T)
+    plt.xticks(ticks=xticks, labels=[str(i/fs) for i in xticks],fontsize=10)
+    plt.yticks(fontsize=10)
+    
+    plt.tight_layout()
+    plt.show()
     

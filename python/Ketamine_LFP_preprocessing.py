@@ -5,20 +5,45 @@ Spyder Editor
 @ Gino Del Ferraro, Fenton lab, Oct 2023
 """
 
+"""
+Code used to generate processed LFP for the computation of the PSD and Spectrogram
+for each of the HPC subregions (e.g. Stratum Oriens, Stratum Pyramidale (Ripple band), S. Radiatum, ....).
+
+The input signal is Neuropixel LFP (2 x N) channels in the (x, y) dimensions. 
+Channels along x are averaged together after pre-processing. Channels in the y dimension
+are averaged together 2-by-2. The resulting number of CSD channels is (2 x N / 4)
+
+@ Gino Del Ferraro, Fenton lab, Oct 2023
+"""
+
 from utilities_ketamine_analysis_v8 import *
 from utils_signal_processing import *
 from utils_plotting import *
 from utils_general import *
 
 
-sess = 3 # session number 
-tot_min = 20
-qband = 200 # Q factor in the notch filter 
-save_var = "CA1" # saving file name, all lfp
 
-# CA1 starting and ending channel
+""" Input parameters """
+sess = 2 # session number 
+
+offset = 5 # starting min for each epoch
+tot_min = 12 - 2*offset # tot numb of minutes in each epoch. Each epoch starts at offset and ends at '30 min - offset'
+save_var = "CA1" # saving file name, Current Source Density
+
+n_el_block = 1 # diving factor to get the tot numb of electrode.  n_el_block = 1 if both avg_x and avg_y are False, it's 4 if both are true, it's 2 if only one of them is True
+
+plot_CSD = True # plot CSD and LFP for comparison
+qband = 200 # Q factor in the notch filter 
+
+
+""" Define Lfp channels of Subregion of HPC -- 
+This is used to select only either  1. Septum Oriens; 2. Septum Oriens and Septum Pyramidale 
+Either way, the selected region is called CA1 for brevity
+"""
 CA1_start = 0
 CA1_end = 36
+" ------------------- "
+
 
 binFullPath = r'C:\Users\fentonlab\Desktop\Gino\LFPs'
 HPC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs','HPC_lfp_paths.file')
@@ -37,7 +62,12 @@ bad_flag, next_id, bad_id = detect_silent_lfp_channel(Lfp, CA1_end, 4, 4, 2500)
 
 # ====== Upsample Speed recording
 speed_up = upsample_speed(speed, Lfp, sess, LFP_rate = 2500, speed_rate = 100)
-# Get Lfp of CA1 only -- Uncomment this only for CA1 analysis 
+
+""" Get Lfp of Subregion of HPC -- This is used to select only either 
+1. Septum Oriens
+2. Septum Oriens and Septum Pyramidale 
+Either way, the selected region is called CA1 for brevity
+"""
 Lfp = Lfp[:,CA1_start:CA1_end]
 
 
@@ -67,8 +97,8 @@ Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H = split_into_epoc
  
 
 # nch = int(Lfp_B.shape[1]// 4) # number of channel after averaging a 2x2 block 
-nch = int(Lfp_B.shape[1]) # number of channel after averaging a 2x2 block 
-nch = int(Lfp_B.shape[1]// 4)*4 # number of channel after averaging a 2x2 block 
+nch = int(Lfp_B.shape[1]// n_el_block) # number of channel after averaging a 2x2 block 
+
 # low speed
 lfp_B_ep_low_s = [[] for ch in range(nch)]
 lfp_L_ep_low_s = [[] for ch in range(nch)]
@@ -113,7 +143,7 @@ for current_min in range(0,tot_min):
     
     # ====== Select 1 min data 
     Lfp_B_min, Lfp_L_min, Lfp_M_min, Lfp_H_min, speed_B_min, speed_L_min, speed_M_min, speed_H_min = \
-        select_1min_data(Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H, current_min, N=2500)
+        select_1min_data(Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H, current_min, offset = 5, fs=2500)
     
     # ====== Replace Lfp bad channel with nearest neighbor (if bad channel exists)
     if bad_flag:
