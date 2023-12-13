@@ -6,10 +6,10 @@ f = psd.f;
 
 for min = 1:size(psd.B,1) % numb of minute
     subplot(5,4,min)
-    plot(f,log10(psd.B(min,:)),'LineWidth', 2); hold on
-    plot(f,log10(psd.L(min,:)),'LineWidth', 2); hold on
-    plot(f,log10(psd.M(min,:)),'LineWidth', 2); hold on
-    plot(f,log10(psd.H(min,:)),'LineWidth', 2); 
+    plot(f,log10(psd.B(min,:)),'LineWidth', 2, 'Color','#417C81'); hold on
+    plot(f,log10(psd.L(min,:)),'LineWidth', 2, 'Color','#7986AC'); hold on
+    plot(f,log10(psd.M(min,:)),'LineWidth', 2, 'Color','#2F4172'); hold on
+    plot(f,log10(psd.H(min,:)),'LineWidth', 2, 'Color','#061439'); 
     
     title(sprintf('min = %d',min))
     grid on
