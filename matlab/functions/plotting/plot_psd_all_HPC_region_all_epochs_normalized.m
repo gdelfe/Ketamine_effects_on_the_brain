@@ -4,6 +4,9 @@ function plot_psd_all_HPC_region_all_epochs_normalized(psd, dir_rec, min, save_f
 fig = figure('Position', [0, 0, 1000, 3900]);
 f = psd.CA1.f;
 fmax = 100;
+
+mit_tot = -4;
+max_tot = 
 % BASELINE 
 subplot(2,2,1)
 plot(f,log10(psd.CA1.B(min,:)/sum(psd.CA1.B(min,:))),'LineWidth', 2); hold on

@@ -24,8 +24,8 @@ method = 'CSD';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % channels for HPC subareas -- Copy/Pase the values on the excel file
 % Session 2
-CA1 = 1:5;  % CA1 
-ripple = 6:11; % pyramidal layer 
+so = 1:5;  % oriens layer  
+sp = 6:11; % pyramidal layer 
 rad = 12:17; % Radiatum 
 lm = 18:22; % Loc Mol 
 dup = 23:25; % Dentate upper part 
@@ -36,7 +36,7 @@ dd = 26:28; % Dentate lower part
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % channels for HPC subareas -- Copy/Pase the values on the excel file
 % Session 3
-% CA1 = 1:9;  % CA1 
+% CA1 = 1:9;  % oriens 
 % ripple = 10:14; % pyramidal layer 
 % rad = 15:15; % Radiatum 
 % lm = 16:17; % Loc Mol 
@@ -75,8 +75,8 @@ plot(lfp.H{ch,min}(1,:))
 
 % aggregate trials 
 [lfp_agg.HPC] = aggregate_trials_ch_range(lfp,1:nch); % All HPC
-[lfp_agg.CA1] = aggregate_trials_ch_range(lfp,CA1);
-[lfp_agg.ripple] = aggregate_trials_ch_range(lfp,ripple);
+[lfp_agg.so] = aggregate_trials_ch_range(lfp,so);
+[lfp_agg.sp] = aggregate_trials_ch_range(lfp,sp);
 [lfp_agg.rad] = aggregate_trials_ch_range(lfp,rad);
 [lfp_agg.lm] = aggregate_trials_ch_range(lfp,lm);
 [lfp_agg.dup] = aggregate_trials_ch_range(lfp,dup);
@@ -104,8 +104,8 @@ keyboard
 plot_psd_20_min(psd.HPC, ['HPC ',method,' - PSD not normalized - RS Ketamine'],dir_rec,['HPC_',method],1,method)
 plot_psd_20_min_normalize(psd.HPC, ['HPC ',method,' - PSD normalized - RS Ketamine'],dir_rec,['HPC_',method],1,method)
 % By region 
-plot_psd_20_min_normalize(psd.CA1, ['CA1 ',method,' - PSD normalized - RS Ketamine'],dir_rec,['CA1_',method],1,method)
-plot_psd_20_min_normalize(psd.ripple, ['Ripple ',method ,' - PSD normalized  RS Ketamine'], dir_rec, ['Ripple_',method],1,method)
+plot_psd_20_min_normalize(psd.CA1, ['S. Oriens ',method,' - PSD normalized - RS Ketamine'],dir_rec,['SO_',method],1,method)
+plot_psd_20_min_normalize(psd.ripple, ['S. Pyramidale ',method ,' - PSD normalized  RS Ketamine'], dir_rec, ['SP_',method],1,method)
 plot_psd_20_min_normalize(psd.rad, ['Radiatum ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['Radiatum_',method],1,method)
 plot_psd_20_min_normalize(psd.lm, ['LocMol ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['LocMol_',method],1,method)
 plot_psd_20_min_normalize(psd.dup, ['Dentate Up ',method,' - PSD normalized  - RS Ketamine'], dir_rec,['DentUp_',method], 1,method)
