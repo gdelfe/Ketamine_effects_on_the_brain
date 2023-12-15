@@ -5,9 +5,6 @@ fig = figure('Position', [0, 0, 1000, 3900]);
 f = psd.CA1.f;
 fmax = 100;
 
-min_tot = -;
-max_tot = ;
-
 % BASELINE 
 subplot(2,2,1)
 plot(f,log10(psd.CA1.B(min,:)),'LineWidth', 2); hold on

@@ -5,8 +5,8 @@ fig = figure('Position', [0, 0, 1000, 3900]);
 f = psd.CA1.f;
 fmax = 100;
 
-mit_tot = -4;
-max_tot = 
+min_tot = -4.3;
+max_tot = -1.3;
 % BASELINE 
 subplot(2,2,1)
 plot(f,log10(psd.CA1.B(min,:)/sum(psd.CA1.B(min,:))),'LineWidth', 2); hold on
@@ -20,6 +20,7 @@ xlabel('Frequency (Hz)')
 ylabel('Log10 PSD ')
 title('Baseline','FontSize',12)
 xlim([0,fmax])
+ylim([min_tot,max_tot])
 
 h_legend = legend('CA1', 'Ripple','Radiatum','LocMol','Dentate Up','Dentate Down'); 
 set(h_legend)
@@ -37,6 +38,7 @@ xlabel('Frequency (Hz)')
 ylabel('Log10 PSD ')
 title('Low Dose','FontSize',12)
 xlim([0,fmax])
+ylim([min_tot,max_tot])
 
 h_legend = legend('CA1', 'Ripple','Radiatum','LocMol','Dentate Up','Dentate Down'); 
 set(h_legend)
@@ -55,6 +57,7 @@ xlabel('Frequency (Hz)')
 ylabel('Log10 PSD ')
 title('Mid Dose','FontSize',12)
 xlim([0,fmax])
+ylim([min_tot,max_tot])
 
 h_legend = legend('CA1', 'Ripple','Radiatum','LocMol','Dentate Up','Dentate Down'); 
 set(h_legend)
@@ -72,6 +75,7 @@ xlabel('Frequency (Hz)')
 ylabel('Log10 PSD ')
 title('High Dose','FontSize',12)
 xlim([0,fmax])
+ylim([min_tot,max_tot])
 
 h_legend = legend('CA1', 'Ripple','Radiatum','LocMol','Dentate Up','Dentate Down'); 
 set(h_legend)

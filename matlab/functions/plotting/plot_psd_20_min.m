@@ -21,7 +21,7 @@ max_H = max(max(log10(psd.H(:,:))));
 min_tot = min([min_B,min_L,min_M,min_H]);
 max_tot = max([max_B,max_L,max_M,max_H]) + delta;
 
-ha = tight_subplot(5,4,[.021 .02],[.05 .05],[.07 .2]); 
+ha = tight_subplot(5,4,[.021 .02],[.05 .05],[.07 .2]);  % [gap_h gap_w] , margin [lower upper] [left right]
 for minute = 1:size(psd.B,1) % numb of minute
 %     subplot(5,4,minute)
     axes(ha(minute));
@@ -87,6 +87,7 @@ if save_flag
         mkdir(dir_out)
     end
     saveas(fig, strcat(dir_out,sprintf('\\20_min_psd_%s.png',hpc_reg) ))
+    saveas(fig, strcat(dir_out,sprintf('\\20_min_psd_%s.pdf',hpc_reg) ))
 end
 
 

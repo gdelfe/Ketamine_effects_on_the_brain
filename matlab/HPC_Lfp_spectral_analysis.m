@@ -53,6 +53,7 @@ PFC_file = strcat(main_dir,'PFC_lfp_paths.mat');
 
 main_dir_HPC = 'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC';
 main_dir_PFC = 'C:\Users\fentonlab\Desktop\Gino\LFPs\PFC';
+load(strcat(main_dir,'color_strata.mat')); % load colors for plots
 
 load(HPC_file) 
 Paths_HPC = extract_paths(HPC_file_list); 
@@ -84,8 +85,8 @@ plot(lfp.H{ch,min}(1,:))
 
 % compute PSD for each minute, for 20 min 
 [psd.HPC] = psd_across_min(lfp_agg.HPC, W, fk); % All HPC
-[psd.CA1] = psd_across_min(lfp_agg.CA1, W, fk);
-[psd.ripple] = psd_across_min(lfp_agg.ripple, W, fk);
+[psd.so] = psd_across_min(lfp_agg.so, W, fk);
+[psd.sp] = psd_across_min(lfp_agg.sp, W, fk);
 [psd.rad] = psd_across_min(lfp_agg.rad, W, fk);
 [psd.lm] = psd_across_min(lfp_agg.lm, W, fk);
 [psd.dup] = psd_across_min(lfp_agg.dup, W, fk);
@@ -104,8 +105,8 @@ keyboard
 plot_psd_20_min(psd.HPC, ['HPC ',method,' - PSD not normalized - RS Ketamine'],dir_rec,['HPC_',method],1,method)
 plot_psd_20_min_normalize(psd.HPC, ['HPC ',method,' - PSD normalized - RS Ketamine'],dir_rec,['HPC_',method],1,method)
 % By region 
-plot_psd_20_min_normalize(psd.CA1, ['S. Oriens ',method,' - PSD normalized - RS Ketamine'],dir_rec,['SO_',method],1,method)
-plot_psd_20_min_normalize(psd.ripple, ['S. Pyramidale ',method ,' - PSD normalized  RS Ketamine'], dir_rec, ['SP_',method],1,method)
+plot_psd_20_min_normalize(psd.so, ['S. Oriens ',method,' - PSD normalized - RS Ketamine'],dir_rec,['SO_',method],1,method)
+plot_psd_20_min_normalize(psd.sp, ['S. Pyramidale ',method ,' - PSD normalized  RS Ketamine'], dir_rec, ['SP_',method],1,method)
 plot_psd_20_min_normalize(psd.rad, ['Radiatum ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['Radiatum_',method],1,method)
 plot_psd_20_min_normalize(psd.lm, ['LocMol ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['LocMol_',method],1,method)
 plot_psd_20_min_normalize(psd.dup, ['Dentate Up ',method,' - PSD normalized  - RS Ketamine'], dir_rec,['DentUp_',method], 1,method)
@@ -113,8 +114,8 @@ plot_psd_20_min_normalize(psd.dd, ['Dentate Down ',method,' - PSD normalized - R
 
 % plot 1 min PSD for each region, each epoch 
 minute = 10;
-plot_psd_all_HPC_region_all_epochs(psd, dir_rec, minute, 1, 'CSD')
-plot_psd_all_HPC_region_all_epochs_normalized(psd, dir_rec, minute, 1, 'CSD')
+plot_psd_all_HPC_region_all_epochs_compact(psd, dir_rec, minute, 1, 'CSD')
+plot_psd_all_HPC_region_all_epochs_normalized_compact(psd, dir_rec, minute, 1, 'CSD')
 
 keyboard 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%

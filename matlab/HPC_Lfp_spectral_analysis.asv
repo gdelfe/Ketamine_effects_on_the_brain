@@ -53,6 +53,7 @@ PFC_file = strcat(main_dir,'PFC_lfp_paths.mat');
 
 main_dir_HPC = 'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC';
 main_dir_PFC = 'C:\Users\fentonlab\Desktop\Gino\LFPs\PFC';
+load(strcat(main_dir,'color_strata.mat')); % load colors for plots
 
 load(HPC_file) 
 Paths_HPC = extract_paths(HPC_file_list); 
@@ -101,20 +102,20 @@ keyboard
 % plot_psd_20_min(psd, 'PSD all HPC - Stationary - RS Ketamine', dir_rec,1)
 % plotting PSD normalized 
 % All HPC 
-plot_psd_20_min(psd.HPC, ['HPC ',method,' - PSD not normalized - RS Ketamine'],dir_rec,['HPC_',method],1,method)
-plot_psd_20_min_normalize(psd.HPC, ['HPC ',method,' - PSD normalized - RS Ketamine'],dir_rec,['HPC_',method],1,method)
+plot_psd_20_min(psd.HPC, ['HPC ',method,' - PSD not normalized - RS Ketamine'],dir_rec,['HPC_',method],1,method, colors.HPC)
+plot_psd_20_min_normalize(psd.HPC, ['HPC ',method,' - PSD normalized - RS Ketamine'],dir_rec,['HPC_',method],1,method, colors.HPC)
 % By region 
-plot_psd_20_min_normalize(psd.CA1, ['SO ',method,' - PSD normalized - RS Ketamine'],dir_rec,['SO_',method],1,method)
-plot_psd_20_min_normalize(psd.ripple, ['SP ',method ,' - PSD normalized  RS Ketamine'], dir_rec, ['SP_',method],1,method)
-plot_psd_20_min_normalize(psd.rad, ['Radiatum ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['Radiatum_',method],1,method)
-plot_psd_20_min_normalize(psd.lm, ['LocMol ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['LocMol_',method],1,method)
-plot_psd_20_min_normalize(psd.dup, ['Dentate Up ',method,' - PSD normalized  - RS Ketamine'], dir_rec,['DentUp_',method], 1,method)
-plot_psd_20_min_normalize(psd.dd, ['Dentate Down ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['DentDown_',method],1,method)
+plot_psd_20_min_normalize(psd.so, ['S. Oriens ',method,' - PSD normalized - RS Ketamine'],dir_rec,['SO_',method],1,method, colors.so)
+plot_psd_20_min_normalize(psd.sp, ['S. Pyramidale ',method ,' - PSD normalized  RS Ketamine'], dir_rec, ['SP_',method],1,method,  colors.sp)
+plot_psd_20_min_normalize(psd.rad, ['Radiatum ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['Radiatum_',method],1,method, colors.rad)
+plot_psd_20_min_normalize(psd.lm, ['LocMol ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['LocMol_',method],1,method, colors.lm)
+plot_psd_20_min_normalize(psd.dup, ['Dentate Up ',method,' - PSD normalized  - RS Ketamine'], dir_rec,['DentUp_',method], 1,method, colors.dup)
+plot_psd_20_min_normalize(psd.dd, ['Dentate Down ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['DentDown_',method],1,method, colors.dd)
 
 % plot 1 min PSD for each region, each epoch 
 minute = 10;
-plot_psd_all_HPC_region_all_epochs(psd, dir_rec, minute, 1, 'CSD')
-plot_psd_all_HPC_region_all_epochs_normalized(psd, dir_rec, minute, 1, 'CSD')
+plot_psd_all_HPC_region_all_epochs_compact(psd, dir_rec, minute, 1, 'CSD')
+plot_psd_all_HPC_region_all_epochs_normalized_compact(psd, dir_rec, minute, 1, 'CSD')
 
 keyboard 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%

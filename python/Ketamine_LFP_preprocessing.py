@@ -27,8 +27,8 @@ from utils_general import *
 sess = 2 # session number 
 
 offset = 5 # starting min for each epoch
-tot_min = 12 - 2*offset # tot numb of minutes in each epoch. Each epoch starts at offset and ends at '30 min - offset'
-save_var = "CA1" # saving file name, Current Source Density
+tot_min = 30 - 2*offset # tot numb of minutes in each epoch. Each epoch starts at offset and ends at '30 min - offset'
+save_var = "so_sp" # saving file name, Current Source Density
 
 n_el_block = 1 # diving factor to get the tot numb of electrode.  n_el_block = 1 if both avg_x and avg_y are False, it's 4 if both are true, it's 2 if only one of them is True
 
@@ -41,7 +41,7 @@ This is used to select only either  1. Septum Oriens; 2. Septum Oriens and Septu
 Either way, the selected region is called CA1 for brevity
 """
 CA1_start = 0
-CA1_end = 36
+CA1_end = 46
 " ------------------- "
 
 
@@ -93,7 +93,7 @@ Lfp = Lfp[:,CA1_start:CA1_end]
 
 
 # ====== Split speed and Lfp into injection periods (epochs): baseline, low, mid, and high injection
-Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H = split_into_epochs(Lfp,speed_up,N=2500)
+Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H = split_into_epochs(Lfp,speed_up,fs=2500)
  
 
 # nch = int(Lfp_B.shape[1]// 4) # number of channel after averaging a 2x2 block 
@@ -247,8 +247,6 @@ for current_min in range(0,tot_min):
 #                   lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_ep_low_s, lfp_H_ep_low_s, 
 #                   lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s)
 
-
-#%%
 
 # All trials with mask for low/high speed --- ONLY FOR CA1 -- For single LFP-spike cell analysis 
 # (min id, length T for 60 sec, channel id)
