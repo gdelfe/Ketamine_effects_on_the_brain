@@ -10,7 +10,7 @@ if nargin < 6 % if the analysis regards the whole HPC and not just a HPC subarea
 end
 
 for min = min_start:min_end
-
+    
     X = sq(lfp_all.B(min,sec_start:sec_ends,ch_range))';
     if length(ch_range) == 1 ; X = X'; end   
     [spec, ~, ~] = tfspec(X, spec_par.tapers, spec_par.fs, spec_par.dn, spec_par.fk, pad, 0.05,1);

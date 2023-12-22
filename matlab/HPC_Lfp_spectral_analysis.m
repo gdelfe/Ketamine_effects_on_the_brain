@@ -12,7 +12,7 @@ addpath('C:\Users\fentonlab\Desktop\Gino\Gino_codes\');
 
 iSess = 2; % python session number 
 sess = iSess + 1; % session number 
-ch = 1; min = 13; % channel and minute to look at 
+ch = 1; minute = 13; % channel and minute to look at 
 W  = 3; % frequency resolution PSD
 fk = 100; % max frequency PSD
 
@@ -65,10 +65,10 @@ dir_rec = strcat(main_dir_HPC,Paths_HPC{sess}) % directory path  for the recordi
 nch = size(lfp_all.B,3);
 % plot 1 min lfp to check data is loaded correctly 
 figure;
-plot(lfp.B{ch,min}(1,:)); hold on 
-plot(lfp.L{ch,min}(1,:)); hold on 
-plot(lfp.M{ch,min}(1,:)); hold on 
-plot(lfp.H{ch,min}(1,:))
+plot(lfp.B{ch,minute}(1,:)); hold on 
+plot(lfp.L{ch,minute}(1,:)); hold on 
+plot(lfp.M{ch,minute}(1,:)); hold on 
+plot(lfp.H{ch,minute}(1,:))
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % PSD  %%%%%%%%%%%%%%%%%%%%%%
@@ -102,15 +102,15 @@ keyboard
 % plot_psd_20_min(psd, 'PSD all HPC - Stationary - RS Ketamine', dir_rec,1)
 % plotting PSD normalized 
 % All HPC 
-plot_psd_20_min(psd.HPC, ['HPC ',method,' - PSD not normalized - RS Ketamine'],dir_rec,['HPC_',method],1,method)
-plot_psd_20_min_normalize(psd.HPC, ['HPC ',method,' - PSD normalized - RS Ketamine'],dir_rec,['HPC_',method],1,method)
+plot_psd_20_min(psd.HPC, ['HPC ',method,' - PSD not normalized - RS Ketamine'],dir_rec,['HPC_',method],1,method, colors.HPC)
+plot_psd_20_min_normalize(psd.HPC, ['HPC ',method,' - PSD normalized - RS Ketamine'],dir_rec,['HPC_',method],1,method, colors.HPC)
 % By region 
-plot_psd_20_min_normalize(psd.so, ['S. Oriens ',method,' - PSD normalized - RS Ketamine'],dir_rec,['SO_',method],1,method)
-plot_psd_20_min_normalize(psd.sp, ['S. Pyramidale ',method ,' - PSD normalized  RS Ketamine'], dir_rec, ['SP_',method],1,method)
-plot_psd_20_min_normalize(psd.rad, ['Radiatum ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['Radiatum_',method],1,method)
-plot_psd_20_min_normalize(psd.lm, ['LocMol ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['LocMol_',method],1,method)
-plot_psd_20_min_normalize(psd.dup, ['Dentate Up ',method,' - PSD normalized  - RS Ketamine'], dir_rec,['DentUp_',method], 1,method)
-plot_psd_20_min_normalize(psd.dd, ['Dentate Down ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['DentDown_',method],1,method)
+plot_psd_20_min_normalize(psd.so, ['S. Oriens ',method,' - PSD normalized - RS Ketamine'],dir_rec,['SO_',method],1,method, colors.so)
+plot_psd_20_min_normalize(psd.sp, ['S. Pyramidale ',method ,' - PSD normalized  RS Ketamine'], dir_rec, ['SP_',method],1,method,  colors.sp)
+plot_psd_20_min_normalize(psd.rad, ['Radiatum ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['Radiatum_',method],1,method, colors.rad)
+plot_psd_20_min_normalize(psd.lm, ['LocMol ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['LocMol_',method],1,method, colors.lm)
+plot_psd_20_min_normalize(psd.dup, ['Dentate Up ',method,' - PSD normalized  - RS Ketamine'], dir_rec,['DentUp_',method], 1,method, colors.dup)
+plot_psd_20_min_normalize(psd.dd, ['Dentate Down ',method,' - PSD normalized - RS Ketamine'], dir_rec, ['DentDown_',method],1,method, colors.dd)
 
 % plot 1 min PSD for each region, each epoch 
 minute = 10;
@@ -138,8 +138,8 @@ spec_par.dn = 0.05; % sliding step;
 % compute spectrograms whole HPC
 spec_rec = {};
 [spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all, 'HPC', fs, min_start, min_end, start, ends, spec_par, 1:nch); % all HPC 
-[spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all, 'CA1', fs, min_start, min_end,start, ends, spec_par, CA1);
-[spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all, 'ripple',fs, min_start, min_end, start, ends, spec_par, ripple);
+[spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all, 'so', fs, min_start, min_end,start, ends, spec_par, so);
+[spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all, 'sp',fs, min_start, min_end, start, ends, spec_par, sp);
 [spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all,'rad', fs, min_start, min_end, start, ends, spec_par, rad);
 [spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all,'lm', fs, min_start, min_end, start, ends, spec_par, lm);
 [spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all, 'dup', fs, min_start, min_end, start, ends, spec_par, dup);
@@ -158,23 +158,23 @@ save_spectrograms(spec_rec, dir_rec, '\spec_rec_HPC_lfp_CDS_reg_min_14_15.mat')
 
 step_t = 10;
 step_f = 20;
-min = 1;       % This is the min in spec, depends on what min you are looking at 
-min_lab = 14;  % this depends on min_lab above
+minute = 2;       % This is the min in spec, depends on what min you are looking at 
+min_lab = 15;  % this depends on min_lab above
 
 % plot single spectrograms:
-title_spec = sprintf('min %d',min);
+title_spec = sprintf('min %d',minute);
 epoch = 'high';
 % no-normalization
-plot_spectrogram(sq(spec_rec.H), 'HPC', spec_rec, min, step_t, step_f, title_spec, epoch,[], dir_rec, 1);
+plot_spectrogram(sq(spec_rec.H), 'HPC', spec_rec, minute, step_t, step_f, title_spec, epoch,[], dir_rec, 1);
 % zscore normalization 
-plot_spectrogram(sq(spec_rec.H),'HPC', spec_rec, min, step_t, step_f, title_spec, epoch, "zscore",dir_rec, 1);
+plot_spectrogram(sq(spec_rec.H),'HPC', spec_rec, minute, step_t, step_f, title_spec, epoch, "zscore",dir_rec, 1);
 
 % plot multiple spectrograms, same epoch 
 range = 1:10;
 % plot_20_min_spectrograms(spec_rec.H.HPC, spec_rec, step_t, step_f, range,'high','RS Ket',dir_rec,1)
 
 % plot 1 min spectrogram, all epochs 
-plot_spectrograms_all_epochs(spec_rec, mask, step_t, step_f, min,'RS Ket',dir_rec,1)
+plot_spectrograms_all_epochs(spec_rec,'HPC', mask, step_t, step_f, minute, min_lab, 'RS Ket',dir_rec,1)
 % plot_spectrograms_all_epochs_and_gamma(spec_rec, mask, step_t, step_f, min,'RS Ket',dir_rec,1)
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -182,21 +182,21 @@ plot_spectrograms_all_epochs(spec_rec, mask, step_t, step_f, min,'RS Ket',dir_re
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % PLOT SPECTROGRAM FOR EACH EPOCH, EACH SUBREGION 
-plot_spectrograms_all_regions(spec_rec, 'B', mask, step_t, step_f, min, min_lab, 'RS Ket - BASELINE', dir_rec, 1)
-plot_spectrograms_all_regions(spec_rec, 'L', mask, step_t, step_f, min, min_lab, 'RS Ket - LOW DOSE', dir_rec, 1)
-plot_spectrograms_all_regions(spec_rec, 'M', mask, step_t, step_f, min, min_lab, 'RS Ket - MID DOSE', dir_rec, 1)
-plot_spectrograms_all_regions(spec_rec, 'H', mask, step_t, step_f, min, min_lab, 'RS Ket - HIGH DOSE', dir_rec, 1)
+plot_spectrograms_all_regions(spec_rec, 'B', mask, step_t, step_f, minute, min_lab, 'RS Ket - BASELINE', dir_rec, 1)
+plot_spectrograms_all_regions(spec_rec, 'L', mask, step_t, step_f, minute, min_lab, 'RS Ket - LOW DOSE', dir_rec, 1)
+plot_spectrograms_all_regions(spec_rec, 'M', mask, step_t, step_f, minute, min_lab, 'RS Ket - MID DOSE', dir_rec, 1)
+plot_spectrograms_all_regions(spec_rec, 'H', mask, step_t, step_f, minute, min_lab, 'RS Ket - HIGH DOSE', dir_rec, 1)
 
-plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min_lab, 'RS Ket - HPC', dir_rec, 'HPC', 1)
+plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, minute, min_lab, 'RS Ket - HPC', dir_rec, 'HPC', 1)
 
-plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min_lab, 'RS Ket - CA1', dir_rec, 'CA1', 1)
-plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min_lab, 'RS Ket - Ripple', dir_rec, 'ripple', 1)
-plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min_lab, 'RS Ket - Radiatum', dir_rec, 'rad', 1)
-plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min_lab, 'RS Ket - LocMol', dir_rec, 'lm', 1)
-plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min_lab, 'RS Ket - Dentate Up', dir_rec, 'dup', 1)
-plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, min, min_lab, 'RS Ket - Dentate Down', dir_rec, 'dd', 1)
+plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, minute, min_lab, 'RS Ket - CA1', dir_rec, 'CA1', 1)
+plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, minute, min_lab, 'RS Ket - Ripple', dir_rec, 'ripple', 1)
+plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, minute, min_lab, 'RS Ket - Radiatum', dir_rec, 'rad', 1)
+plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, minute, min_lab, 'RS Ket - LocMol', dir_rec, 'lm', 1)
+plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, minute, min_lab, 'RS Ket - Dentate Up', dir_rec, 'dup', 1)
+plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, minute, min_lab, 'RS Ket - Dentate Down', dir_rec, 'dd', 1)
 
-plot_zscored_psd_from_spectrogram(spec_rec,dir_rec,min,min_lab,1)
+plot_zscored_psd_from_spectrogram(spec_rec,dir_rec,minute,min_lab,1)
 % plot_psd_from_spectrogram(spec_rec,dir_rec,min,min_lab,1)
 
 
@@ -209,8 +209,8 @@ plot_zscored_psd_from_spectrogram(spec_rec,dir_rec,min,min_lab,1)
 
 
 figure;
-plot(f,log10(psd_B(min,:)),'LineWidth', 2); hold on
-plot(f,log10(psd_L(min,:)),'LineWidth', 2); hold on
-plot(f,log10(psd_M(min,:)),'LineWidth', 2); hold on
-plot(f,log10(psd_H(min,:)),'LineWidth', 2); hold on
+plot(f,log10(psd_B(minute,:)),'LineWidth', 2); hold on
+plot(f,log10(psd_L(minute,:)),'LineWidth', 2); hold on
+plot(f,log10(psd_M(minute,:)),'LineWidth', 2); hold on
+plot(f,log10(psd_H(minute,:)),'LineWidth', 2); hold on
 

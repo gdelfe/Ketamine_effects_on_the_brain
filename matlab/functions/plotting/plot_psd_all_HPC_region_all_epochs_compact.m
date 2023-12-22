@@ -1,7 +1,7 @@
 
-function plot_psd_all_HPC_region_all_epochs_compact(psd, dir_rec, min, save_flag, method, colors)
+function plot_psd_all_HPC_region_all_epochs_compact(psd, dir_rec, min, save_flag, method)
 
-fig = figure('Position', [0, 0, 900, 280]);
+fig = figure('Position', [0, 0, 800, 280]);
 f = psd.so.f;
 fmax = 100;
 
@@ -10,17 +10,17 @@ max_tot = 9;
 epoch = ['B','L','M','H'];
 ep_title = {'Baseline', 'Low Dose', 'High Dose', 'Mid Dose'};
 
-ha = tight_subplot(1,4,[.03 .02],[.15 .13],[.06 .07]); % [gap_h gap_w] , margin [lower upper] [left right]
+ha = tight_subplot(1,4,[.03 .02],[.15 .2],[.06 .07]); % [gap_h gap_w] , margin [lower upper] [left right]
 
 for ii = 1:4
     % BASELINE
     axes(ha(ii));
-    plot(f,log10(psd.so.(epoch(ii))(min,:)),'LineWidth', 2, 'Color', colors.so.(epoch(ii))); hold on
-    plot(f,log10(psd.sp.(epoch(ii))(min,:)),'LineWidth', 2); hold on
-    plot(f,log10(psd.rad.(epoch(ii))(min,:)),'LineWidth', 2); hold on
-    plot(f,log10(psd.lm.(epoch(ii))(min,:)),'LineWidth', 2); hold on
-    plot(f,log10(psd.dup.(epoch(ii))(min,:)),'LineWidth', 2); hold on
-    plot(f,log10(psd.dd.(epoch(ii))(min,:)),'LineWidth', 2); hold on
+    plot(f,log10(psd.so.(epoch(ii))(min,:)),'LineWidth', 2, 'Color', '#ef476f'); hold on
+    plot(f,log10(psd.sp.(epoch(ii))(min,:)),'LineWidth', 2, 'Color', '#f78c6b'); hold on
+    plot(f,log10(psd.rad.(epoch(ii))(min,:)),'LineWidth', 2, 'Color', '#ffd166'); hold on
+    plot(f,log10(psd.lm.(epoch(ii))(min,:)),'LineWidth', 2, 'Color', '#06d6a0'); hold on
+    plot(f,log10(psd.dup.(epoch(ii))(min,:)),'LineWidth', 2, 'Color', '#118ab2'); hold on
+    plot(f,log10(psd.dd.(epoch(ii))(min,:)),'LineWidth', 2, 'Color', '#073b4c');
     
     ax = gca;
     ax.LineWidth = 1.2;
@@ -32,11 +32,13 @@ for ii = 1:4
     grid off;
     title(ep_title{ii},'FontSize',9, 'FontWeight','light')
     if ii == 1
+        xlabel('Frequency (Hz)')
+        ylabel('Norm log(PSD)')
+    end
+    if ii == 4
         h = legend('Oriens', 'Pyramidale','Radiatum','LocMol','Dentate Up','Dentate Down');
         set(h, 'EdgeColor', 'none', 'FontSize', 8, 'Location', 'northeast');
         h.Color ='none';
-        xlabel('Frequency (Hz)')
-        ylabel('Norm log(PSD)')
     end
     % Remove y-axis and x-axis numbers except on the first subplot
     if ii ~= 1
@@ -71,6 +73,7 @@ if save_flag
         mkdir(dir_out)
     end
     saveas(fig, strcat(dir_out,sprintf('\\psd_all_epochs_all_regions_min_%d_%s.png', min, method) ))
+    saveas(fig, strcat(dir_out,sprintf('\\psd_all_epochs_all_regions_min_%d_%s.pdf', min, method) ))
 end
 
 

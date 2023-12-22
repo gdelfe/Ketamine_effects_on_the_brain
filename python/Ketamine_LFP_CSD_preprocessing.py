@@ -25,13 +25,13 @@ from utils_plotting import *
 from utils_general import *
 
 """ Input parameters """
-sess = 3 # session number 
+sess = 2 # session number 
 
 offset = 5 # starting min for each epoch
 tot_min = 12 - 2*offset # tot numb of minutes in each epoch. Each epoch starts at offset and ends at '30 min - offset'
-save_var = "CSD_all_ch" # saving file name, Current Source Density
+save_var = "CSD_x_avg" # saving file name, Current Source Density
 
-average_x = False # average electrodes along the x direction in the Neuropixel
+average_x = True # average electrodes along the x direction in the Neuropixel
 average_y = False # average electrodes 2-by-2 in the y direction in the Neuropixel
 n_el_block = 1 # diving factor to get the tot numb of electrode.  n_el_block = 1 if both avg_x and avg_y are False, it's 4 if both are true, it's 2 if only one of them is True
 
@@ -173,7 +173,6 @@ for current_min in range(0,tot_min):
     csd_H, csd_H_fil  = compute_iCSD(lfp_dec_H, average_y, plot_CSD)
     
 
-#%%
     # ====== Stack lfp all trials for each minute together 
     lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep = \
         stack_lfp_1min_all_trials(lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, csd_B_fil, csd_L_fil, csd_M_fil, csd_H_fil)

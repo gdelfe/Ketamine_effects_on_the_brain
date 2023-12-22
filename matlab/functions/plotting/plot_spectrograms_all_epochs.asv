@@ -2,7 +2,7 @@
 %
 % @ Gino Del Ferraro, NYU, June 2023
 
-function plot_spectrograms_all_epochs(spec_rec, brain_reg, mask, step_t, step_f, minute, min_lab, main_title, dir_rec, save)
+function plot_spectrograms_all_epochs(spec_rec, mask, step_t, step_f, min, main_title, dir_rec, save)
 
 
 ts = spec_rec.ts;
@@ -24,18 +24,18 @@ ti = spec_rec.t ;
 % end
 
 fig = figure('Position', [0, 0, 1000, 500]);
-ha = tight_subplot(4,1,[.07 .02],[.1 .1],[.07 .2]);  % [gap_h gap_w] , margin [lower upper] [left right]
+ha = tight_subplot(4,1,[.05 .02],[.05 .1],[.07 .2]);  % [gap_h gap_w] , margin [lower upper] [left right]
 
 % BASELINE 
 % subplot(4,1,1)
 axes(ha(1));
-tvimage(zscore(log10(spec_rec.B.(brain_reg)(:,:,minute)),1,2)); colorbar; hold on 
-title(sprintf('BASE, min = %d',min_lab),'FontSize',10)
+tvimage(zscore(log10(spec_rec.B.HPC(:,:,min)),1,2)); colorbar; hold on 
+title(sprintf('BASE, min = %d',min),'FontSize',10)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
 grid on
-high_trials = high_trial_times(mask,'B_low','B_high',ti,minute); % get high trials time 
-% A = spec_rec.B(:,:,minute);
+high_trials = high_trial_times(mask,'B_low','B_high',ti,min); % get high trials time 
+A = spec_rec.B(:,:,min);
 for ii = 1:length(high_trials)
     if high_trials(ii) == 1
         plot([ii-0.5, ii+0.5], [20,20], 'k-', 'LineWidth', 1);
@@ -46,13 +46,13 @@ end
 % LOW INJECTION 
 % subplot(4,1,2)
 axes(ha(2));
-tvimage(zscore(log10(spec_rec.L.(brain_reg)(:,:,minute)),1,2)); colorbar; hold on 
-title(sprintf('LOW, min = %d',min_lab),'FontSize',10)
+tvimage(zscore(log10(spec_rec.L.HPC(:,:,min)),1,2)); colorbar; hold on 
+title(sprintf('LOW, min = %d',min),'FontSize',10)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
 grid on
-high_trials = high_trial_times(mask,'L_low','L_high',ti,minute); % get high trials time 
-% A = spec_rec.L(:,:,minute);
+high_trials = high_trial_times(mask,'L_low','L_high',ti,min); % get high trials time 
+A = spec_rec.L(:,:,min);
 for ii = 1:length(high_trials)
     if high_trials(ii) == 1
         plot([ii-0.5, ii+0.5], [20,20], 'k-', 'LineWidth', 1);
@@ -65,13 +65,13 @@ end
 
 % subplot(4,1,3)
 axes(ha(3));
-tvimage(zscore(log10(spec_rec.M.(brain_reg)(:,:,minute)),1,2)); colorbar; hold on 
-title(sprintf('MID, min = %d',min_lab),'FontSize',10)
+tvimage(zscore(log10(spec_rec.M.HPC(:,:,min)),1,2)); colorbar; hold on 
+title(sprintf('MID, min = %d',min),'FontSize',10)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
 grid on
-high_trials = high_trial_times(mask,'M_low','M_high',ti,minute); % get high trials time 
-% A = spec_rec.M(:,:,minute);
+high_trials = high_trial_times(mask,'M_low','M_high',ti,min); % get high trials time 
+A = spec_rec.M(:,:,min);
 for ii = 1:length(high_trials)
     if high_trials(ii) == 1
         plot([ii-0.5, ii+0.5], [20,20], 'k-', 'LineWidth', 1);
@@ -82,13 +82,13 @@ end
 % HIGH INJECTION 
 % subplot(4,1,4)
 axes(ha(4));
-tvimage(zscore(log10(spec_rec.H.(brain_reg)(:,:,minute)),1,2)); colorbar; hold on 
-title(sprintf('HIGH, min = %d',min_lab),'FontSize',10)
+tvimage(zscore(log10(spec_rec.H.HPC(:,:,min)),1,2)); colorbar; hold on 
+title(sprintf('HIGH, min = %d',min),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
 grid on
-high_trials = high_trial_times(mask,'H_low','H_high',ti,minute); % get high trials time 
-% A = spec_rec.B(:,:,minute);
+high_trials = high_trial_times(mask,'H_low','H_high',ti,min); % get high trials time 
+A = spec_rec.B(:,:,min);
 for ii = 1:length(high_trials)
     if high_trials(ii) == 1
         plot([ii-0.5, ii+0.5], [20,20], 'k-', 'LineWidth', 1);
@@ -99,7 +99,7 @@ xlabel('time (sec)')
 
 % Title for the entire figure (the manual way without suptitle)
 fig_title = uicontrol('Style', 'text',...
-    'String', [brain_reg, ' ', main_title] ,...
+    'String', main_title,...
     'Units', 'normalized',...
     'Position', [0.3 0.95 0.4 0.04],...
     'BackgroundColor', get(gcf, 'Color'),...
@@ -112,7 +112,7 @@ if save
     if ~exist(dir_out, 'dir')
         mkdir(dir_out)
     end
-    saveas(fig,strcat(dir_out,sprintf('\\spec_all_epochs_%s_min_%d_%s.png',brain_reg, min_lab) ) )
+    saveas(fig,strcat(dir_out,sprintf('\\spec_all_epochs_HPC_min_%d_%s.png',min) ) )
 end
 
 end
