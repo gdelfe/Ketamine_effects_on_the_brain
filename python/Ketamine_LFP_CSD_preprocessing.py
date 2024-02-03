@@ -28,8 +28,8 @@ from utils_general import *
 sess = 2 # session number 
 
 offset = 5 # starting min for each epoch
-tot_min = 12 - 2*offset # tot numb of minutes in each epoch. Each epoch starts at offset and ends at '30 min - offset'
-save_var = "CSD_x_avg" # saving file name, Current Source Density
+tot_min = 30 - 2*offset # tot numb of minutes in each epoch. Each epoch starts at offset and ends at '30 min - offset'
+save_var = "CSD" # saving file name, Current Source Density
 
 average_x = True # average electrodes along the x direction in the Neuropixel
 average_y = False # average electrodes 2-by-2 in the y direction in the Neuropixel
