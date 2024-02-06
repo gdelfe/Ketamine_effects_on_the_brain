@@ -233,9 +233,13 @@ def calculate_pdf_sm(hist_arr, norm, sigma):
 
 
 """ -------------------------------------------------------
-Plot subplots for the phase-frequency LFP-spike coupling for all the 4 epochs together
-""" 
-def setup_subplot(fig, ax, pdf, pdf_sm, freq, smooth, bin_edges, step_x, step_f, title, label_font, show_y_axis, bar_name, vmin, vmax):
+Plot subplots for the phase-frequency LFP-spike coupling for all the 4 epochs together, one subplot for each layer
+"""
+def setup_subplot(fig, ax, pdf, pdf_sm, freq, smooth, bin_edges, step_x, step_f, title, show_y_axis, bar_name, vmin, vmax):
+    
+    # Define a common font for titles
+    title_font = {'family': 'sans-serif','fontsize': 14}
+    label_font = {'family': 'sans-serif', 'color':  'black', 'weight': 'ultralight', 'size': 14}
     
     if smooth: distribution = pdf_sm 
     else: distribution = pdf
@@ -249,10 +253,13 @@ def setup_subplot(fig, ax, pdf, pdf_sm, freq, smooth, bin_edges, step_x, step_f,
     cax = ax.imshow(1.*distribution, cmap='RdYlBu_r', interpolation='nearest', origin='lower', aspect='auto', vmin=vmin, vmax=vmax)
     bin_values = bin_edges[:-1]
     bins = bin_values[::step_x]
+    
     xticks = np.arange(0, bin_edges[:-1].size, step_x)
     ax.set_xticks(xticks)
     ax.set_xticklabels(['' if i % 2!=0 else '{:d}'.format(int(b)) for i, b in enumerate(bins)], rotation=45, fontsize=14)
+    ax.set_xlabel('Phase (deg)', fontdict=label_font)
 
+    
     ax.set_yticks(np.arange(0, len(freq), step_f))
     if show_y_axis:
         ax.set_yticklabels(['{:d}'.format(int(f)) for f in freq[::step_f]], fontsize=14)
@@ -262,25 +269,67 @@ def setup_subplot(fig, ax, pdf, pdf_sm, freq, smooth, bin_edges, step_x, step_f,
         
     ax.spines['left'].set_linewidth(0.5)  # Adjust the left spine thickness
     ax.spines['bottom'].set_linewidth(0.5)  # Adjust the bottom spine thickness
-    
-    # Define a common font for titles
-    title_font = {'family': 'sans-serif','fontsize': 14}
-    label_font = {'family': 'sans-serif', 'color':  'black', 'weight': 'ultralight', 'size': 14}
 
     ax.tick_params(axis='both', which='major', width=1, length=7)  # Change '2' to your desired thickness
-    ax.set_title(title, fontdict=title_font)
-    ax.set_xlabel('Phase (deg)', fontdict=label_font)
     
     
+
     # cbar = fig.colorbar(plt.cm.ScalarMappable(cmap='RdYlBu_r', norm=plt.Normalize(vmin=vmin, vmax=vmax)), ax=axes.ravel().tolist(), pad=0.01, aspect=20)
     # cbar = fig.colorbar(plt.cm.ScalarMappable(cmap='RdYlBu_r', norm=plt.Normalize(vmin=vmin, vmax=vmax)), pad=0.01, aspect=20)
     
-    if bar_name: 
+    if bar_name: # print colorbar 
         cbar = fig.colorbar(cax, ax=ax, cmap='RdYlBu_r', format='%.3f')
         cbar.set_label('Probability', fontsize=12)
         cbar.ax.tick_params(labelsize=9,  width=1, length=7) 
         cbar.outline.set_linewidth(0.5)
+        
+        
+""" -------------------------------------------------------
+Plot frequency-phase plots for all the epochs together, one subplot for each layer
+
+"""
+
+def plot_freq_phase_map_all_epochs(hist_dict, bin_dict, norm_dict, freq, rec, sess, cell, layer, layer_dir, layer_acr, lfp_ch, smooth = True, sigma = 1, save_flag = False, step_x = 5, step_f = 8):
+
     
+    # norm_tot = norm_B + norm_L + norm_M + norm_H
+    # Calculate PDFs
+    pdf_B, pdf_sm_B = calculate_pdf_sm(hist_dict['B'], norm_dict['B'], sigma)
+    pdf_L, pdf_sm_L = calculate_pdf_sm(hist_dict['L'], norm_dict['L'], sigma)
+    pdf_M, pdf_sm_M = calculate_pdf_sm(hist_dict['M'], norm_dict['M'], sigma)
+    pdf_H, pdf_sm_H = calculate_pdf_sm(hist_dict['H'], norm_dict['H'], sigma)
+    
+    # # Determine the global min and max values for the color scale
+    
+    vmin = min(np.nanmin(pdf_sm_B), np.nanmin(pdf_sm_L), np.nanmin(pdf_sm_M), np.nanmin(pdf_sm_H))
+    vmax = max(np.nanmax(pdf_sm_B), np.nanmax(pdf_sm_L), np.nanmax(pdf_sm_M), np.nanmax(pdf_sm_H))
+    print('vmin ', vmin, 'vmax', vmax)
+    
+    # Create 4 subplots
+    fig, axes = plt.subplots(1, 4, figsize=(10, 5), constrained_layout=True) # Adjust the figsize as needed
+    
+    # Define a common font for titles
+    title_font = {'family': 'sans-serif','fontsize': 14}
+    label_font = {'family': 'sans-serif', 'color':  'black', 'weight': 'ultralight', 'size': 14}
+    
+    # Plot each histogram
+    setup_subplot(fig, axes[0], pdf_B, pdf_sm_B, freq, smooth, bin_dict['B'], step_x, step_f, 'Baseline', True, False, vmin, vmax)
+    setup_subplot(fig, axes[1], pdf_L, pdf_sm_L, freq, smooth, bin_dict['L'], step_x, step_f, 'Low dose', False, False, vmin, vmax)
+    setup_subplot(fig, axes[2], pdf_M, pdf_sm_M, freq, smooth, bin_dict['M'], step_x, step_f, 'Mid dose', False, False, vmin, vmax)
+    setup_subplot(fig, axes[3], pdf_H, pdf_sm_H, freq, smooth, bin_dict['H'], step_x, step_f, 'High dose',False, True, vmin, vmax)
+    
+    # Add a common color bar for all subplots
+    # cbar = fig.colorbar(plt.cm.ScalarMappable(cmap='RdYlBu_r', norm=plt.Normalize(vmin=vmin, vmax=vmax)), ax=axes.ravel().tolist(), pad=0.01, aspect=20)
+    # cbar.set_label('Probability', fontsize=12)
+    # cbar.ax.tick_params(labelsize=10,  width=1, length=7) 
+    # cbar.outline.set_linewidth(0.5)
+    
+    fig.suptitle(f'{layer}, RS Ket, cell = {cell}, lfp ch = {lfp_ch} ', fontsize=16, fontweight='regular')
+    plt.show()
+    
+    if save_flag:
+        save_figures_freq_phase(fig, rec, sess, 'HPC', cell, layer_dir, layer_acr, lfp_ch)
+        
     
 """ -------------------------------------------------------
 Save phase-frequency plot for the 4 epochs together 
@@ -324,59 +373,148 @@ def save_spike_count_hist(fig, rec, sess, brain_reg, cell, layer_dir, layer_acr)
     fig.savefig(file_name, dpi=300)
     
     
-    
+        
+""" -------------------------------------------------------
+Plot subplots for the phase-frequency LFP-spike coupling for all the 4 epochs together
 """
-Plot frequency-phase plots for all the epochs together
 
-"""
-def plot_freq_phase_map_all_epochs(hist_dict, bin_dict, norm_dict, freq, rec, sess, cell, layer, layer_dir, layer_acr, lfp_ch, smooth = True, sigma = 1, save_flag = False, step_x = 5, step_f = 8):
-
-    
-    # norm_tot = norm_B + norm_L + norm_M + norm_H
-    # Calculate PDFs
-    pdf_B, pdf_sm_B = calculate_pdf_sm(hist_dict['B'], norm_dict['B'], sigma)
-    pdf_L, pdf_sm_L = calculate_pdf_sm(hist_dict['L'], norm_dict['L'], sigma)
-    pdf_M, pdf_sm_M = calculate_pdf_sm(hist_dict['M'], norm_dict['M'], sigma)
-    pdf_H, pdf_sm_H = calculate_pdf_sm(hist_dict['H'], norm_dict['H'], sigma)
-    
-    # # Determine the global min and max values for the color scale
-    
-    vmin = min(np.nanmin(pdf_sm_B), np.nanmin(pdf_sm_L), np.nanmin(pdf_sm_M), np.nanmin(pdf_sm_H))
-    vmax = max(np.nanmax(pdf_sm_B), np.nanmax(pdf_sm_L), np.nanmax(pdf_sm_M), np.nanmax(pdf_sm_H))
-    print('vmin ', vmin, 'vmax', vmax)
-    
-    # Create 4 subplots
-    fig, axes = plt.subplots(1, 4, figsize=(10, 5), constrained_layout=True) # Adjust the figsize as needed
+def setup_subplot_4_by_4(fig, ax, pdf, pdf_sm, freq, smooth, bin_edges, step_x, step_f, title, i, title_print, stratus_name, show_y_axis, bar_name, vmin, vmax):
     
     # Define a common font for titles
-    title_font = {'family': 'sans-serif','fontsize': 14}
-    label_font = {'family': 'sans-serif', 'color':  'black', 'weight': 'ultralight', 'size': 14}
+    title_font = {'family': 'Arial','fontsize': 14}
+    label_font = {'family': 'Arial', 'color':  'black', 'weight': 'ultralight', 'size': 14}
     
-    # Plot each histogram
-    setup_subplot(fig, axes[0], pdf_B, pdf_sm_B, freq, smooth, bin_dict['B'], step_x, step_f, 'Baseline', label_font, True, False, vmin, vmax)
-    setup_subplot(fig, axes[1], pdf_L, pdf_sm_L, freq, smooth, bin_dict['L'], step_x, step_f, 'Low dose', label_font, False, False,vmin, vmax)
-    setup_subplot(fig, axes[2], pdf_M, pdf_sm_M, freq, smooth, bin_dict['M'], step_x, step_f, 'Mid dose', label_font, False, False,vmin, vmax)
-    setup_subplot(fig, axes[3], pdf_H, pdf_sm_H, freq, smooth, bin_dict['H'], step_x, step_f, 'High dose', label_font, False, True, vmin, vmax)
+    if smooth: distribution = pdf_sm 
+    else: distribution = pdf
     
-    # Add a common color bar for all subplots
+    # vmin = np.nanmin(distribution)
+    # vmax = np.nanmax(distribution)
+    
+    # print('vmin local', vmin)
+    # print('vmax local',vmax)
+    
+    cax = ax.imshow(1.*distribution, cmap='RdYlBu_r', interpolation='nearest', origin='lower', aspect='auto', vmin=vmin, vmax=vmax)
+    bin_values = bin_edges[:-1]
+    bins = bin_values[::step_x]
+    
+    xticks = np.arange(0, bin_edges[:-1].size, step_x)
+    ax.set_xticks(xticks)
+    if i == 3: # if you are plotting the last layer at the bottom, add x labels 
+        ax.set_xticklabels(['' if i % 2!=0 else '{:d}'.format(int(b)) for i, b in enumerate(bins)], rotation=45, fontsize=14)
+        ax.set_xlabel('Phase (deg)', fontdict=label_font)
+    else:
+        ax.set_xticklabels([])
+    
+    ax.set_yticks(np.arange(0, len(freq), step_f))
+    if show_y_axis:
+        ax.set_yticklabels(['{:d}'.format(int(f)) for f in freq[::step_f]], fontsize=14)
+        ax.set_ylabel(f'{stratus_name.upper()} \n Frequency (Hz)', fontdict=label_font)
+    else:
+        ax.set_yticklabels([])
+        
+    ax.spines['left'].set_linewidth(0.5)  # Adjust the left spine thickness
+    ax.spines['bottom'].set_linewidth(0.5)  # Adjust the bottom spine thickness
+
+    ax.tick_params(axis='both', which='major', width=1, length=7)  # Change '2' to your desired thickness
+    
+    if title_print == 0: # set suplots titles, i.e. baseline, low, mid, high dose
+        ax.set_title(title, fontdict=label_font)
+    
     # cbar = fig.colorbar(plt.cm.ScalarMappable(cmap='RdYlBu_r', norm=plt.Normalize(vmin=vmin, vmax=vmax)), ax=axes.ravel().tolist(), pad=0.01, aspect=20)
-    # cbar.set_label('Probability', fontsize=12)
-    # cbar.ax.tick_params(labelsize=10,  width=1, length=7) 
-    # cbar.outline.set_linewidth(0.5)
+    # cbar = fig.colorbar(plt.cm.ScalarMappable(cmap='RdYlBu_r', norm=plt.Normalize(vmin=vmin, vmax=vmax)), pad=0.01, aspect=20)
     
-    fig.suptitle(f'{layer}, RS Ket, cell = {cell}, lfp ch = {lfp_ch} ', fontsize=16, fontweight='regular')
-    plt.show()
+    if bar_name: # print colorbar 
+        cbar = fig.colorbar(cax, ax=ax, cmap='RdYlBu_r', format='%.3f')
+        cbar.set_label('Probability', fontsize=14, fontdict=label_font)
+        cbar.ax.tick_params(labelsize=12,  width=1, length=7) 
+        cbar.outline.set_linewidth(0.5)
     
-    if save_flag:
-        save_figures_freq_phase(fig, rec, sess, 'HPC', cell, layer_dir, layer_acr, lfp_ch)
 
+    
 
-
-
-
+""" -------------------------------------------------------
+Plot frequency-phase plots for all the strata together, in a 4x4 grid plot, where on the x we have: baseline, low, mid, high dose
+on the y we have stratum oriens, pyramidale, radiatum, locmol 
 """
+
+
+def plot_freq_phase_map_all_epochs_4_by_4(hist_dict_array, bin_dict_array, norm_dict_array, freq, rec, sess, cell, idx, stratus_name, 
+                                          smooth=True, sigma=1, save_flag=False, step_x=5, step_f=8):
+   
+    title_font = {'family': 'Arial','size': 14}
+    label_font = {'family': 'Arial', 'color':  'black', 'weight': 'ultralight', 'size': 14}
+    
+    fig, axes = plt.subplots(4, 4, figsize=(10, 16), constrained_layout=True)  # Create a 4x4 grid of subplots
+    
+    # Plot each layer on a single row, made of 4 columns 
+    for i, (hist_dict, bin_dict, norm_dict) in enumerate(zip(hist_dict_array, bin_dict_array, norm_dict_array)):
+        # Calculate row-specific vmin and vmax for color scaling
+        vmin, vmax = calculate_row_vmin_vmax(hist_dict, norm_dict, sigma)
+                   
+        # Plot each histogram
+        pdf_B, pdf_sm_B = calculate_pdf_sm(hist_dict['B'], norm_dict['B'], sigma)
+        setup_subplot_4_by_4(fig, axes[i,0], pdf_B, pdf_sm_B, freq, smooth, bin_dict['B'], step_x, step_f, 'Baseline', i, i, stratus_name[i], True, False, vmin, vmax)
+        
+        pdf_L, pdf_sm_L = calculate_pdf_sm(hist_dict['L'], norm_dict['L'], sigma)
+        setup_subplot_4_by_4(fig, axes[i,1], pdf_L, pdf_sm_L, freq, smooth, bin_dict['L'], step_x, step_f, 'Low dose', i, i, stratus_name[i], False, False,vmin, vmax)
+        
+        pdf_M, pdf_sm_M = calculate_pdf_sm(hist_dict['M'], norm_dict['M'], sigma)
+        setup_subplot_4_by_4(fig, axes[i,2], pdf_M, pdf_sm_M, freq, smooth, bin_dict['M'], step_x, step_f, 'Mid dose', i, i, stratus_name[i], False, False,vmin, vmax)
+        
+        pdf_H, pdf_sm_H = calculate_pdf_sm(hist_dict['H'], norm_dict['H'], sigma)
+        setup_subplot_4_by_4(fig, axes[i,3], pdf_H, pdf_sm_H, freq, smooth, bin_dict['H'], step_x, step_f, 'High dose', i, i, stratus_name[i], False, True, vmin, vmax)
+    
+    fig.suptitle(f'RS Ket, cell: {idx}, id: {cell}, CA1 layers ', fontweight='regular',fontdict=title_font)
+    plt.show()
+
+    if save_flag:
+        save_figures_freq_phase_4_by_4(fig, rec, sess, 'HPC', cell, idx)
+        pass
+
+
+
+""" -------------------------------------------------------
+Save phase-frequency plot for the 4 epochs together 
+"""
+def save_figures_freq_phase_4_by_4(fig, rec, sess, brain_reg, cell, idx):
+
+    main_dir = r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC'
+    path = rec[sess][brain_reg]
+
+    dir_sess = path.split('\\')[-3]     # path for session directory
+    full_dir_path = os.path.join(main_dir, dir_sess, 'Figures\\freq_phase\\all_strata')
+    
+    if not os.path.exists(full_dir_path):
+        os.makedirs(full_dir_path)
+    
+    print(full_dir_path)
+    file_name = os.path.join(full_dir_path,'sess_{}_cell_{}_id_{}_freq_phase_CSD.pdf'.format(sess,idx, cell))
+    fig.savefig(file_name, dpi=300)
+    file_name = os.path.join(full_dir_path,'sess_{}_cell_{}_id_{}_freq_phase_CSD.png'.format(sess,idx, cell))
+    fig.savefig(file_name, dpi=300)
+    print("\nsaving file:\n",file_name)
+    
+    
+
+""" -------------------------------------------------------
+Calculate max and min in frequency-phase histogram 
+"""
+
+def calculate_row_vmin_vmax(hist_dict, norm_dict, sigma):
+    vmin = vmax = None
+    for key in ['B', 'L', 'M', 'H']:
+        pdf, pdf_sm = calculate_pdf_sm(hist_dict[key], norm_dict[key], sigma)
+        if vmin is None or np.nanmin(pdf_sm) < vmin:
+            vmin = np.nanmin(pdf_sm)
+        if vmax is None or np.nanmax(pdf_sm) > vmax:
+            vmax = np.nanmax(pdf_sm)
+    return vmin, vmax
+
+
+""" -------------------------------------------------------
 Average LFP across stratum 
 """
+
 def get_lfp_stratum(lfp_B, lfp_L, lfp_M, lfp_H, stratum_chs):
     
     # get the average LFP for each stratum 
@@ -389,9 +527,10 @@ def get_lfp_stratum(lfp_B, lfp_L, lfp_M, lfp_H, stratum_chs):
 
 
 
-"""
+""" -------------------------------------------------------
 Combine masks across channels for the same CA1 stratum 
 """
+
 def get_mask_stratum(mask_B, mask_L, mask_M, mask_H, stratum_chs):
 
     min_dim = mask_B.shape[0]

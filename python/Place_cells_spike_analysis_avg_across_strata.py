@@ -255,76 +255,123 @@ print(phase_BR.shape, mask_BR.shape, mask_BR.shape[0]/250/20)
 
 """ PICK CELL FOR THE SPIKING COUNT """
 
-idx = 0 # index for cell and LFP 
-cell = idx_cell_hpc[idx]
-# lfp_ch = spk[2][idx_cell_hpc[idx]] # lfp_channel
-# print('- cell:', cell, '| lfp ch:', lfp_ch)
-print('- cell:', cell, ', total number of cells in CA1 is: ', idx_cell_hpc.size)
+idx = 1 # index for cell and LFP 
 
-print('For the 4 epochs: spk length {}, phase length {}'.format(
-spk[0][cell].shape, phase_BR.shape[0]*4 + phase_BR.shape[0]/2*4))
+for idx in range(0,len(idx_cell_hpc)):
+    
+    cell = idx_cell_hpc[idx]
+    # lfp_ch = spk[2][idx_cell_hpc[idx]] # lfp_channel
+    # print('- cell:', cell, '| lfp ch:', lfp_ch)
+    print('- cell:', cell, ', total number of cells in CA1 is: ', idx_cell_hpc.size)
+    
+    print('For the 4 epochs: spk length {}, phase length {}'.format(
+    spk[0][cell].shape, phase_BR.shape[0]*4 + phase_BR.shape[0]/2*4))
+    
+    ### 3.D Get spike activity for each epoch (20 min of activity), for a single cell
+    
+    fs = 250 # final sampling frequency for speed, phase, lfp
+    L = phase_BR.shape[0] # length of one trimmed epoch, 20 min 
+    
+    # baseline, starting at min 5
+    shift = 5*60*fs # 5 min shift at the beginning of the epoch, in numb of points
+    spk_epoch_B = spk[0][cell][shift:shift+L]
+    # Low dose, starting at min 35
+    shift = 35*60*fs # 5 min shift at the beginning of the epoch, in numb of points
+    spk_epoch_L = spk[0][cell][shift:shift+L]
+    # Mid dose, starting at min 65
+    shift = 65*60*fs # 5 min shift at the beginning of the epoch, in numb of points
+    spk_epoch_M = spk[0][cell][shift:shift+L]
+    # High dose, starting at min 95
+    shift = 95*60*fs # 5 min shift at the beginning of the epoch, in numb of points
+    spk_epoch_H = spk[0][cell][shift:shift+L]
+    
+    spk_epoch_H.shape
+    print('SPIKE COUNT for cell, both low speed and high speed trials') 
+    print('Across epochs: ', np.sum(spk[0][cell]))
+    print('Baseline',np.sum(spk_epoch_B))
+    print('Low dose:',np.sum(spk_epoch_L))
+    print('Mid dose:',np.sum(spk_epoch_M))
+    print('High dose:',np.sum(spk_epoch_H))
 
-### 3.D Get spike activity for each epoch (20 min of activity), for a single cell
 
-fs = 250 # final sampling frequency for speed, phase, lfp
-L = phase_BR.shape[0] # length of one trimmed epoch, 20 min 
 
-# baseline, starting at min 5
-shift = 5*60*fs # 5 min shift at the beginning of the epoch, in numb of points
-spk_epoch_B = spk[0][cell][shift:shift+L]
-# Low dose, starting at min 35
-shift = 35*60*fs # 5 min shift at the beginning of the epoch, in numb of points
-spk_epoch_L = spk[0][cell][shift:shift+L]
-# Mid dose, starting at min 65
-shift = 65*60*fs # 5 min shift at the beginning of the epoch, in numb of points
-spk_epoch_M = spk[0][cell][shift:shift+L]
-# High dose, starting at min 95
-shift = 95*60*fs # 5 min shift at the beginning of the epoch, in numb of points
-spk_epoch_H = spk[0][cell][shift:shift+L]
-
-spk_epoch_H.shape
-print('SPIKE COUNT for cell, both low speed and high speed trials') 
-print('Across epochs: ', np.sum(spk[0][cell]))
-print('Baseline',np.sum(spk_epoch_B))
-print('Low dose:',np.sum(spk_epoch_L))
-print('Mid dose:',np.sum(spk_epoch_M))
-print('High dose:',np.sum(spk_epoch_H))
+    """
+    Compute 2D histogram for each epoch - Each layer is plotted in the same figure, 
+    the result is a 4x4 plot, 4 layers, one for each row, 4 epochs, one for each column
+    """
+    
+    # 1st part: accumulate data needed for the 4x4 plot
+    
+    nch = phase_BR.shape[1]
+    hist_dict_arr, bin_dict_arr, norm_dict_arr = [], [], []
+    for ch in range(0,4):
+        
+        hist_arr_B, bin_edges_B = freq_phase_map(phase_BR, mask_BR, spk_epoch_B, ch)
+        hist_arr_L, bin_edges_L = freq_phase_map(phase_LR, mask_LR, spk_epoch_L, ch)
+        hist_arr_M, bin_edges_M = freq_phase_map(phase_MR, mask_MR, spk_epoch_M, ch)
+        hist_arr_H, bin_edges_H = freq_phase_map(phase_HR, mask_HR, spk_epoch_H, ch)
+        
+        # normalization factor for the PDF frequency-phase
+        norm_B = np.sum(hist_arr_B, axis=1)[0]
+        norm_L = np.sum(hist_arr_L, axis=1)[0]
+        norm_M = np.sum(hist_arr_M, axis=1)[0]
+        norm_H = np.sum(hist_arr_H, axis=1)[0]
+    
+        # Create dictionaries to store normalization, bin values, histogram values
+        norm_dict = {'B':norm_B, 'L':norm_L, 'M':norm_M, 'H':norm_H}   
+        bin_dict = {'B': bin_edges_B, 'L': bin_edges_L, 'M': bin_edges_M, 'H': bin_edges_H}    
+        hist_dict = {'B': hist_arr_B, 'L': hist_arr_L, 'M': hist_arr_M, 'H': hist_arr_H}
+        
+        hist_dict_arr.append(hist_dict)
+        bin_dict_arr.append(bin_dict)
+        norm_dict_arr.append(norm_dict)
+        
+    
+    # 2nd part: plot the 4x4 Figure 
+    stratus_name = ["oriens","pyramidale","radiatum","LocMol"]
+    
+    plot_freq_phase_map_all_epochs_4_by_4(hist_dict_arr, bin_dict_arr, norm_dict_arr, freq, rec, sess, cell, idx, stratus_name, True , 1 , True)
 
 #%%
 
-start_time = time.time()
-stratus_name = ["oriens","pyramidale","radiatum","LocMol"]
-stratus_acronym = ["SO","SP","SR","SLM"]
-ch_start = 0
+"""
+Compute 2D histogram for each epoch - Each layer is plotted in a separate way
+"""
 
-nch = phase_BR.shape[1]
-for ch in range(0,4):
+
+# start_time = time.time()
+# stratus_name = ["oriens","pyramidale","radiatum","LocMol"]
+# stratus_acronym = ["SO","SP","SR","SLM"]
+# ch_start = 0
+
+# nch = phase_BR.shape[1]
+# for ch in range(0,4):
     
-    hist_arr_B, bin_edges_B = freq_phase_map(phase_BR, mask_BR, spk_epoch_B, ch)
-    hist_arr_L, bin_edges_L = freq_phase_map(phase_LR, mask_LR, spk_epoch_L, ch)
-    hist_arr_M, bin_edges_M = freq_phase_map(phase_MR, mask_MR, spk_epoch_M, ch)
-    hist_arr_H, bin_edges_H = freq_phase_map(phase_HR, mask_HR, spk_epoch_H, ch)
+#     hist_arr_B, bin_edges_B = freq_phase_map(phase_BR, mask_BR, spk_epoch_B, ch)
+#     hist_arr_L, bin_edges_L = freq_phase_map(phase_LR, mask_LR, spk_epoch_L, ch)
+#     hist_arr_M, bin_edges_M = freq_phase_map(phase_MR, mask_MR, spk_epoch_M, ch)
+#     hist_arr_H, bin_edges_H = freq_phase_map(phase_HR, mask_HR, spk_epoch_H, ch)
     
-    # normalization factor for the PDF frequency-phase
-    norm_B = np.sum(hist_arr_B, axis=1)[0]
-    norm_L = np.sum(hist_arr_L, axis=1)[0]
-    norm_M = np.sum(hist_arr_M, axis=1)[0]
-    norm_H = np.sum(hist_arr_H, axis=1)[0]
+#     # normalization factor for the PDF frequency-phase
+#     norm_B = np.sum(hist_arr_B, axis=1)[0]
+#     norm_L = np.sum(hist_arr_L, axis=1)[0]
+#     norm_M = np.sum(hist_arr_M, axis=1)[0]
+#     norm_H = np.sum(hist_arr_H, axis=1)[0]
     
-    norm = np.max([np.sum(hist_arr_B, axis=1)[0], np.sum(hist_arr_L, axis=1)[0], np.sum(hist_arr_M, axis=1)[0], np.sum(hist_arr_H, axis=1)[0]])
+#     norm = np.max([np.sum(hist_arr_B, axis=1)[0], np.sum(hist_arr_L, axis=1)[0], np.sum(hist_arr_M, axis=1)[0], np.sum(hist_arr_H, axis=1)[0]])
     
-    time_taken = time.time() - start_time
-    print(f"Time of execution {time_taken} in sec")
+#     time_taken = time.time() - start_time
+#     print(f"Time of execution {time_taken} in sec")
     
-    # plot_freq_phase_map_one_epoch(hist_arr_B, bin_edges_B, freq, 'baseline')
+#     # plot_freq_phase_map_one_epoch(hist_arr_B, bin_edges_B, freq, 'baseline')
         
-    # Create dictionaries to store normalization, bin values, histogram values
-    norm_dict = {'B':norm_B, 'L':norm_L, 'M':norm_M, 'H':norm_H}   
-    bin_dict = {'B': bin_edges_B, 'L': bin_edges_L, 'M': bin_edges_M, 'H': bin_edges_H}    
-    hist_dict = {'B': hist_arr_B, 'L': hist_arr_L, 'M': hist_arr_M, 'H': hist_arr_H}
+#     # Create dictionaries to store normalization, bin values, histogram values
+#     norm_dict = {'B':norm_B, 'L':norm_L, 'M':norm_M, 'H':norm_H}   
+#     bin_dict = {'B': bin_edges_B, 'L': bin_edges_L, 'M': bin_edges_M, 'H': bin_edges_H}    
+#     hist_dict = {'B': hist_arr_B, 'L': hist_arr_L, 'M': hist_arr_M, 'H': hist_arr_H}
     
-    # plot all the epochs together 
-    plot_freq_phase_map_all_epochs(hist_dict, bin_dict, norm_dict, freq, rec, sess, cell, stratus_name[ch], stratus_name[ch], stratus_acronym[ch], ch, save_flag = False)
+#     # plot all the epochs together 
+#     plot_freq_phase_map_all_epochs(hist_dict, bin_dict, norm_dict, freq, rec, sess, cell, stratus_name[ch], stratus_name[ch], stratus_acronym[ch], ch, save_flag = False)
     
     
 
