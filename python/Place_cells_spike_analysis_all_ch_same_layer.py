@@ -21,6 +21,7 @@ import time
 
 sess = 2
 hpc_start = 75 
+CA1_end = 120 # Fissure value
 hpc_end = 131 
 
 name_lfp_file = "lfp_epoch_all_trials_CSD_x_avg.mat"
@@ -59,7 +60,7 @@ with open(ts_ephys_PATH,'rb') as file:
 
 start_time = time.time()
 # load HPC file names and store them in rec spikes at 250 Hz
-path_spike = Path(r'\\sshfs.r\gino@monk.cns.nyu.edu\f\fentonlab\RAWDATA\NeuroPix\spk_ketamine\HPC\\')
+path_spike = Path(r'Z:\NeuroPix\spk_ketamine\HPC\\')
 rec_name = 'spk_250Hz_' + str(sess) + '.file'
 spk_file_name = os.path.join(path_spike , rec_name)
 
@@ -128,13 +129,7 @@ spk[0][0][0:1000]
 spk[2][:]
 
 
-condition = (spk[2] >= hpc_start*2) & (spk[2] <= hpc_end*2) # get map of cells in CA1
-idx_cell_hpc = np.where(condition)[0] # get index of cells in CA1
-print('lfp cell index', idx_cell_hpc)
-
-
-
-condition = (spk[2] >= hpc_start*2) & (spk[2] <= hpc_end*2) # get map of cells in CA1
+condition = (spk[2] >= hpc_start*2) & (spk[2] <= CA1_end*2) # get map of cells in CA1
 idx_cell_hpc = np.where(condition)[0] # get index of cells in CA1
 print("Cell index in full labeling:  \n", idx_cell_hpc) # print cell index 
 print("Lfp channel associated to cell in full labeling:  \n", spk[2][idx_cell_hpc]) # print cell LFP channel 
@@ -149,8 +144,18 @@ freq
 """
 **** CHOOSE YOUR CHANNEL LIST HERE ****
 Channel indexes of the different CA1 strata (oriens, pyramidale, radiatum, loc mol, 
+
+For reference, these are the values used in the average calcuation in the avg_across_strata code:
+                                             
+so_ch = list(range(1,11)) # oriens
+sp_ch = list(range(13,23)) # pyramidale 
+rad_ch = list(range(25,34)) # radiatum
+lm_ch = list(range(36,41)) # loc mol
+
 """
-lfp_ch_idx = list(range(6,11)) # CA1 layer 
+
+lfp_ch_idx = list(range(36,41)) # CA1 layer, max 5 channel at the same time for Memory issues
+
 # baseline 
 lfp_B_CA1 = lfp_B[:,:,lfp_ch_idx]
 mask_B_CA1 = mask_B[:,:,lfp_ch_idx]
@@ -267,10 +272,13 @@ print('High dose:',np.sum(spk_epoch_H))
 
 start_time = time.time()
 
-ch_start = 0
+lfp_ch = 0 # counting label for the channel in the figures
+
+layer_name = 'LocMol'
+layer_acr = 'SLM'
 
 nch = phase_BR.shape[1]
-for ch in range(ch_start,nch):
+for ch in range(0,nch):
     
     hist_arr_B, bin_edges_B = freq_phase_map(phase_BR, mask_BR, spk_epoch_B, ch)
     hist_arr_L, bin_edges_L = freq_phase_map(phase_LR, mask_LR, spk_epoch_L, ch)
@@ -296,9 +304,9 @@ for ch in range(ch_start,nch):
     hist_dict = {'B': hist_arr_B, 'L': hist_arr_L, 'M': hist_arr_M, 'H': hist_arr_H}
     
     # plot all the epochs together 
-    plot_freq_phase_map_all_epochs(hist_dict, bin_dict, norm_dict, freq, rec, sess, cell, "oriens", "oriens", "SO", ch, save_flag = True)
+    plot_freq_phase_map_all_epochs(hist_dict, bin_dict, norm_dict, freq, rec, sess, cell, idx, layer_name, layer_name, layer_acr, lfp_ch, save_flag = True)
     
-    
+    lfp_ch += 1
 
 
 #%%

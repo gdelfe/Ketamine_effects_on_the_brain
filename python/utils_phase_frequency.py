@@ -289,7 +289,7 @@ Plot frequency-phase plots for all the epochs together, one subplot for each lay
 
 """
 
-def plot_freq_phase_map_all_epochs(hist_dict, bin_dict, norm_dict, freq, rec, sess, cell, layer, layer_dir, layer_acr, lfp_ch, smooth = True, sigma = 1, save_flag = False, step_x = 5, step_f = 8):
+def plot_freq_phase_map_all_epochs(hist_dict, bin_dict, norm_dict, freq, rec, sess, cell, idx, layer, layer_dir, layer_acr, lfp_ch, smooth = True, sigma = 1, save_flag = False, step_x = 5, step_f = 8):
 
     
     # norm_tot = norm_B + norm_L + norm_M + norm_H
@@ -328,19 +328,19 @@ def plot_freq_phase_map_all_epochs(hist_dict, bin_dict, norm_dict, freq, rec, se
     plt.show()
     
     if save_flag:
-        save_figures_freq_phase(fig, rec, sess, 'HPC', cell, layer_dir, layer_acr, lfp_ch)
+        save_figures_freq_phase(fig, rec, sess, 'HPC', cell, idx, layer_dir, layer_acr, lfp_ch)
         
     
 """ -------------------------------------------------------
 Save phase-frequency plot for the 4 epochs together 
 """
-def save_figures_freq_phase(fig, rec, sess, brain_reg, cell, layer_dir, layer_acr, lfp_ch):
+def save_figures_freq_phase(fig, rec, sess, brain_reg, cell, idx, layer_dir, layer_acr, lfp_ch):
 
     main_dir = r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC'
     path = rec[sess][brain_reg]
 
     dir_sess = path.split('\\')[-3]     # path for session directory
-    full_dir_path = os.path.join(main_dir, dir_sess, 'Figures\\freq_phase\\all_channels', layer_dir)
+    full_dir_path = os.path.join(main_dir, dir_sess, f'Figures\\freq_phase\\all_channels\\cell_{idx}_ID_{cell}\\{layer_dir}')
     
     if not os.path.exists(full_dir_path):
         os.makedirs(full_dir_path)
