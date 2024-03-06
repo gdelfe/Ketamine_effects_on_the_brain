@@ -257,8 +257,12 @@ print(phase_BR.shape, mask_BR.shape, mask_BR.shape[0]/250/20)
 
 idx = 1 # index for cell and LFP 
 
-for idx in range(0,len(idx_cell_hpc)):
+#for idx in range(0,len(idx_cell_hpc)):
+for idx in range(0,3):
     
+    """
+    Load spikes for that specific cell
+    """
     cell = idx_cell_hpc[idx]
     # lfp_ch = spk[2][idx_cell_hpc[idx]] # lfp_channel
     # print('- cell:', cell, '| lfp ch:', lfp_ch)

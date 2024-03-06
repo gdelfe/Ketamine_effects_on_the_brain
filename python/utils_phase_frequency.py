@@ -438,11 +438,12 @@ on the y we have stratum oriens, pyramidale, radiatum, locmol
 """
 
 
-def plot_freq_phase_map_all_epochs_4_by_4(hist_dict_array, bin_dict_array, norm_dict_array, freq, rec, sess, cell, idx, stratus_name, 
+def plot_save_freq_phase_map_all_epochs_4_by_4(hist_dict_array, bin_dict_array, norm_dict_array, freq, rec, sess, cell, idx, stratus_name, 
                                           smooth=True, sigma=1, save_flag=False, step_x=5, step_f=8):
-   
     title_font = {'family': 'Arial','size': 14}
     label_font = {'family': 'Arial', 'color':  'black', 'weight': 'ultralight', 'size': 14}
+    pdf_sm_dict = [] # list of dictionaries to store the phase-freq map for each epoch, and each stratum 
+    
     
     fig, axes = plt.subplots(4, 4, figsize=(10, 16), constrained_layout=True)  # Create a 4x4 grid of subplots
     
@@ -464,11 +465,16 @@ def plot_freq_phase_map_all_epochs_4_by_4(hist_dict_array, bin_dict_array, norm_
         pdf_H, pdf_sm_H = calculate_pdf_sm(hist_dict['H'], norm_dict['H'], sigma)
         setup_subplot_4_by_4(fig, axes[i,3], pdf_H, pdf_sm_H, freq, smooth, bin_dict['H'], step_x, step_f, 'High dose', i, i, stratus_name[i], False, True, vmin, vmax)
     
+        pdf_sm_dict.append({'B':pdf_sm_B, 'L':pdf_sm_L, 'M':pdf_sm_M, 'H':pdf_sm_H}) # append freq-maps for eahc stratum (all epochs)
+        
+        
+        
     fig.suptitle(f'RS Ket, cell: {idx}, id: {cell}, CA1 layers ', fontweight='regular',fontdict=title_font)
     plt.show()
-
+    
     if save_flag:
-        save_figures_freq_phase_4_by_4(fig, rec, sess, 'HPC', cell, idx)
+        save_figures_freq_phase_4_by_4(fig, rec, sess, 'HPC', cell, idx) # save figures for each cell
+        save_matrices_freq_phase_4_by_4(pdf_sm_dict, rec, sess, 'HPC', cell, idx) # save matrices freq-phase for each cell 
         pass
 
 
@@ -487,12 +493,60 @@ def save_figures_freq_phase_4_by_4(fig, rec, sess, brain_reg, cell, idx):
     if not os.path.exists(full_dir_path):
         os.makedirs(full_dir_path)
     
-    print(full_dir_path)
     file_name = os.path.join(full_dir_path,'sess_{}_cell_{}_id_{}_freq_phase_CSD.pdf'.format(sess,idx, cell))
     fig.savefig(file_name, dpi=300)
     file_name = os.path.join(full_dir_path,'sess_{}_cell_{}_id_{}_freq_phase_CSD.png'.format(sess,idx, cell))
     fig.savefig(file_name, dpi=300)
-    print("\nsaving file:\n",file_name)
+    print("\nsaving Figures on file:\n",file_name)
+    
+    
+    
+    
+""" -------------------------------------------------------
+Save phase-frequency matrices for the 4 epochs together 
+in a dictionary
+output: dictionary saved on file with the pdf_smoothed for a given cell-LFP
+"""
+def save_matrices_freq_phase_4_by_4(pdf_sm_dict, rec, sess, brain_reg, cell, idx):
+    
+    import pickle 
+    
+    main_dir = r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC'
+    path = rec[sess][brain_reg]
+
+    dir_sess = path.split('\\')[-3]     # path for session directory
+    full_dir_path = os.path.join(main_dir, dir_sess, 'freq_phase_matrices')
+    
+    if not os.path.exists(full_dir_path):
+        os.makedirs(full_dir_path)
+    
+    file_name = os.path.join(full_dir_path,'sess_{}_cell_{}_id_{}_freq_phase_CSD.pkl'.format(sess,idx, cell))
+    with open(file_name,'wb')as file:
+        pickle.dump(pdf_sm_dict, file)
+
+    print("\nsaving matrices on file:\n",file_name)
+    
+    
+def load_matrices_freq_phase_4_by_4(rec, sess, brain_reg, cell, idx):
+    
+    import pickle 
+    
+    main_dir = r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC'
+    path = rec[sess][brain_reg]
+
+    dir_sess = path.split('\\')[-3]     # path for session directory
+    full_dir_path = os.path.join(main_dir, dir_sess, 'freq_phase_matrices')
+    
+    if not os.path.exists(full_dir_path):
+        os.makedirs(full_dir_path)
+    
+    file_name = os.path.join(full_dir_path,'sess_{}_cell_{}_id_{}_freq_phase_CSD.pkl'.format(sess,idx, cell))
+    with open(file_name,'rb')as file:
+        pdf_sm_dict = pickle.load(file)
+
+    return pdf_sm_dict
+    
+    
     
     
 
