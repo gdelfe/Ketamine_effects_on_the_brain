@@ -19,12 +19,13 @@ from utilities_ketamine_analysis_v8 import *
 from utils_signal_processing import *
 from utils_plotting import *
 from utils_general import *
-from utils_phase_frequency import *
+from utils_phase_frequency import *s
 from scipy.signal import morlet, welch, convolve
 from scipy.io import loadmat 
 import matplotlib.gridspec as gridspec
 import time 
-
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib.animation import FuncAnimation
 
 binFullPath = r'C:\Users\fentonlab\Desktop\Gino\LFPs'
 main_dir = r'C:\Users\fentonlab\Desktop\Gino\LFPs\HPC'
@@ -36,12 +37,40 @@ sess = 2
 # ====== Load rec path 
 rec = load_rec_path(binFullPath,HPC_path_file,PFC_path_file,"HPC",sess)
 idx_cell_HPC = load_list_channel_CA1(rec, sess, "HPC")
+freq = np.logspace(0.32, 2.48, num=70, endpoint=True)
 
-idx = 0
-cell = idx_cell_hpc[idx]
-#%%
+# frequency range/bands
+theta = np.where((freq>=2) & (freq <=15)) # [2, 15] Hz
+low_gamma = np.where((freq>=30) & (freq <=60)) # [30, 60] Hz
+high_gamma = np.where((freq>60) & (freq <=100)) # # (60, 100] Hz
 
-# frequency-phase map, list of 4 elements, one for each layer, each layer has 4 epochs
-# call it via pdf_sm[0]["B"]
+"""
+Compute Mean Abs Error for freq-phase map wrt to Baseline-Low dose, Baseline-Mid dose, Baseline-High dose
+in the theta, low gamma, and high gamma frequency range 
+"""
+mae_sess = []
+for idx in range(0,len(idx_cell_HPC)):
+    cell = idx_cell_hpc[idx]
+    pdf_sm = load_matrices_freq_phase_4_by_4(rec, sess, "HPC", cell, idx) 
+    mae_sess.append( mean_abs_error_freq_phase_maps(pdf_sm,theta,low_gamma,high_gamma) )
+    
 
-pdf_sm = load_matrices_freq_phase_4_by_4(rec, sess, "HPC", cell, idx) 
+vector = create_array_for_3D_plots(mae_sess,idx_cell_HPC,0,'theta')
+
+
+
+# plot_3D_mean_abs_error_all_cells(vector)
+# vector_freq = create_array_for_3D_plots_axis_freq_band(mae_sess,idx_cell_HPC,ch,'BL')
+# plot_3D_mean_abs_error_all_cells(vector_freq,'Baseline - Low dose')
+# vector_freq = create_array_for_3D_plots_axis_freq_band(mae_sess,idx_cell_HPC,ch,'BM')
+# plot_3D_mean_abs_error_all_cells(vector_freq,'Baseline - Mid dose')
+# vector_freq = create_array_for_3D_plots_axis_freq_band(mae_sess,idx_cell_HPC,ch,'BH')
+# plot_3D_mean_abs_error_all_cells(vector_freq,'Baseline - High dose')
+
+
+
+
+plot_3D_mean_abs_error_all_cells_animated(vector, 'animatin')
+
+
+

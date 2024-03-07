@@ -688,3 +688,170 @@ def get_mask_stratum(mask_B, mask_L, mask_M, mask_H, stratum_chs):
 
 
 
+def mean_abs_error_freq_phase_maps(pdf_sm,theta,low_gamma,high_gamma):
+    
+    MAE = []
+    for ch in range(4):
+        MAE.append({
+            'theta': {
+                'BL': np.mean(np.abs(pdf_sm[ch]["B"][theta] - pdf_sm[ch]["L"][theta])), # baseline-low dose
+                'BM': np.mean(np.abs(pdf_sm[ch]["B"][theta] - pdf_sm[ch]["M"][theta])), # baseline-mid dose
+                'BH': np.mean(np.abs(pdf_sm[ch]["B"][theta] - pdf_sm[ch]["H"][theta])), # baseline-high dose
+                }, 
+            'low_gamma': {
+                'BL': np.mean(np.abs(pdf_sm[ch]["B"][low_gamma] - pdf_sm[ch]["L"][low_gamma])),
+                'BM': np.mean(np.abs(pdf_sm[ch]["B"][low_gamma] - pdf_sm[ch]["M"][low_gamma])),
+                'BH': np.mean(np.abs(pdf_sm[ch]["B"][low_gamma] - pdf_sm[ch]["H"][low_gamma])),
+                },
+            'high_gamma': {
+                'BL': np.mean(np.abs(pdf_sm[ch]["B"][high_gamma] - pdf_sm[ch]["L"][high_gamma])),
+                'BM': np.mean(np.abs(pdf_sm[ch]["B"][high_gamma] - pdf_sm[ch]["M"][high_gamma])),
+                'BH': np.mean(np.abs(pdf_sm[ch]["B"][high_gamma] - pdf_sm[ch]["H"][high_gamma])),
+                }
+            })
+        
+        
+    return  MAE
+    
+""""
+Prepare data to 3D plot, each axis is baseline-low, baseline-mid, baseline-high
+ch: channel of the stratum, i.e. 4 channels in total
+freq_band: either theta, low_gamma, high_gamma
+"""
+def create_array_for_3D_plots(mae_sess,idx_cell_HPC,ch,freq_band):
+    
+    vector = []
+    for idx in range(len(idx_cell_HPC)):
+        
+        x = mae_sess[idx][ch][freq_band]['BL']
+        y = mae_sess[idx][ch][freq_band]['BM']
+        z = mae_sess[idx][ch][freq_band]['BH']
+        
+        vector.append([idx,x,y,z])
+    
+    
+    return np.array(vector)
+
+
+"""
+create array for 3D plot, with axis theta, low_gamma, high)gamma.
+"""
+
+def create_array_for_3D_plots_axis_freq_band(mae_sess,idx_cell_HPC,ch,epoch_diff):
+    
+    vector = []
+    for idx in range(len(idx_cell_HPC)):
+        
+        theta = mae_sess[idx][ch]['theta'][epoch_diff]
+        low_gamma = mae_sess[idx][ch]["low_gamma"][epoch_diff]
+        high_gamma = mae_sess[idx][ch]["high_gamma"][epoch_diff]
+        
+        vector.append([idx,theta,low_gamma,high_gamma])
+    
+    
+    return np.array(vector)
+
+
+"""
+3D plot, with axis theta, low_gamma, high)gamma
+    for each cell in the session. Plot the mean absolute error 
+    between baseline-ketamine dose
+"""
+    
+def plot_3D_mean_abs_error_all_cells(vector, title_name):
+
+    X = vector[:,1]
+    Y = vector[:,2]
+    Z = vector[:,3]
+    
+    d = 0.003
+    
+    fig = plt.figure(figsize=(10, 7))
+    ax = fig.add_subplot(111, projection='3d')
+    
+    # Scatter plot with improved appearance
+    # Color points with a gradient based on the Z value, change size with s parameter
+    scatter = ax.scatter(X, Y, Z, c='k', s=50, edgecolor='k', alpha=0.7)
+    
+    for i, (x, y, z) in enumerate(zip(X, Y, Z)):
+        ax.text(x, y, z+d, f'{i}', color='black',fontsize=10)
+    
+    # Enhancing labels with font size adjustments
+    ax.set_xlabel('theta', fontsize=15, fontweight='light')
+    ax.set_ylabel('low-gamma', fontsize=15, fontweight='light')
+    ax.set_zlabel('high-gamma', fontsize=15, fontweight='light')
+    
+    # Setting the title with additional styling
+    ax.set_title(title_name, fontsize=18, fontweight='light', color='k')
+    
+    # Setting the background color of the plot
+    ax.set_facecolor('white')  # Change background color
+    
+    # Configuring the grid
+    ax.grid(True, linestyle='--', color='gray', linewidth=0.3, alpha=0.8)
+    # Make the numbers on the axes smaller
+    ax.tick_params(axis='both', which='major', labelsize=10)
+    ax.tick_params(axis='both', which='minor', labelsize=6)
+        
+    # Show plot with improved appearance
+    plt.show()
+    
+
+        
+def plot_3D_mean_abs_error_all_cells_animated(vector, title_name):
+
+    from matplotlib.animation import FuncAnimation
+    from mpl_toolkits.mplot3d import Axes3D
+    
+    X = vector[:,1]
+    Y = vector[:,2]
+    Z = vector[:,3]
+    
+    d = 0.003
+    
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    scatter = ax.scatter(X, Y, Z, c='k', s=50, edgecolor='k', alpha=0.7)
+    
+    ax.set_xlabel('theta', fontsize=15, fontweight='light')
+    ax.set_ylabel('low-gamma', fontsize=15, fontweight='light')
+    ax.set_zlabel('high-gamma', fontsize=15, fontweight='light')
+    
+    # Setting the title with additional styling
+    ax.set_title(title_name, fontsize=18, fontweight='light', color='k')
+    
+    # Setting the background color of the plot
+    ax.set_facecolor('white')  # Change background color
+    
+    # Configuring the grid
+    ax.grid(True, linestyle='--', color='gray', linewidth=0.3, alpha=0.8)
+    # Make the numbers on the axes smaller
+    ax.tick_params(axis='both', which='major', labelsize=10)
+    ax.tick_params(axis='both', which='minor', labelsize=6)
+    
+    # Setting the initial view
+    ax.view_init(elev=20, azim=30)
+    
+    # Update function for the animation
+    def update(frame):
+        # Rotating by updating the azimuth angle (azim)
+        ax.view_init(elev=20, azim=frame)
+        return scatter,
+    
+    # Creating the animation
+    ani = FuncAnimation(fig, update, frames=np.arange(0, 360, 2), blit=False)
+
+    # To display the animation inline in a Jupyter notebook, use:
+    from IPython.display import HTML
+    HTML(ani.to_html5_video())
+    # Save the animation
+    # ani.save('3d_animation.mp4', writer='ffmpeg')
+    
+    # # Show the plot
+    # plt.show()
+
+    
+    
+    
+    
+    

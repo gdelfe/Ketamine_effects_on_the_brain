@@ -43,7 +43,7 @@ psd_2 = load_psd(dir_rec, name_file_psd);
 plot_psd_20_min(psd_1.HPC, ['HPC ',method,' - PSD not normalized - RS Ketamine'],dir_rec,['HPC_',method],0,method)
 plot_psd_20_min(psd_2.HPC, ['HPC ',method,' - PSD not normalized - RS Ketamine'],dir_rec,['HPC_',method],0,method)
 
-plot_psd_20_min_1st_and_boost(psd_1.HPC, psd_2.HPC, '1st day vs boost', dir_rec, 'HPC', 1, method)
-plot_psd_20_min_1st_and_boost_normalized(psd_1.HPC, psd_2.HPC, '1st day vs boost - normalized', dir_rec, 'HPC', 1, method)
+plot_psd_20_min_pre_post(psd_1.HPC, psd_2.HPC, 'PRE and POST', dir_rec, 'HPC', 1)
+plot_psd_20_min_pre_post_normalized(psd_1.HPC, psd_2.HPC, 'PRE and POST - normalized', dir_rec, 'HPC', 1)
 
 
