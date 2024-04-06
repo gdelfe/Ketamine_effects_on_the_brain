@@ -18,10 +18,11 @@ are averaged together 2-by-2. The resulting number of CSD channels is (2 x N / 4
 import sys
 import os
 
-# Assuming your script is running in DIR/LFP, you can navigate to DIR by going up one level
-# and then add the Utils directory to the path
-path_to_utils = os.path.join(os.path.dirname(__file__), '..', 'utils-tools')
-sys.path.append(path_to_utils)
+
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+py_utils_path = os.path.join(base_dir, '00-functions-tools', 'python-utils-tools')
+
+sys.path.append(py_utils_path)
 
 
 from utilities_ketamine_analysis_v8 import *

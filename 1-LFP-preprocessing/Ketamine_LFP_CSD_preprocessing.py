@@ -20,10 +20,10 @@ are averaged together 2-by-2. The resulting number of CSD channels is (2 x N / 4
 import sys
 import os
 
-current_script_dir = os.path.dirname(__file__)  # Gets the directory of the current script
-parent_dir = os.path.dirname(current_script_dir)  # Goes up one level to 'dir'
-utils_dir = os.path.join(parent_dir, 'utils-tools')  # Specifies the 'dir/utils' directory
-sys.path.append(utils_dir)
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+py_utils_path = os.path.join(base_dir, '00-functions-tools', 'python-utils-tools')
+
+sys.path.append(py_utils_path)
 
 from utilities_ketamine_analysis_v8 import *
 from utils_signal_processing import *
@@ -35,10 +35,10 @@ sess = 2 # session number
 
 offset = 5 # starting min for each epoch
 tot_min = 30 - 2*offset # tot numb of minutes in each epoch. Each epoch starts at offset and ends at '30 min - offset'
-save_var = "CSD_try" # saving file name, Current Source Density
+save_var = "CSD" # saving file name, Current Source Density
 
 average_x = True # average electrodes along the x direction in the Neuropixel
-average_y = True # average electrodes 2-by-2 in the y direction in the Neuropixel
+average_y = True # average electrodes 2-by-2 in the y direction in the Neuropixel - the average is done in the computation of CSD!
 n_el_block = 4 # diving factor to get the tot numb of electrode.  n_el_block = 1 if both avg_x and avg_y are False, it's 4 if both are true, it's 2 if only one of them is True
 
 plot_CSD = False # plot CSD and LFP for comparison
@@ -64,7 +64,7 @@ bad_flag, next_id, bad_id = detect_silent_lfp_channel(Lfp, CH_end, 4, 4, 2500)
 # ====== Upsample Speed recording
 speed_up = upsample_speed_v2(speed, Lfp, sess, 2500, 100)
 
-
+#%%
 # =============================================================================
 # PLOTTING -- sanity checks / data visualization 
 # =============================================================================
