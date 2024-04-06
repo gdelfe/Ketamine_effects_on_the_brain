@@ -1,4 +1,17 @@
-
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Plot PSD for a given HPC stratum or the whole HPC depending on the chosen
+% input by the user "hpc_reg". PSD is plotted for 20 min, one minute at the
+% time. Both baseline, low, mid, high dose PSD are plotted together.
+% PSD is normalized 
+%
+% Inputs: psd structure, dir_rec: path for the saving directory; hpc_reg:
+% hpc region to plot; save_flag: 0/1 depending if want to not save(save);
+% method: method used to appear in title; color: assigned color (don't need
+% to change
+%
+% Output: Figures saved in given directory .../psd
+%
+% @ Gino Del Ferraro, Fenton Lab, Nov/Dec 2023
 function plot_psd_20_min_normalize(psd, main_title, dir_rec, hpc_reg, save_flag, method, color)
 
 fig = figure('Position', [0, 0, 700, 700]);

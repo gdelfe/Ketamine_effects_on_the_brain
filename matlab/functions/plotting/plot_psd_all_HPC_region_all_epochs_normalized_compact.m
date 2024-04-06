@@ -1,3 +1,14 @@
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Plot PSD for a given minute chosen by the user with "min" for all the
+% different HPC strata, for each one of the epochs (base, low, mid, high)
+% PSD is normalized
+%
+% Inputs: psd structure, dir_rec: path for the saving directory; min:
+% minute to analyze; save_flag: 0/1 depending if want to not save(save);
+% method: method used to appear in title
+% Output: Figures saved in given directory .../psd
+%
+% @ Gino Del Ferraro, Fenton Lab, Dec 2023
 
 function plot_psd_all_HPC_region_all_epochs_normalized_compact(psd, dir_rec, minute, save_flag, method)
 

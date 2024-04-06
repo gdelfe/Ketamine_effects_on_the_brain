@@ -127,7 +127,7 @@ minute = 10;
 plot_psd_all_HPC_region_all_epochs_compact(psd, dir_rec, minute, 1, 'CSD')
 plot_psd_all_HPC_region_all_epochs_normalized_compact(psd, dir_rec, minute, 1, 'CSD')
 
-keyboard 
+
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SPECTROGRAMS      %%%%%%%%%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -139,7 +139,9 @@ ends = 60*fs;
 
 % INPUT PARAMETERS for the Spectograms
 min_start = 14; % starting minute for the computation of Spectrogram
-min_end = 15;   % ending minute 
+min_end = 15;   % ending minute
+% ----------------------------------
+
 
 % Don't chance these values below 
 spec_par.fs = 1250; % sampling rate 
@@ -147,6 +149,7 @@ spec_par.fk = [0 100]; % freq range
 spec_par.tapers = [0.6 5]; % Time resolution, Freq. resoluzion
 k = floor(2*spec_par.tapers(1)*spec_par.tapers(2) - 1) % number of tapers used
 spec_par.dn = 0.05; % sliding step
+% ----------------------------------
 
 % compute spectrograms whole HPC
 spec_rec = {};
@@ -159,7 +162,7 @@ spec_rec = {};
 [spec_rec] = compute_spectrograms_whole_rec(spec_rec, lfp_all, 'dd', fs, min_start, min_end, start, ends, spec_par, dd);
 
 % save spectrograms whole HPC
-save_spectrograms(spec_rec, dir_rec, '\spec_rec_HPC_lfp_CDS_reg_min_14_15.mat')
+save_spectrograms(spec_rec, dir_rec, sprintf('spec_rec_HPC_lfp_CDS_reg_min_%d_%d.mat',min_start,min_end))
 
 % load spectrograms whole HPC 
 % spec_rec = load_spectrograms(dir_rec);
@@ -169,6 +172,7 @@ save_spectrograms(spec_rec, dir_rec, '\spec_rec_HPC_lfp_CDS_reg_min_14_15.mat')
 % PLOT SPECTROGRAMS 
 % %%%%%%%%%%%%%%%%%%%%%%%
 
+% INPUT PARAMETERS for the Plots
 step_t = 10;
 step_f = 20;
 minute = 2;       % This is the min in spec, depends on what min you are looking at 
@@ -202,28 +206,12 @@ plot_spectrograms_all_regions(spec_rec, 'H', mask, step_t, step_f, minute, min_l
 
 plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, minute, min_lab, 'RS Ket - HPC', dir_rec, 'HPC', 1)
 
-plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, minute, min_lab, 'RS Ket - CA1', dir_rec, 'CA1', 1)
-plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, minute, min_lab, 'RS Ket - Ripple', dir_rec, 'ripple', 1)
+plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, minute, min_lab, 'RS Ket - Oriens', dir_rec, 'so', 1)
+plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, minute, min_lab, 'RS Ket - Pyramidale', dir_rec, 'sp', 1)
 plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, minute, min_lab, 'RS Ket - Radiatum', dir_rec, 'rad', 1)
 plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, minute, min_lab, 'RS Ket - LocMol', dir_rec, 'lm', 1)
 plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, minute, min_lab, 'RS Ket - Dentate Up', dir_rec, 'dup', 1)
 plot_spectrograms_all_epochs_one_region(spec_rec, mask, step_t, step_f, minute, min_lab, 'RS Ket - Dentate Down', dir_rec, 'dd', 1)
 
-plot_zscored_psd_from_spectrogram(spec_rec,dir_rec,minute,min_lab,1)
-% plot_psd_from_spectrogram(spec_rec,dir_rec,min,min_lab,1)
 
-
-
-
-
-
-
-
-
-
-figure;
-plot(f,log10(psd_B(minute,:)),'LineWidth', 2); hold on
-plot(f,log10(psd_L(minute,:)),'LineWidth', 2); hold on
-plot(f,log10(psd_M(minute,:)),'LineWidth', 2); hold on
-plot(f,log10(psd_H(minute,:)),'LineWidth', 2); hold on
 

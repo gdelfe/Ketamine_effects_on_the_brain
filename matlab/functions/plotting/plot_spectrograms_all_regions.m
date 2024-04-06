@@ -31,11 +31,11 @@ fig = figure('Position', [0, 0, 1700, 3900]);
 low_lim = -2.5;
 high_lim = 2.5;
 
-% CA1
+% Oriens
 subplot(6,1,1)
-tvimage(zscore(log10(spec_rec.(epoch).CA1(:,:,min)),1,2)); colorbar; hold on 
+tvimage(zscore(log10(spec_rec.(epoch).so(:,:,min)),1,2)); colorbar; hold on 
 caxis([low_lim, high_lim]);
-title(sprintf('CA1, min = %d',min_lab),'FontSize',12)
+title(sprintf('Oriens, min = %d',min_lab),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
 grid on
@@ -48,11 +48,11 @@ for ii = 1:length(high_trials)
 end
  
 
-% Ripple
+% Pyramidale
 subplot(6,1,2)
-tvimage(zscore(log10(spec_rec.(epoch).ripple(:,:,min)),1,2)); colorbar; hold on
+tvimage(zscore(log10(spec_rec.(epoch).sp(:,:,min)),1,2)); colorbar; hold on
 caxis([low_lim, high_lim]);
-title(sprintf('Ripple, min = %d',min_lab),'FontSize',12)
+title(sprintf('Pyramidale, min = %d',min_lab),'FontSize',12)
 set(gca, 'XTick',valx_idx, 'XTickLabel',round(valxlbl))
 set(gca, 'YTick',y_idx, 'YTickLabel',ylbl)
 grid on
