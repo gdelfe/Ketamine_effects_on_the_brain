@@ -265,8 +265,8 @@ print(phase_BR.shape, mask_BR.shape, mask_BR.shape[0]/250/20)
 
 """ PICK CELL FOR THE SPIKING COUNT """
 
-#for idx in range(0,len(idx_cell_hpc)):
-for idx in range(0,1):
+for idx in range(0,len(idx_cell_hpc)):
+# for idx in range(0,1):
     
     """
     Load spikes for that specific cell
@@ -320,11 +320,11 @@ for idx in range(0,1):
     
     for ch in range(0,4): # for each stratum 
         
-        print('stratuts name: ',stratus_name[ch])
-        hist_arr_B, bin_edges_B = freq_phase_map(phase_BR, mask_BR, spk_epoch_B, ch)
-        hist_arr_L, bin_edges_L = freq_phase_map(phase_LR, mask_LR, spk_epoch_L, ch)
-        hist_arr_M, bin_edges_M = freq_phase_map(phase_MR, mask_MR, spk_epoch_M, ch)
-        hist_arr_H, bin_edges_H = freq_phase_map(phase_HR, mask_HR, spk_epoch_H, ch)
+        print('stratuts name: ',stratum_name[ch])
+        hist_arr_B, bin_edges_B = freq_phase_map(phase_BR, mask_BR, spk_epoch_B, ch, 'baseline')
+        hist_arr_L, bin_edges_L = freq_phase_map(phase_LR, mask_LR, spk_epoch_L, ch, 'Low dose')
+        hist_arr_M, bin_edges_M = freq_phase_map(phase_MR, mask_MR, spk_epoch_M, ch,'Mid dose')
+        hist_arr_H, bin_edges_H = freq_phase_map(phase_HR, mask_HR, spk_epoch_H, ch,'High dose')
         
         # normalization factor for the PDF frequency-phase
         norm_B = np.sum(hist_arr_B, axis=1)[0]
@@ -341,12 +341,10 @@ for idx in range(0,1):
         hist_dict_arr.append(hist_dict)
         bin_dict_arr.append(bin_dict)
         norm_dict_arr.append(norm_dict)
-        
-        plot_save_spiking_count_across_epochs(norm_dict,idx, cell,stratus_name[ch])
-        
+                
     
     # plot and save the 4x4 Figure
-    plot_save_freq_phase_map_all_epochs_4_by_4(hist_dict_arr, bin_dict_arr, norm_dict_arr, freq, rec, sess, cell, idx, stratum_name, True , 1 , True)
+    # plot_save_freq_phase_map_all_epochs_4_by_4(hist_dict_arr, bin_dict_arr, norm_dict_arr, freq, rec, sess, cell, idx, stratum_name, True , 1 , True)
     # plot and save spiking histograms (spiking count )
     plot_save_spiking_count_across_epochs_and_strata(norm_dict_arr, rec, sess, idx, cell, stratum_name)
 #%%

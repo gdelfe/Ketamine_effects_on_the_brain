@@ -1,5 +1,14 @@
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This code computes the PSD and Spectrogram for:
+%   a) The whole HPC
+%   b) Each stratum of the HPC
+%   Input: pre-processed LFP (CSD) via "Ketamine_LFP_CSD_preprocessing.py"
+%   Output: psd and spectrogram matlab files
+%           plots/figure of psd and spectrograms for all HPC and each
+%           stratum
+%
+% @ Gino Del Ferraro, Fenton Lab, NYU, Nov/Dec 2023
 
-%plot EEG from neuropixels
 clear all; close all; clc;
 
 %update path to your EEGLAB
@@ -7,9 +16,9 @@ addpath('C:\Users\fentonlab\Desktop\Gilgamesh\Codes\eeglab\');
 addpath('C:\Users\fentonlab\Desktop\Gilgamesh\Codes\eeglab\functions\sigprocfunc\'); 
 addpath('C:\Users\fentonlab\Desktop\Gilgamesh\Codes\eeglab\functions\guifunc\');
 addpath('C:\Users\fentonlab\Desktop\Gilgamesh\Codes\eeglab\functions\adminfunc\');
-addpath('C:\Users\fentonlab\Desktop\Gino\chronux_2_11\');
 addpath('C:\Users\fentonlab\Desktop\Gino\Gino_codes\');
 
+% INPUT PARAMETERS 
 iSess = 2; % python session number 
 sess = iSess + 1; % session number 
 ch = 1; minute = 13; % channel and minute to look at 
@@ -57,10 +66,11 @@ load(strcat(main_dir,'color_strata.mat')); % load colors for plots
 
 load(HPC_file) 
 Paths_HPC = extract_paths(HPC_file_list); 
-dir_rec = strcat(main_dir_HPC,Paths_HPC{sess}) % directory path  for the recording 
+dir_rec = strcat(main_dir_HPC,Paths_HPC{sess}) % directory path  for the recording
+dir_lfp = strcat(main_dir_HPC,Paths_HPC{sess},'\LFPs_and_masks') % directory path  for the recording
 
 % load LFPs and masks 
-[lfp, lfp_all, mask] = load_lfp_and_masks(dir_rec,name_lfp);
+[lfp, lfp_all, mask] = load_lfp_and_masks(dir_lfp,name_lfp);
 
 nch = size(lfp_all.B,3);
 % plot 1 min lfp to check data is loaded correctly 
@@ -102,6 +112,7 @@ keyboard
 % plot_psd_20_min(psd, 'PSD all HPC - Stationary - RS Ketamine', dir_rec,1)
 % plotting PSD normalized 
 % All HPC 
+(psd, main_title, dir_rec, hpc_reg, save_flag, method)
 plot_psd_20_min(psd.HPC, ['HPC ',method,' - PSD not normalized - RS Ketamine'],dir_rec,['HPC_',method],1,method, colors.HPC)
 plot_psd_20_min_normalize(psd.HPC, ['HPC ',method,' - PSD normalized - RS Ketamine'],dir_rec,['HPC_',method],1,method, colors.HPC)
 % By region 
@@ -126,14 +137,17 @@ keyboard
 fs = 1250;
 start = 1; % 30*fs;
 ends = 60*fs;
-min_start = 14;
-min_end = 15;
 
-spec_par.fs = 1250;
+% INPUT PARAMETERS for the Spectograms
+min_start = 14; % starting minute for the computation of Spectrogram
+min_end = 15;   % ending minute 
+
+% Don't chance these values below 
+spec_par.fs = 1250; % sampling rate 
 spec_par.fk = [0 100]; % freq range
 spec_par.tapers = [0.6 5]; % Time resolution, Freq. resoluzion
 k = floor(2*spec_par.tapers(1)*spec_par.tapers(2) - 1) % number of tapers used
-spec_par.dn = 0.05; % sliding step;
+spec_par.dn = 0.05; % sliding step
 
 % compute spectrograms whole HPC
 spec_rec = {};

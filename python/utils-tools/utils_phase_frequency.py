@@ -8,7 +8,7 @@ Created on Fri Dec 22 15:22:32 2023
 import numpy as np
 import os
 import pickle
-from utilities_ketamine_analysis_v8 import *
+# from utilities_ketamine_analysis_v8 import *
 from utils_signal_processing import *
 from utils_plotting import *
 from utils_general import *
@@ -151,7 +151,7 @@ Input:
 Output:
 - 2D map (freq, phase), with phase in [0, 360] degree
 """
-def freq_phase_map(phase, mask_R, spk_epoch, ch):
+def freq_phase_map(phase, mask_R, spk_epoch, ch, epoch_name):
     
     not_nan = np.where(mask_R[:,ch])[0] # Indexes for LFP low speed values
     n_freq = phase.shape[2] # number of frequencies 
@@ -167,7 +167,7 @@ def freq_phase_map(phase, mask_R, spk_epoch, ch):
         hist, bin_edges = np.histogram(phase_deg_adj, bins=36, range=[0, 360], weights=spk_epoch[not_nan])
         hist_list.append(hist)
         hist_arr = np.array(hist_list)
-    print('spike count, low speed only',np.sum(spk_epoch[not_nan]))
+    print('spike count, low speed only {} {}'.format(epoch_name,np.sum(spk_epoch[not_nan])))
     return hist_arr, bin_edges
 
 """
@@ -430,7 +430,7 @@ def setup_subplot_4_by_4(fig, ax, pdf, pdf_sm, freq, smooth, bin_edges, step_x, 
         cbar.outline.set_linewidth(0.5)
     
 """ -------------------------------------------------------
-Plot spiking histogram (counts) across epochs -- Not in use for now 
+Plot spiking histogram (counts) across epochs -- Not in use for now, 1 plot for each epoch.
 """
 def plot_save_spiking_count_across_epochs(norm_dict, idx, cell, stratum_name):
         
@@ -581,7 +581,7 @@ def load_matrices_freq_phase_4_by_4(rec, sess, brain_reg, cell, idx):
     return pdf_sm_dict
     
 """ -------------------------------------------------------
-Plot spiking histogram (counts) across epochs and strata - One figure 
+Plot spiking histogram (counts) across epochs and strata - One figure, 4 plots 
 """
 
 def plot_save_spiking_count_across_epochs_and_strata(norm_dict_arr, rec, sess, idx, cell, stratum_name):
@@ -735,6 +735,8 @@ def create_array_for_3D_plots(mae_sess,idx_cell_HPC,ch,freq_band):
 
 """
 create array for 3D plot, with axis theta, low_gamma, high)gamma.
+Output: return a 3D vector with the mean absolute value of the epoch_diff
+theta, low gamma, high gamma
 """
 
 def create_array_for_3D_plots_axis_freq_band(mae_sess,idx_cell_HPC,ch,epoch_diff):
@@ -764,17 +766,23 @@ def plot_3D_mean_abs_error_all_cells(vector, title_name):
     Y = vector[:,2]
     Z = vector[:,3]
     
-    d = 0.003
+    d = 0.005
     
     fig = plt.figure(figsize=(10, 7))
     ax = fig.add_subplot(111, projection='3d')
     
+    # indices = np.arange(vector.shape[0])
+    # norm = (indices - indices.min()) / (indices.max() - indices.min())
+    # # Choose a colormap
+    # cmap = plt.get_cmap('viridis')
+    # colors = cmap(norm)
+
     # Scatter plot with improved appearance
     # Color points with a gradient based on the Z value, change size with s parameter
     scatter = ax.scatter(X, Y, Z, c='k', s=50, edgecolor='k', alpha=0.7)
     
     for i, (x, y, z) in enumerate(zip(X, Y, Z)):
-        ax.text(x, y, z+d, f'{i}', color='black',fontsize=10)
+        ax.text(x, y, z+d, f'{i}', color='black',fontsize=12)
     
     # Enhancing labels with font size adjustments
     ax.set_xlabel('theta', fontsize=15, fontweight='light')

@@ -1,6 +1,6 @@
-# This example imports functions from the DemoReadSGLXData module to read
-# digital data. The metadata file must be present in the same directory as the binary file.
-# Works with both imec and nidq digital channels.
+import sys
+path_to_demo_read_sglx_data = r'C:\Users\fentonlab\Desktop\Kentros_2022\Python Analysis Code\DemoReadSGLXData'
+sys.path.append(path_to_demo_read_sglx_data)
 
 import pickle
 from scipy.stats.stats import pearsonr
@@ -18,7 +18,7 @@ from scipy.stats import linregress, spearmanr, kendalltau, pearsonr, circstd
 from pathlib import Path
 from tkinter import Tk
 from tkinter import filedialog
-from DemoReadSGLXData.readSGLX import readMeta, SampRate, makeMemMapRaw, ExtractDigital, Int2Volts
+from readSGLX import readMeta, SampRate, makeMemMapRaw, ExtractDigital, Int2Volts
 from datetime import datetime
 from scipy.io import savemat, loadmat
 from sklearn.manifold import Isomap

@@ -393,7 +393,7 @@ class CSD(object):
             denom_string = denom_string + '%.3f ' % i
         denom_string = denom_string + ']'
 
-        print(('discrete filter coefficients: \nb = {}, \na = {}'.format(num_string, denom_string)))
+       # print(('discrete filter coefficients: \nb = {}, \na = {}'.format(num_string, denom_string)))
 
         if filterfunction == 'filtfilt':
             return ss.filtfilt(num, denom, csd, axis=0) * csd.units

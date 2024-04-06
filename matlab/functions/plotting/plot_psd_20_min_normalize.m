@@ -1,20 +1,20 @@
 
-function plot_psd_20_min(psd, main_title, dir_rec, hpc_reg, save_flag, method, color)
+function plot_psd_20_min_normalize(psd, main_title, dir_rec, hpc_reg, save_flag, method, color)
+
 fig = figure('Position', [0, 0, 700, 700]);
 f = psd.f;
-
 delta = 0.25; % shift yrange for plotting
 
 % find min and max values across all the minutes for range in plotting
-min_B = min(min(log10(psd.B(:,:))));
-min_L = min(min(log10(psd.L(:,:))));
-min_M = min(min(log10(psd.M(:,:))));
-min_H = min(min(log10(psd.H(:,:))));
+min_B = min(min(log10(psd.B(:,:)./sum(psd.B(:,:),2))));
+min_L = min(min(log10(psd.L(:,:)./sum(psd.L(:,:),2))));
+min_M = min(min(log10(psd.M(:,:)./sum(psd.M(:,:),2))));
+min_H = min(min(log10(psd.H(:,:)./sum(psd.H(:,:),2))));
 
-max_B = max(max(log10(psd.B(:,:))));
-max_L = max(max(log10(psd.L(:,:))));
-max_M = max(max(log10(psd.M(:,:))));
-max_H = max(max(log10(psd.H(:,:))));
+max_B = max(max(log10(psd.B(:,:)./sum(psd.B(:,:),2))));
+max_L = max(max(log10(psd.L(:,:)./sum(psd.L(:,:),2))));
+max_M = max(max(log10(psd.M(:,:)./sum(psd.M(:,:),2))));
+max_H = max(max(log10(psd.H(:,:)./sum(psd.H(:,:),2))));
 
 
 min_tot = min([min_B,min_L,min_M,min_H]);
@@ -24,10 +24,10 @@ ha = tight_subplot(5,4,[.021 .02],[.05 .05],[.07 .2]);  % [gap_h gap_w] , margin
 for minute = 1:size(psd.B,1) % numb of minute
     %     ax = subplot(5,4,minute);
     axes(ha(minute));
-    plot(f,log10(psd.B(minute,:)),'LineWidth', 2, 'Color',color.B); hold on
-    plot(f,log10(psd.L(minute,:)),'LineWidth', 2, 'Color',color.L); hold on
-    plot(f,log10(psd.M(minute,:)),'LineWidth', 2, 'Color',color.M); hold on
-    plot(f,log10(psd.H(minute,:)),'LineWidth', 2, 'Color',color.H);
+    plot(f,log10(psd.B(minute,:)/sum(psd.B(minute,:))),'LineWidth', 2, 'Color',color.B); hold on
+    plot(f,log10(psd.L(minute,:)/sum(psd.L(minute,:))),'LineWidth', 2, 'Color',color.L); hold on
+    plot(f,log10(psd.M(minute,:)/sum(psd.M(minute,:))),'LineWidth', 2, 'Color',color.M); hold on
+    plot(f,log10(psd.H(minute,:)/sum(psd.H(minute,:))),'LineWidth', 2, 'Color',color.H);
     
     ax = gca;
     ax.LineWidth = 1;
@@ -78,9 +78,9 @@ if save_flag
     if ~exist(dir_out, 'dir')
         mkdir(dir_out)
     end
-    saveas(fig, strcat(dir_out,sprintf('\\20_min_psd_%s.png',hpc_reg) ))
-    saveas(fig, strcat(dir_out,sprintf('\\20_min_psd_%s.pdf',hpc_reg) ))
+    saveas(fig, strcat(dir_out,sprintf('\\20_min_psd_normalized_%s.png',hpc_reg) ))
+    saveas(fig, strcat(dir_out,sprintf('\\20_min_psd_normalized_%s.pdf',hpc_reg) ))
 end
 
 
-end 
+end

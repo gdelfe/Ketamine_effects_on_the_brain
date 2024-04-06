@@ -4,10 +4,10 @@ Created on Fri Oct  6 16:36:43 2023
 
 @author: Gino Del Ferraro, Fenton Lab, Oct 2023
 """
-
+from utilities_ketamine_analysis_v8 import *
 import numpy as np
 import pickle
-from DemoReadSGLXData.readSGLX import readMeta, SampRate, makeMemMapRaw, ExtractDigital, Int2Volts
+# from DemoReadSGLXData.readSGLX import readMeta, SampRate, makeMemMapRaw, ExtractDigital, Int2Volts
 from pathlib import Path
 
 # import ghostipy as gsp
@@ -31,6 +31,7 @@ import pickle
 from utils_plotting import *
 import pdb
 import h5py
+
 
 
 """
@@ -548,6 +549,7 @@ win = window length, e.g. 1250 = 1 sec
 th = speed threshold 
 
 Input: 1 min Lfp in the form: time x channel
+Output: mask for low (high) speed trial together with LFP artifacts trials, for each epoch
 
 """ 
     
@@ -657,29 +659,6 @@ def stack_mask_1min(mask_B_low, mask_L_low, mask_M_low, mask_H_low,
 
 # =============================================================================
 
-""" Stack mask for low and high speed relative to a given minute, in order to have masks for the whole 20 min period """
-
-def stack_mask_1min(mask_B_low, mask_L_low, mask_M_low, mask_H_low, 
-                     mask_B_high, mask_L_high, mask_M_high, mask_H_high,
-                     tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s,
-                     tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s, tot_mask_H_high_s):
-     
-
-    mask_B_low.append(tot_mask_B_low_s) # add one minute lfp: trial num x trial length, for each channel
-    mask_L_low.append(tot_mask_L_low_s) 
-    mask_M_low.append(tot_mask_M_low_s)
-    mask_H_low.append(tot_mask_H_low_s)
-    
-    mask_B_high.append(tot_mask_B_high_s) # add one minute lfp: trial num x trial length, for each channel
-    mask_L_high.append(tot_mask_L_high_s) 
-    mask_M_high.append(tot_mask_M_high_s)
-    mask_H_high.append(tot_mask_H_high_s)
-    
-    
-    
-    return mask_B_low, mask_L_low, mask_M_low, mask_H_low, mask_B_high, mask_L_high, mask_M_high, mask_H_high
-
-# =============================================================================
 
 """
 Keep only LFP good trials: those without artifacts
@@ -749,7 +728,7 @@ def save_matlab_files(rec, sess, brain_reg,
     path = rec[sess][brain_reg]
     
     dir_sess = path.split('\\')[-3] # path for session directory
-    full_dir_path = os.path.join(main_dir,dir_sess)
+    full_dir_path = os.path.join(main_dir,dir_sess,'LFPs_and_masks')
     
     if not os.path.exists(full_dir_path):
         os.makedirs(full_dir_path)
@@ -843,7 +822,7 @@ def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep,
     path = rec[sess][brain_reg]
     
     dir_sess = path.split('\\')[-3] # path for session directory
-    full_dir_path = os.path.join(main_dir,dir_sess)
+    full_dir_path = os.path.join(main_dir,dir_sess,'LFPs_and_masks')
     
     if not os.path.exists(full_dir_path):
         os.makedirs(full_dir_path)

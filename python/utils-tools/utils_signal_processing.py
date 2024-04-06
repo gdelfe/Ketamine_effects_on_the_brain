@@ -81,7 +81,7 @@ def bandstop_filter(data, f_low, f_high, fs=2500, order=4):
 
 """ Upsample speed data to 2500 Hz, i.e. same resolution as LFP data """
 
-def upsample_speed(speed, LFP, sess, LFP_rate = 2500, speed_rate = 100):
+def upsample_speed_v2(speed, LFP, sess, LFP_rate = 2500, speed_rate = 100):
     
     # time length for speed and LFP variables
     speed_T = np.linspace(0, len(speed[sess])/ speed_rate, len(speed[sess]))
@@ -403,7 +403,7 @@ def compute_iCSD(Lfp, average_y = True, plot_CSD = False):
     
     print(csd.shape)
     
-    if average_y: # if you want to average neighboring electrodes on the y axis (2 by 2)
+    if average_y: # if you want to average neighboring electrodes on the y axis (2 by 2, not overlapping)
         
         # average csd for nearest neighbor channels (average two channels together)
         # the number of resulting channels at the end of this process will be Nch/4

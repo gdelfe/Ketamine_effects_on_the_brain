@@ -15,6 +15,14 @@ are averaged together 2-by-2. The resulting number of CSD channels is (2 x N / 4
 
 @ Gino Del Ferraro, Fenton lab, Oct 2023
 """
+import sys
+import os
+
+# Assuming your script is running in DIR/LFP, you can navigate to DIR by going up one level
+# and then add the Utils directory to the path
+path_to_utils = os.path.join(os.path.dirname(__file__), '..', 'utils-tools')
+sys.path.append(path_to_utils)
+
 
 from utilities_ketamine_analysis_v8 import *
 from utils_signal_processing import *
@@ -91,7 +99,7 @@ Lfp = Lfp[:,CA1_start:CA1_end]
 # plot_lfp_two_channels(Lfp_B_min,1,2,10,100,100,N=2500)
 # plot_lfp_two_channels(mean_B,1,2,10,100,100,N=2500)
 
-
+#%%
 # ====== Split speed and Lfp into injection periods (epochs): baseline, low, mid, and high injection
 Lfp_B, Lfp_L, Lfp_M, Lfp_H, speed_B, speed_L, speed_M, speed_H = split_into_epochs(Lfp,speed_up,fs=2500)
  
