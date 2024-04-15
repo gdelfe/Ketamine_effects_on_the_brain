@@ -8,6 +8,11 @@ The signals are simultaneously recorded with two Neuropixel probes, one located 
 
 ---
 
+Dependencies (mac environment):
+1. sshfs
+2. python3
+3. brew install python-tk
+
 One time setup:
 1. Clone this repository to local filesystem
 2. Run 'make env' to build python environment

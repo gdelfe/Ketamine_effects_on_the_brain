@@ -7,3 +7,5 @@ seaborn
 h5py
 mne
 PyWavelets
+scikit-learn
+joblib
