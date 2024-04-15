@@ -15,4 +15,4 @@ One time setup:
 To use repository:
 1. Run 'make mount' to mount remote filesystem
 2. Run 'make notebook' to start jupyter notebook server
-3. Run 'make unmount' to unmount filesystem once done
+3. Run 'make unmount' to unmount filesystem when done

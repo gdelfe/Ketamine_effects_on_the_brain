@@ -8,9 +8,9 @@ notebook:
 	source env/bin/activate && jupyter notebook
 
 mount:
-	sshfs -o allow_other lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix data
+	sshfs -o allow_other lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix data/mnt
 
 unmount:
-	diskutil unmount force data
+	diskutil unmount force data/mnt
 
 .PHONY: env notebook mount unmount
