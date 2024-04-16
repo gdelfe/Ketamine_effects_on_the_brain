@@ -9,3 +9,5 @@ mne
 PyWavelets
 scikit-learn
 joblib
+quantities
+neo

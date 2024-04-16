@@ -47,8 +47,8 @@ qband = 200 # Q factor in the notch filter - don't change this value
 
 
 binFullPath = r'C:\Users\fentonlab\Desktop\Gino\LFPs'
-HPC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs','HPC_lfp_paths.file')
-PFC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs','PFC_lfp_paths.file')
+HPC_path_file = '/Users/lukearend/phd/kfx/ref/HPC_lfp_paths_local.pkl'
+PFC_path_file ='/Users/lukearend/phd/kfx/ref/PFC_lfp_paths_local.pkl'
 
 
 # =============================================================================
