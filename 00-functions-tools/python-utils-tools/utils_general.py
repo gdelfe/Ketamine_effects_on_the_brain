@@ -104,7 +104,7 @@ def load_data(binFullPath, HPC_path_file, PFC_path_file, brain_reg, sess):
     #### Read LFP start/end time, HPC channels - Choose whether loading HPC or PFC here
         
     pd.set_option('display.max_colwidth',100)
-    in_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs\CA1_DG_id', "recid_CA1_DG_id_modified.csv")
+    in_file = os.path.join(r'C:\Users\fentonlab\Desktop\Diego\LFPs',"recid_CA1_DG_id_modified.csv")
     Lfp_aln = pd.read_csv(in_file)
     
 

@@ -54,9 +54,9 @@ CA1_end = 46
 " ------------------- "
 
 
-binFullPath = r'C:\Users\fentonlab\Desktop\Gino\LFPs'
-HPC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs','HPC_lfp_paths.file')
-PFC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs','PFC_lfp_paths.file')
+binFullPath = r'C:\Users\fentonlab\Desktop\Diego\LFPs'
+HPC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Diego\LFPs','HPC_lfp_paths.file')
+PFC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Diego\LFPs','PFC_lfp_paths.file')
 
 
 # =============================================================================

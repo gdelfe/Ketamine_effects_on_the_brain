@@ -3,7 +3,7 @@ path_to_demo_read_sglx_data = r'C:\Users\fentonlab\Desktop\Kentros_2022\Python A
 sys.path.append(path_to_demo_read_sglx_data)
 
 import pickle
-from scipy.stats.stats import pearsonr
+from scipy.stats import pearsonr
 from scipy import stats
 import itertools
 import numpy as np
@@ -13,7 +13,7 @@ import matplotlib as mpl
 import seaborn as sns
 from scipy import stats
 from scipy.interpolate import interp1d
-from scipy.signal import gaussian, savgol_filter
+# from scipy.signal import gaussian, savgol_filter
 from scipy.stats import linregress, spearmanr, kendalltau, pearsonr, circstd
 from pathlib import Path
 from tkinter import Tk
