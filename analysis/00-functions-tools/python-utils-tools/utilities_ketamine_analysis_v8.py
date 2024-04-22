@@ -2,37 +2,17 @@ import sys
 path_to_demo_read_sglx_data = r'C:\Users\fentonlab\Desktop\Kentros_2022\Python Analysis Code\DemoReadSGLXData'
 sys.path.append(path_to_demo_read_sglx_data)
 
-import pickle
 from scipy.stats.stats import pearsonr
-from scipy import stats
-import itertools
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import seaborn as sns
 from scipy import stats
-from scipy.interpolate import interp1d
-from scipy.signal.windows import gaussian
-from scipy.signal import savgol_filter
-from scipy.stats import linregress, spearmanr, kendalltau, pearsonr, circstd
-from pathlib import Path
-from tkinter import Tk
-from tkinter import filedialog
-from readSGLX import readMeta, SampRate, makeMemMapRaw, ExtractDigital, Int2Volts
-from datetime import datetime
-from scipy.io import savemat, loadmat
-from sklearn.manifold import Isomap
-from scipy.optimize import curve_fit
-from scipy.signal import chirp, peak_widths
-from scipy.signal import find_peaks, savgol_filter, medfilt
-# load pickle module
-import time, os, math
-# nptdms import TdmsFile
 
 from scipy import signal
 
-from joblib import Parallel, delayed
+from scipy.stats import pearsonr
 
 mpl.rcParams['pdf.fonttype'] = 42
 mpl.rcParams['font.sans-serif'] = ['Arial', 'Helvetica', 'Bitstream Vera Sans', 'DejaVu Sans', 'Lucida Grande',
@@ -86,18 +66,6 @@ def NormalizeData(data):
     return (data - np.nanmin(data)) / (np.nanmax(data) - np.nanmin(data))
 
 
-# from scipy.spatial.distance import pdist
-#from ripser import ripser as tda
-# from persim import plot_diagrams
-# from sklearn import neighbors
-# from sklearn.manifold import Isomap
-# from mpl_toolkits.mplot3d import axes3d
-
-# decoding from manifold, velocity ratio, HD anchoring
-
-from scipy.stats import linregress, spearmanr, kendalltau, pearsonr, circstd
-
-
 ## Kendall Tau correlations parallized version ## you can also use pearson or any kind of pairwise computation
 ### features [cells x time]
 def kendall_tau_parallel(features):
@@ -108,17 +76,10 @@ def kendall_tau_parallel(features):
     import dask
     from dask.diagnostics import ProgressBar
 
-    ## all cells
-    tau_corrs_list = []
-    tauVec = []
-    corr_mat = []
-    units_common = []
-
     units_common = np.arange(0, features.shape[0], 1)
     #     print(units_common)
 
     # keep pairs id
-    cell_pairs = []
     cell_pairs = [(x1, x2) for x1, x2 in itertools.combinations(units_common, 2)]
 
     print(len(cell_pairs))
@@ -152,17 +113,10 @@ def pearson_parallel(features):
     import dask
     from dask.diagnostics import ProgressBar
 
-    ## all cells
-    tau_corrs_list = []
-    tauVec = []
-    corr_mat = []
-    units_common = []
-
     units_common = np.arange(0, features.shape[0], 1)
     #     print(units_common)
 
     # keep pairs id
-    cell_pairs = []
     cell_pairs = [(x1, x2) for x1, x2 in itertools.combinations(units_common, 2)]
 
     print(len(cell_pairs))
@@ -194,16 +148,12 @@ def pearson_parallel(features):
 def isomap_proj(behavior, units, ndim, nneigh):
     from sklearn.manifold import Isomap
 
-    tmp_sim = []
     _inp_l = []
-    time = []
-
     _inp_l = units
 
     Xl = np.sqrt(_inp_l.T)
     print(Xl.shape)
 
-    embedding = []
     embedding = Isomap(n_neighbors=nneigh, n_components=ndim)
     tmp_sim = embedding.fit_transform(Xl)
 
@@ -860,7 +810,7 @@ def bin_spk(df, binSize):
 
 def get_theta_ch_v2(data_lfp,lim):
 
-    from scipy.signal import butter, lfilter, freqz, iirnotch, welch 
+    from scipy.signal import butter, lfilter, freqz, iirnotch, welch
 
     theta_power_all = []
     for ich in range(0,data_lfp.shape[1]):
@@ -871,7 +821,7 @@ def get_theta_ch_v2(data_lfp,lim):
     #     print('theta_freqs', freqs[theta_band_freqs])
     #     print(theta_power)
         theta_power_all.append(theta_power)
-        
+
     thres = []
     thres = np.percentile(np.hstack(theta_power_all),lim)
 #     print('psd threshold', thres)
@@ -879,18 +829,18 @@ def get_theta_ch_v2(data_lfp,lim):
     theta_ch = []
     theta_ch = np.hstack(np.argwhere(np.hstack(theta_power_all) > thres))
 #     print('theta channels', np.arange(theta_ch[0],theta_ch[-1]))
-      
+
     return np.arange(theta_ch[0],theta_ch[-1]), np.hstack(theta_power_all)[np.arange(theta_ch[0],theta_ch[-1])]
 
 
 ####
 
 def get_swr_ch_v2(data_lfp_tmp,theta_channels):
-    
-    data_lfp = []    
+
+    data_lfp = []
     data_lfp  = data_lfp_tmp[:,theta_channels]
 
-    from scipy.signal import butter, lfilter, freqz, iirnotch, welch 
+    from scipy.signal import butter, lfilter, freqz, iirnotch, welch
 
     ripple_power_all = []
     for ich in range(0,data_lfp.shape[1]):
@@ -912,25 +862,25 @@ def get_swr_ch_v2(data_lfp_tmp,theta_channels):
 
     # print('ripple channels', np.arange(ripple_ch[0],ripple_ch[-1]))
 #     print('ripple channels',theta_channels[ripple_ch])
-    
+
     return np.hstack(ripple_power_all), [ripple_ch, theta_channels[ripple_ch]]
 
 ###
 
 def theta_fir(ripple_data):
-    
+
     n_channels = ripple_data.shape[1]
     print(n_channels)
     outputSignal = []
     fs_val = 2500
-    
+
     theta_all = []
     raw_all = []
     ripple_all = []
-    
-    
+
+
     for ich in range(0,n_channels):
-            
+
         signal_tmp = []
         signal_tmp = ripple_data[:,ich] - np.mean(ripple_data[:,ich])
 
@@ -941,33 +891,33 @@ def theta_fir(ripple_data):
         # reject any signal below 200 Hz
         sos3 = signal.butter(4, 4, 'hp', fs=fs_val, output='sos')
 
-        ripple_only = signal.sosfiltfilt(sos3, signal_zscore2)   
-    
+        ripple_only = signal.sosfiltfilt(sos3, signal_zscore2)
+
         ripple_all.append(ripple_only)
-        
-    
-    ripple_all = np.vstack(ripple_all)    
-        
-    return ripple_all   
+
+
+    ripple_all = np.vstack(ripple_all)
+
+    return ripple_all
 
 ###
 
 def csd_fir(ripple_data):
-    
+
     n_channels = ripple_data.shape[1]
     print(n_channels)
     outputSignal = []
     fs_val = 2500
-    
+
     theta_all = []
     raw_all = []
     ripple_all = []
-    
+
     filter_60Hz = False
     outputSignal = []
-    
+
     if filter_60Hz == True:
-        
+
         for ich in range(0,n_channels):
 
             signal_tmp = []
@@ -979,7 +929,7 @@ def csd_fir(ripple_data):
 
             # reject any signal below 200 Hz
             sos3 = signal.butter(4, 5, 'hp', fs=fs_val, output='sos')
-            ripple_only = signal.sosfiltfilt(sos3, signal_zscore2)   
+            ripple_only = signal.sosfiltfilt(sos3, signal_zscore2)
 
 
             # Create/view notch filter
@@ -992,9 +942,9 @@ def csd_fir(ripple_data):
             # Apply notch filter to the noisy signal using signal.filtfilt
             outputSignal_tmp = []
             outputSignal_tmp = signal.filtfilt(b_notch, a_notch, ripple_only)
-            
+
             ripple_all.append(outputSignal_tmp)
-    
+
     if filter_60Hz == False:
         for ich in range(0,n_channels):
 
@@ -1007,17 +957,17 @@ def csd_fir(ripple_data):
 
             # reject any signal below 200 Hz
             sos3 = signal.butter(4, 5, 'hp', fs=fs_val, output='sos')
-            ripple_only = signal.sosfiltfilt(sos3, signal_zscore2)   
+            ripple_only = signal.sosfiltfilt(sos3, signal_zscore2)
             ripple_all.append(ripple_only)
-        
-    
-    ripple_all = np.vstack(ripple_all)    
-        
-    return ripple_all    
-    
-    
+
+
+    ripple_all = np.vstack(ripple_all)
+
+    return ripple_all
+
+
     ####
-    
+
 from scipy.interpolate import interp1d
 import pdb
 
@@ -1026,32 +976,32 @@ import pdb
 ## speed rate is Hz of behavior
 
 def upsample_speed(speed, LFP, LFP_rate = 2500, speed_rate = 100):
-    
+
     # time length for speed and LFP variables
     speed_T = np.linspace(0, len(speed)/ speed_rate, len(speed))
     LFP_T = np.linspace(0, len(LFP[:,0])/ LFP_rate, len(LFP[:,0])) # all channels have same length
 
     # interpolate speed variable based on LFP
     interpolator = interp1d(speed_T, speed, kind = 'linear', fill_value="extrapolate")
-    speed_upsampled = interpolator(LFP_T) 
-    
+    speed_upsampled = interpolator(LFP_T)
+
     return speed_upsampled
 
 #####
 
-# Create a speed mask. 
+# Create a speed mask.
 # True if speed < threshold at any point in a given time window of length win
 # False if there is at least one value above threshold in the given time window
 
 ## input: upsampled speed
-## period: 
+## period:
 # threshold in mm/s
 # win is computation window for thresholding in samples (2500 is seconds)
 
 def create_speed_mask(speed_up,win,thresh):
     mask = []
     speed_th = speed_up > thresh # speed mask above threshold
-    cnt = 0 # count for high speed trials 
+    cnt = 0 # count for high speed trials
     for i in range(0,len(speed_th),win):
         data_win = speed_th[i:i+win]
         if np.mean(data_win): # if all the speed value are above threshold
@@ -1059,7 +1009,7 @@ def create_speed_mask(speed_up,win,thresh):
             cnt +=1
         else:
             mask.extend([False]) # create False mask for that window
-            
+
     return np.array(mask)
 
 
@@ -1068,7 +1018,7 @@ def create_speed_mask(speed_up,win,thresh):
 def create_sta_mask(speed_up,win,thresh):
     mask = []
     speed_th = speed_up < thresh # speed mask above threshold
-    cnt = 0 # count for high speed trials 
+    cnt = 0 # count for high speed trials
     for i in range(0,len(speed_th),win):
         data_win = speed_th[i:i+win]
         if np.all(data_win): # if all the speed value are above threshold
@@ -1076,7 +1026,7 @@ def create_sta_mask(speed_up,win,thresh):
             cnt +=1
         else:
             mask.extend([False]) # create False mask for that window
-            
+
     return np.array(mask)
 
 ####
@@ -1105,28 +1055,28 @@ def HPC_lfp_CA1_DG_fisure_detection_v3(data_lfp_tmp,data_lfp_sta,samples_to_plot
                 symbol=symbol,
                 u_symbol=u_symbol))
         lastdefinition = definition
-    
+
     ## get theta channels
     theta_channels = []
     theta_channels = get_theta_ch_v2(data_lfp_tmp,50)
 
     data_lfp = []
     data_lfp = data_lfp_tmp[:,theta_channels]
-    
+
     fs_val = 2500
-    n_channels = data_lfp.shape[1]    
+    n_channels = data_lfp.shape[1]
     #loading test data
     ## input is channel x time
     # test_data = io.loadmat(r'G:\My Drive\Fenton_Lab\Ketamine_analysis\Ketamine_data\Neurotar_HPC_ketamine\iCSD-master\test_data.mat')
 
     #prepare lfp data for use, by changing the units to SI and append quantities,
     #along with electrode geometry, conductivities and assumed source geometry
-    lfp_data = csd_fir(data_lfp) * 1E-6 * pq.V 
+    lfp_data = csd_fir(data_lfp) * 1E-6 * pq.V
     z_data = np.arange(20E-6,3860E-6,20E-6) * pq.m # [m]
     diam = 500E-6 * pq.m                              # [m]
     h = 20E-6 * pq.m                                 # [m]
     sigma = 0.3 * pq.S / pq.m                         # [S/m] or [1/(ohm*m)]
-    sigma_top = 0.3 * pq.S / pq.m    
+    sigma_top = 0.3 * pq.S / pq.m
 
     # [S/m] or [1/(ohm*m)]
 
@@ -1150,7 +1100,7 @@ def HPC_lfp_CA1_DG_fisure_detection_v3(data_lfp_tmp,data_lfp_sta,samples_to_plot
     #versions of the current-source density estimates.
     csd_dict = dict(spline_icsd = icsd.SplineiCSD(**spline_input),)
 
-    ## for plotting purposes 
+    ## for plotting purposes
     data_lfp2 = theta_fir(data_lfp)
     theta_filtered = np.hstack(data_lfp2[:,np.argmax(data_lfp2,axis=1)[0]])
 
@@ -1171,8 +1121,8 @@ def HPC_lfp_CA1_DG_fisure_detection_v3(data_lfp_tmp,data_lfp_sta,samples_to_plot
     min_idx = np.argmin(spl(np.arange(len(data))))    # local
     max_abs = np.argmax(np.abs(spl(np.arange(len(data))))) # max max absolute, the one we use
 
-    print('absolute max min method',np.hstack([max_idx, min_idx]),theta_channels[np.hstack([max_idx, min_idx])])    
-    print('absolute abs max method',np.hstack([max_abs]),theta_channels[np.hstack([max_abs])])    
+    print('absolute max min method',np.hstack([max_idx, min_idx]),theta_channels[np.hstack([max_idx, min_idx])])
+    print('absolute abs max method',np.hstack([max_abs]),theta_channels[np.hstack([max_abs])])
 
     # plot csd and raw lfp on top
     for method, csd_obj in list(csd_dict.items()):
@@ -1202,7 +1152,7 @@ def HPC_lfp_CA1_DG_fisure_detection_v3(data_lfp_tmp,data_lfp_sta,samples_to_plot
         cb = plt.colorbar(im, ax=ax)
         cb.set_label('CSD (%s)' % csd.dimensionality.string)
         ax.set_ylabel('ch #')
-        ax.set_xlabel('Samples @ 2500 Hz')        
+        ax.set_xlabel('Samples @ 2500 Hz')
 
         plt.show()
 
@@ -1232,7 +1182,7 @@ def HPC_lfp_CA1_DG_fisure_detection_v3(data_lfp_tmp,data_lfp_sta,samples_to_plot
         cb = plt.colorbar(im, ax=ax)
         cb.set_label('CSD (%s)' % csd.dimensionality.string)
         ax.set_ylabel('ch #')
-        ax.set_xlabel('Samples @ 2500 Hz')      
+        ax.set_xlabel('Samples @ 2500 Hz')
 
         plt.show()
 
@@ -1247,7 +1197,7 @@ def HPC_lfp_CA1_DG_fisure_detection_v3(data_lfp_tmp,data_lfp_sta,samples_to_plot
     swr_power, swr_band_ch = [], []
     swr_power, swr_band_ch = get_swr_ch_v2(data_lfp_sta,theta_channels)
 
-    ## Print summary        
+    ## Print summary
 
     print('Theta channels',theta_channels)
     print('Ripple channels',swr_band_ch[1])
@@ -1267,19 +1217,19 @@ def HPC_lfp_CA1_DG_fisure_detection_v3(data_lfp_tmp,data_lfp_sta,samples_to_plot
 
 
 def plot_lfps_theta(ripple_data, time, window_idx,scale):
-    
+
     from scipy import signal
-    
+
     n_channels = ripple_data.shape[1]
     print(n_channels)
     outputSignal = []
     fs_val = 2500
-    
+
     theta_all = []
     raw_all = []
     ripple_all = []
-    
-    
+
+
     for ich in range(0,n_channels):
 
         filter_60hz = False
@@ -1306,11 +1256,11 @@ def plot_lfps_theta(ripple_data, time, window_idx,scale):
             outputSignal.append(signal.filtfilt(b_notch, a_notch, outputSignal_tmp))
 
             # low pass butterworth filter at 280Hz
-            #sos = signal.butter(10, 100, 'lp', fs=fs, output='sos', analog=False)        
+            #sos = signal.butter(10, 100, 'lp', fs=fs, output='sos', analog=False)
             #outputSignal = signal.sosfilt(sos, outputSignal_tmp2)
 
         else:
-            
+
             signal_tmp = []
             signal_tmp = ripple_data[:,ich] - np.mean(ripple_data[:,ich])
 
@@ -1321,9 +1271,9 @@ def plot_lfps_theta(ripple_data, time, window_idx,scale):
             # reject any signal above 12 Hz
             sos2 = signal.butter(4, 4, 'hp', fs=fs_val, output='sos')
 
-            theta_only = signal.sosfiltfilt(sos2, signal_zscore)   
-            
-            
+            theta_only = signal.sosfiltfilt(sos2, signal_zscore)
+
+
             # reject any signal above 350 Hz
             sos_ini2 = signal.butter(4, 350, 'lp', fs=fs_val, output='sos')
             signal_zscore2 = signal.sosfiltfilt(sos_ini2, signal_tmp)
@@ -1331,51 +1281,51 @@ def plot_lfps_theta(ripple_data, time, window_idx,scale):
             # reject any signal below 200 Hz
             sos3 = signal.butter(4, 200, 'hp', fs=fs_val, output='sos')
 
-            ripple_only = signal.sosfiltfilt(sos3, signal_zscore2)   
-    
-        theta_all.append(theta_only) 
-        ripple_all.append(ripple_only) 
+            ripple_only = signal.sosfiltfilt(sos3, signal_zscore2)
+
+        theta_all.append(theta_only)
+        ripple_all.append(ripple_only)
 
         raw_all.append(signal_tmp)
-        
-    
-    raw_all = np.vstack(raw_all)    
+
+
+    raw_all = np.vstack(raw_all)
     print(raw_all.shape)
-    
+
     raw_all -= np.mean(raw_all,axis=0)
-    
+
     window_start = window_idx - time* fs_val #np.random.randint(0,outputSignal.size - fs*time,1)[0]
     # ripple_data[window_start[0]:window_start[0]+fs*60]
     fig = plt.figure(figsize=(48,40))
-    
+
     time_array = np.linspace(0,time,fs_val*time)
     windows_end = window_start+fs_val*time
-    
+
     for ich in range(0,n_channels):
-    
+
         plt.plot(time_array,(raw_all[ich, window_start:windows_end]/scale + ich),color='blue', linewidth = 2)
 #         plt.plot(time_array,(theta_all[ich][window_start:windows_end]/scale - ich),color='red', linewidth = 2)
 
 #         plt.xlim(0,time)
 #         label_y = 'Ch' + str(ich*4)
-        
+
 #         if ich == n_channels - 1:
 #             plt.xlabel('Time [sec]')
 #             #get current axes
 #             ax = plt.gca()
 #             #hide x-axis
-#             ax.get_yaxis().set_visible(False)   
-                        
+#             ax.get_yaxis().set_visible(False)
+
 #         else:
-        plt.axis('off')    
-    
+        plt.axis('off')
+
     plt.show()
-    
+
     fig = plt.figure(figsize=(48,40))
     ax = fig.add_subplot(1,1,1)
-    
+
     for ich in range(0,n_channels):
-    
+
 #         plt.plot(time_array,(raw_all[ich, window_start:windows_end]/scale - ich),color='blue', linewidth = 2)
         ax.plot(time_array,theta_all[ich][window_start:windows_end]/scale + ich,color='red', linewidth = 2)
 #         plt.plot(time_array,(ripple_all[ich][window_start:windows_end]/scale - ich),color='green', linewidth = 2)
@@ -1384,58 +1334,58 @@ def plot_lfps_theta(ripple_data, time, window_idx,scale):
 
 #         plt.xlim(0,time)
 #         label_y = 'Ch' + str(ich*4)
-        
+
 #         if ich == n_channels - 1:
 #             plt.xlabel('Time [sec]')
 #             #get current axes
 #             ax = plt.gca()
 #             #hide x-axis
-#             ax.get_yaxis().set_visible(False)   
-                        
+#             ax.get_yaxis().set_visible(False)
+
 #         else:
         ax.axis('off')
-    
-    
-    ax_histy = ax.inset_axes([1.05, 0, 0.25, 1], sharey=ax)    
+
+
+    ax_histy = ax.inset_axes([1.05, 0, 0.25, 1], sharey=ax)
     ax_histy.plot(np.vstack(theta_all)[:,2000], np.arange(0,385,1), color = 'black', linewidth = 10)
     ax_histy.axis('off')
-    
-    plt.show()       
-    
+
+    plt.show()
+
     fig = plt.figure(figsize=(48,40))
     ax = fig.add_subplot(1,1,1)
 
     for ich in range(0,n_channels):
-    
+
 #         plt.plot(time_array,(raw_all[ich, window_start:windows_end]/scale - ich),color='blue', linewidth = 2)
         ax.plot(time_array,ripple_all[ich][window_start:windows_end]/scale + ich,color='green', linewidth = 2)
 
 #         plt.xlim(0,time)
 #         label_y = 'Ch' + str(ich*4)
-        
+
 #         if ich == n_channels - 1:
 #             plt.xlabel('Time [sec]')
 #             #get current axes
 #             ax = plt.gca()
 #             #hide x-axis
-#             ax.get_yaxis().set_visible(False)   
-                        
+#             ax.get_yaxis().set_visible(False)
+
 #         else:
         ax.axis('off')
 
-    ax_histy = ax.inset_axes([1.05, 0, 0.25, 1], sharey=ax)    
+    ax_histy = ax.inset_axes([1.05, 0, 0.25, 1], sharey=ax)
     ax_histy.plot(np.vstack(ripple_all)[:,1000], np.arange(0,385,1), color = 'black', linewidth = 10)
-    ax_histy.axis('off')    
-    
-    plt.show()          
-        
-        
-    return raw_all, ripple_all, theta_all    
+    ax_histy.axis('off')
+
+    plt.show()
+
+
+    return raw_all, ripple_all, theta_all
 
 ####
-    
+
     # prelimiary spectral analysis
-from scipy.signal import butter, lfilter, freqz, iirnotch, welch 
+from scipy.signal import butter, lfilter, freqz, iirnotch, welch
 
 def bandpass_filter(data, lowcut, highcut, fs=2500, order=5):
     nyq = 0.5 * fs
@@ -1462,5 +1412,4 @@ def notch_filter(data, notch_freq, fs=2500, Q=30):
     return filtered_data
 
 
-    
-    
+

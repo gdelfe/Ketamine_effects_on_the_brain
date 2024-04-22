@@ -3,3 +3,4 @@ __pycache__/
 env/
 data/
 .ipynb_checkpoints/
+.idea/

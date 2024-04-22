@@ -11,3 +11,5 @@ scikit-learn
 joblib
 quantities
 neo
+dask
+-e .
