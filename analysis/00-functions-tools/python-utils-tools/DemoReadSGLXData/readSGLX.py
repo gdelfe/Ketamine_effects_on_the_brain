@@ -15,8 +15,6 @@ the 'meta' dictionary will make your data handling
 much easier!
 
 """
-import os
-
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
@@ -32,21 +30,25 @@ from tkinter import filedialog
 # The string values are converted to numbers using the "int" and "float"
 # functions. Note that python 3 has no size limit for integers.
 #
-def read_meta(binpath):
-    metapath = binpath[:-len('.bin')] + ".meta"
-    md = {}
-    assert os.path.isfile(metapath)
-    with open(metapath, 'r') as f:
-        lines = f.read().splitlines()
-        # convert the list entries into key value pairs
-        for m in lines:
-            vals = m.split(sep='=')
-            if vals[0][0] == '~':
-                k = vals[0][1:len(vals[0])]
-            else:
-                k = vals[0]
-            md.update({k: vals[1]})
-    return(md)
+def readMeta(binFullPath):
+    metaName = binFullPath.stem + ".meta"
+    metaPath = Path(binFullPath.parent / metaName)
+    metaDict = {}
+    if metaPath.exists():
+        # print("meta file present")
+        with metaPath.open() as f:
+            mdatList = f.read().splitlines()
+            # convert the list entries into key value pairs
+            for m in mdatList:
+                csList = m.split(sep='=')
+                if csList[0][0] == '~':
+                    currKey = csList[0][1:len(csList[0])]
+                else:
+                    currKey = csList[0]
+                metaDict.update({currKey: csList[1]})
+    else:
+        print("no meta file")
+    return(metaDict)
 
 
 # Return sample rate as python float.
