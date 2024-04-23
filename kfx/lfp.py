@@ -29,7 +29,7 @@ def preprocess_lfp(lfp):
     X = X[::2]
 
     time = lfp.index[::2]
-    site = pd.Series(lfp.columns[::2] // 2, name='site')
+    site = pd.Series(lfp.columns[:-1:2] // 2, name='site')
     return pd.DataFrame(X, index=time, columns=site)
 
 

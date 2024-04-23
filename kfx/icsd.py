@@ -366,16 +366,16 @@ class CSD(object):
             raise ae("{} not equal to 'filtfilt' or 'convolve'".format(filterfunction))
 
         if self.f_type == 'boxcar':
-            num = ss.boxcar(self.f_order)
+            num = ss.windows.boxcar(self.f_order)
             denom = np.array([num.sum()])
         elif self.f_type == 'hamming':
-            num = ss.hamming(self.f_order)
+            num = ss.windows.hamming(self.f_order)
             denom = np.array([num.sum()])
         elif self.f_type == 'triangular':
-            num = ss.triang(self.f_order)
+            num = ss.windows.triang(self.f_order)
             denom = np.array([num.sum()])
         elif self.f_type == 'gaussian':
-            num = ss.gaussian(self.f_order[0], self.f_order[1])
+            num = ss.windows.gaussian(self.f_order[0], self.f_order[1])
             denom = np.array([num.sum()])
         elif self.f_type == 'identity':
             num = np.array([1.])
