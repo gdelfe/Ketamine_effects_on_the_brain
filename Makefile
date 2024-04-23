@@ -9,9 +9,10 @@ notebook:
 	source env/bin/activate && jupyter notebook
 
 mount:
-	sshfs lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine data/mnt
+    mkdir -p data/mnt
+	sshfs lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine
 
 unmount:
-	diskutil unmount force data/mnt
+	fusermount3 -u data/mnt
 
 .PHONY: env notebook mount unmount
