@@ -31,7 +31,7 @@ from utils_plotting import *
 from utils_general import *
 
 """ Input parameters """
-sess = 2 # session number 
+sess = 0 # session number 
 
 offset = 5 # starting min for each epoch
 tot_min = 30 - 2*offset # tot numb of minutes in each epoch. Each epoch starts at offset and ends at '30 min - offset'
@@ -46,9 +46,9 @@ qband = 200 # Q factor in the notch filter - don't change this value
 " ------------------- "
 
 
-binFullPath = r'C:\Users\fentonlab\Desktop\Gino\LFPs'
-HPC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs','HPC_lfp_paths.file')
-PFC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\Gino\LFPs','PFC_lfp_paths.file')
+binFullPath = r'C:\Users\fentonlab\Desktop\luke\LFPs'
+HPC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\luke\LFPs','HPC_lfp_paths.file')
+PFC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\luke\LFPs','PFC_lfp_paths.file')
 
 
 # =============================================================================

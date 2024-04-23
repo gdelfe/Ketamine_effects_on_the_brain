@@ -18,10 +18,9 @@ addpath('C:\Users\fentonlab\Desktop\Gilgamesh\Codes\eeglab\functions\guifunc\');
 addpath('C:\Users\fentonlab\Desktop\Gilgamesh\Codes\eeglab\functions\adminfunc\');
 addpath('C:\Users\fentonlab\Desktop\luke\kfx\00-functions-tools\matlab-functions');
 addpath('C:\Users\fentonlab\Desktop\luke\kfx\00-functions-tools\matlab-functions\save_and_load');
+addpath('C:\Users\fentonlab\Desktop\luke\kfx\00-functions-tools\matlab-tools');
 addpath('C:\Users\fentonlab\Desktop\luke\kfx\00-functions-tools\matlab-functions\plotting');
 addpath('C:\Users\fentonlab\Desktop\luke\kfx\00-functions-tools\matlab-functions\other_tools');
-addpath('C:\Users\fentonlab\Desktop\luke\kfx\00-functions-tools\matlab-tools');
-addpath('C:\Users\fentonlab\Desktop\luke\kfx\00-functions-tools\matlab-tools\shadedErrorBars');
 
 % INPUT PARAMETERS 
 iSess = 2; % python session number 
