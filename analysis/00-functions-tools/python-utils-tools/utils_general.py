@@ -33,6 +33,9 @@ import pdb
 import h5py
 
 
+LFP_PATH = os.getenv('LFP_PATH', r'C:\Users\fentonlab\Desktop\luke\LFPs')
+BEHAV_PATH = os.getenv('BEHAV_PATH', r'C:\Users\fentonlab\Desktop\luke\behaviour')
+
 
 """
 Load LFP data, trim it in order to align it with speed data
@@ -73,7 +76,6 @@ def load_data(binFullPath, HPC_path_file, PFC_path_file, brain_reg, sess):
     # select path for specific session recording 
     binFullPath = rec[sess][brain_reg] 
     print('Loading file in: ',binFullPath)
-    # print(binFullPath)
     numChannels = 385
     
     # =============================================================================
@@ -104,7 +106,7 @@ def load_data(binFullPath, HPC_path_file, PFC_path_file, brain_reg, sess):
     #### Read LFP start/end time, HPC channels - Choose whether loading HPC or PFC here
         
     pd.set_option('display.max_colwidth',100)
-    in_file = os.path.join(r'C:\Users\fentonlab\Desktop\luke\LFPs\CA1_DG_id', "recid_CA1_DG_id_modified.csv")
+    in_file = os.path.join(LFP_PATH, 'CA1_DG_id', "recid_CA1_DG_id_modified.csv")
     Lfp_aln = pd.read_csv(in_file)
     
 
@@ -137,7 +139,7 @@ def load_data(binFullPath, HPC_path_file, PFC_path_file, brain_reg, sess):
     # =============================================================================
     
     ### Load Speed, x, and y
-    speed_path = r'C:\Users\fentonlab\Desktop\luke\behaviour'
+    speed_path = BEHAV_PATH
     # x = np.load(os.path.join(speed_path, "x_aln.npy"), allow_pickle=True)
     # y = np.load(os.path.join(speed_path, "y_aln.npy"), allow_pickle=True)
     speed = np.load(os.path.join(speed_path, "speed_aln.npy"), allow_pickle=True)
@@ -724,8 +726,9 @@ def save_matlab_files(rec, sess, brain_reg,
                       lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_ep_low_s,lfp_H_ep_low_s, 
                       lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s, save_var):
     
-    main_dir = r'C:\Users\fentonlab\Desktop\luke\lfp'
+    main_dir = os.path.join(LFP_PATH, 'HPC')
     path = rec[sess][brain_reg]
+    print('SAVE PATH:', path)
     
     dir_sess = path.split('\\')[-3] # path for session directory
     full_dir_path = os.path.join(main_dir,dir_sess,'LFPs_and_masks')
@@ -779,7 +782,7 @@ def save_matlab_files(rec, sess, brain_reg,
 #                                tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s,
 #                                tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s, tot_mask_H_high_s):
     
-#     main_dir = r'C:\Users\fentonlab\Desktop\luke\LFPs\HPC'
+#     main_dir = os.path.join(LFP_PATH, 'HPC')
 #     path = rec[sess][brain_reg]
     
 #     dir_sess = path.split('\\')[-3] # path for session directory
@@ -818,8 +821,9 @@ def save_matlab_files_all_lfps(rec,sess,brain_reg, lfp_B_ep, lfp_L_ep, lfp_M_ep,
                                tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s,
                                tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s, tot_mask_H_high_s, save_var):
     
-    main_dir = r'C:\Users\fentonlab\Desktop\luke\LFPs\HPC'
+    main_dir = os.path.join(LFP_PATH, 'HPC')
     path = rec[sess][brain_reg]
+    print('SAVE PATH:', path)
     
     dir_sess = path.split('\\')[-3] # path for session directory
     full_dir_path = os.path.join(main_dir,dir_sess,'LFPs_and_masks')
@@ -889,7 +893,7 @@ shaped into a 4D array nch, min id, id trial, length trial
 def save_h5_files(rec, sess, brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_ep_low_s, lfp_H_ep_low_s, 
                   lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s):
     
-    main_dir = r'C:\Users\fentonlab\Desktop\luke\LFPs\HPC'
+    main_dir = os.path.join(LFP_PATH, 'HPC')
     path = rec[sess][brain_reg]
     
     dir_sess = path.split('\\')[-3] # path for session directory
@@ -934,7 +938,7 @@ def save_h5_files(rec, sess, brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_ep
 def save_hdf5_files(rec, sess, brain_reg, lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_ep_low_s, lfp_H_ep_low_s, 
                     lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s):
     
-    main_dir = r'C:\Users\fentonlab\Desktop\luke\LFPs\HPC'
+    main_dir = os.path.join(LFP_PATH, 'HPC')
     path = rec[sess][brain_reg]
     
     dir_sess = path.split('\\')[-3] # path for session directory
@@ -984,7 +988,7 @@ def save_matlab_files_all_lfps_h5(rec, sess, brain_reg, lfp_B_ep, lfp_L_ep, lfp_
                                tot_mask_B_low_s, tot_mask_L_low_s, tot_mask_M_low_s, tot_mask_H_low_s,
                                tot_mask_B_high_s, tot_mask_L_high_s, tot_mask_M_high_s, tot_mask_H_high_s):
     
-    main_dir = r'C:\Users\fentonlab\Desktop\luke\LFPs\HPC'
+    main_dir = os.path.join(LFP_PATH, 'HPC')
     path = rec[sess][brain_reg]
     
     dir_sess = path.split('\\')[-3]  # path for session directory
@@ -1053,7 +1057,7 @@ Save list of electrodes in CA1
     
 def save_list_channel_CA1(idx_cell_hpc, rec, sess, brain_reg):
     
-    main_dir = r'C:\Users\fentonlab\Desktop\luke\LFPs\HPC'
+    main_dir = os.path.join(LFP_PATH, 'HPC')
     path = rec[sess][brain_reg]
 
     dir_sess = path.split('\\')[-3]     # path for session directory
@@ -1064,7 +1068,7 @@ def save_list_channel_CA1(idx_cell_hpc, rec, sess, brain_reg):
     
 def load_list_channel_CA1(rec, sess, brain_reg):
     
-    main_dir = r'C:\Users\fentonlab\Desktop\luke\LFPs\HPC'
+    main_dir = os.path.join(LFP_PATH, 'HPC')
     path = rec[sess][brain_reg]
 
     dir_sess = path.split('\\')[-3]     # path for session directory

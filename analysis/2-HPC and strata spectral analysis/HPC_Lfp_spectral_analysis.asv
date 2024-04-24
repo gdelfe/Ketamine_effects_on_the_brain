@@ -16,14 +16,15 @@ addpath('C:\Users\fentonlab\Desktop\Gilgamesh\Codes\eeglab\');
 addpath('C:\Users\fentonlab\Desktop\Gilgamesh\Codes\eeglab\functions\sigprocfunc\'); 
 addpath('C:\Users\fentonlab\Desktop\Gilgamesh\Codes\eeglab\functions\guifunc\');
 addpath('C:\Users\fentonlab\Desktop\Gilgamesh\Codes\eeglab\functions\adminfunc\');
-addpath('C:\Users\fentonlab\Desktop\luke\kfx\00-functions-tools\matlab-functions');
-addpath('C:\Users\fentonlab\Desktop\luke\kfx\00-functions-tools\matlab-functions\save_and_load');
-addpath('C:\Users\fentonlab\Desktop\luke\kfx\00-functions-tools\matlab-tools');
-addpath('C:\Users\fentonlab\Desktop\luke\kfx\00-functions-tools\matlab-functions\plotting');
-addpath('C:\Users\fentonlab\Desktop\luke\kfx\00-functions-tools\matlab-functions\other_tools');
+addpath('C:\Users\fentonlab\Desktop\luke\kfx\analysis\00-functions-tools\matlab-functions');
+addpath('C:\Users\fentonlab\Desktop\luke\kfx\analysis\00-functions-tools\matlab-functions\save_and_load');
+addpath('C:\Users\fentonlab\Desktop\luke\kfx\analysis\00-functions-tools\matlab-functions\plotting');
+addpath('C:\Users\fentonlab\Desktop\luke\kfx\analysis\00-functions-tools\matlab-functions\other_tools');
+addpath('C:\Users\fentonlab\Desktop\luke\kfx\analysis\00-functions-tools\matlab-tools');
+addpath('C:\Users\fentonlab\Desktop\luke\kfx\analysis\00-functions-tools\matlab-tools\shadedErrorBars');
 
 % INPUT PARAMETERS 
-iSess = 2; % python session number 
+iSess = 0; % python session number 
 sess = iSess + 1; % session number 
 ch = 1; minute = 13; % channel and minute to look at 
 W  = 3; % frequency resolution PSD
@@ -36,28 +37,32 @@ method = 'CSD';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % channels for HPC subareas -- Copy/Pase the values on the excel file
+
+% Session 0
+so = 1:5; % oriens layer  
+sp = 6:14; % pyramidal layer 
+rad = 15:17; % Radiatum 
+lm = 18:20; % Loc Mol 
+dup = 21:29; % Dentate upper part 
+dd = 30:38; % Dentate lower part
+
 % Session 2
-so = 1:5;  % oriens layer  
-sp = 6:11; % pyramidal layer 
-rad = 12:17; % Radiatum 
-lm = 18:22; % Loc Mol 
-dup = 23:25; % Dentate upper part 
-dd = 26:28; % Dentate lower part
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% so = 1:5;
+% sp = 6:11;
+% rad = 12:17;
+% lm = 18:22;
+% dup = 23:25;
+% dd = 26:28;
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% channels for HPC subareas -- Copy/Pase the values on the excel file
 % Session 3
-% CA1 = 1:9;  % oriens 
-% ripple = 10:14; % pyramidal layer 
-% rad = 15:15; % Radiatum 
-% lm = 16:17; % Loc Mol 
-% dup = 18:20 % Dentate upper part 
-% dd = 21:23; % Dentate lower part
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% so = 1:9;
+% sp = 10:14;
+% rad = 15:15;
+% lm = 16:17;
+% dup = 18:20;
+% dd = 21:23;
 
-
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % directory and file names for the recording paths 
 main_dir = 'C:\Users\fentonlab\Desktop\luke\LFPs\';
@@ -66,7 +71,7 @@ PFC_file = strcat(main_dir,'PFC_lfp_paths.mat');
 
 main_dir_HPC = 'C:\Users\fentonlab\Desktop\luke\LFPs\HPC';
 main_dir_PFC = 'C:\Users\fentonlab\Desktop\luke\LFPs\PFC';
-load(strcat(main_dir,'color_strata.mat')); % load colors for plots
+load(strcat(main_dir,'color_strata_v2.mat')); % load colors for plots
 
 load(HPC_file) 
 Paths_HPC = extract_paths(HPC_file_list); 
@@ -151,7 +156,7 @@ min_end = 15;   % ending minute
 spec_par.fs = 1250; % sampling rate 
 spec_par.fk = [0 100]; % freq range
 spec_par.tapers = [0.6 5]; % Time resolution, Freq. resoluzion
-k = floor(2*spec_par.tapers(1)*spec_par.tapers(2) - 1) % number of tapers used
+k = floor(2*spec_par.tapers(1)*spec_par.tapers(2) - 1); % number of tapers used
 spec_par.dn = 0.05; % sliding step
 % ----------------------------------
 

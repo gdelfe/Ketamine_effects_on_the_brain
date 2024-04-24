@@ -17,6 +17,7 @@ are averaged together 2-by-2. The resulting number of CSD channels is (2 x N / 4
 @ Gino Del Ferraro, Fenton lab, Nov 2023
 """
 
+import argparse
 import sys
 import os
 
@@ -30,9 +31,23 @@ from utils_signal_processing import *
 from utils_plotting import *
 from utils_general import *
 
-""" Input parameters """
-sess = 0 # session number 
+my_parser = argparse.ArgumentParser()
+my_parser.add_argument('--sess-num', action='store', type=int)
+my_parser.add_argument('--lfp-path', action='store', type=str)
+args = my_parser.parse_args()
 
+SESS_NUM = args.sess_num
+if SESS_NUM is None:
+    SESS_NUM = int(os.getenv('SESS_NUM', 0))
+
+LFP_PATH = args.lfp_path
+if LFP_PATH is None:
+    LFP_PATH = os.getenv('LFP_PATH', r'C:\Users\fentonlab\Desktop\luke\LFPs')
+
+print('arguments:', args, LFP_PATH, SESS_NUM)
+
+
+""" Input parameters """
 offset = 5 # starting min for each epoch
 tot_min = 30 - 2*offset # tot numb of minutes in each epoch. Each epoch starts at offset and ends at '30 min - offset'
 save_var = "CSD" # saving file name, Current Source Density
@@ -46,9 +61,9 @@ qband = 200 # Q factor in the notch filter - don't change this value
 " ------------------- "
 
 
-binFullPath = r'C:\Users\fentonlab\Desktop\luke\LFPs'
-HPC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\luke\LFPs','HPC_lfp_paths.file')
-PFC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\luke\LFPs','PFC_lfp_paths.file')
+binFullPath = LFP_PATH
+HPC_path_file = os.path.join(LFP_PATH,'HPC_lfp_paths.file')
+PFC_path_file = os.path.join(LFP_PATH,'PFC_lfp_paths.file')
 
 
 # =============================================================================
@@ -56,13 +71,13 @@ PFC_path_file = os.path.join(r'C:\Users\fentonlab\Desktop\luke\LFPs','PFC_lfp_pa
 # =============================================================================
 
 # ====== Load Lfp and speed data for a specific recording and brain area 
-Lfp, speed, gain, rec, _ , CH_end = load_data(binFullPath,HPC_path_file,PFC_path_file,"HPC",sess)
+Lfp, speed, gain, rec, _ , CH_end = load_data(binFullPath,HPC_path_file,PFC_path_file,"HPC",SESS_NUM)
 
 # ====== Detect bad (silent) Lfp channel (if it exist)
 bad_flag, next_id, bad_id = detect_silent_lfp_channel(Lfp, CH_end, 4, 4, 2500)
 
 # ====== Upsample Speed recording
-speed_up = upsample_speed_v2(speed, Lfp, sess, 2500, 100)
+speed_up = upsample_speed_v2(speed, Lfp, SESS_NUM, 2500, 100)
 
 #%%
 # =============================================================================
@@ -70,9 +85,9 @@ speed_up = upsample_speed_v2(speed, Lfp, sess, 2500, 100)
 # =============================================================================
 
 # # plot speed
-# plot_speed(speed_up,sess,0,100,10,fs_lfp=2500,fs_beh=100)
+# plot_speed(speed_up,SESS_NUM,0,100,10,fs_lfp=2500,fs_beh=100)
 # # # plot speed histogram 
-# plot_speed_histo_logscale(speed,sess)
+# plot_speed_histo_logscale(speed,SESS_NUM)
 # plot_speed_histo_regimes(speed_up, th_low = 30,th_mid = 100)
 
 # # plot Lfp
@@ -133,7 +148,6 @@ mask_H_high = []
 
 
 for current_min in range(0,tot_min):
-# for current_min in range(0,2):
     
     print('\n# ======== Current minute = {}  ----------------------- \n'.format(current_min))
     
@@ -263,7 +277,7 @@ for current_min in range(0,tot_min):
 """  Save LFP trials without artifacts for low and high speed - usage: PSD calculation """
 
 print('Saving Lfp split into trials ...')
-save_matlab_files(rec, sess, 'HPC', 
+save_matlab_files(rec, SESS_NUM, 'HPC', 
                   lfp_B_ep_low_s, lfp_L_ep_low_s, lfp_M_ep_low_s, lfp_H_ep_low_s, 
                   lfp_B_ep_high_s, lfp_L_ep_high_s, lfp_M_ep_high_s, lfp_H_ep_high_s, save_var)
 
@@ -275,6 +289,6 @@ save_matlab_files(rec, sess, 'HPC',
 """ Save all LFP trials and total mask - usage: Spectrograms, and other signal processing analysis """
 
 print('Saving lfp whole min recording + masks ...')
-save_matlab_files_all_lfps(rec,sess,'HPC', lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, 
+save_matlab_files_all_lfps(rec,SESS_NUM,'HPC', lfp_B_ep, lfp_L_ep, lfp_M_ep, lfp_H_ep, 
                                mask_B_low, mask_L_low, mask_M_low, mask_H_low, 
                                mask_B_high, mask_L_high, mask_M_high, mask_H_high, save_var)
