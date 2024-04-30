@@ -13,7 +13,8 @@ import matplotlib as mpl
 import seaborn as sns
 from scipy import stats
 from scipy.interpolate import interp1d
-from scipy.signal import gaussian, savgol_filter
+from scipy.signal import savgol_filter
+from scipy.signal.windows import gaussian
 from scipy.stats import linregress, spearmanr, kendalltau, pearsonr, circstd
 from pathlib import Path
 from tkinter import Tk

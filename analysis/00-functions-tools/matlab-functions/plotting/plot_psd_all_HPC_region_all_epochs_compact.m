@@ -19,7 +19,7 @@ fmax = 100;
 min_tot = 5.5;
 max_tot = 9;
 epoch = ['B','L','M','H'];
-ep_title = {'Baseline', 'Low Dose', 'High Dose', 'Mid Dose'};
+ep_title = {'Baseline', 'Low Dose', 'Mid Dose', 'High Dose'};
 
 ha = tight_subplot(1,4,[.03 .02],[.15 .2],[.06 .07]); % [gap_h gap_w] , margin [lower upper] [left right]
 

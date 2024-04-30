@@ -38,7 +38,7 @@ args = my_parser.parse_args()
 
 SESS_NUM = args.sess_num
 if SESS_NUM is None:
-    SESS_NUM = int(os.getenv('SESS_NUM', 0))
+    SESS_NUM = int(os.getenv('SESS_NUM', 1))
 
 LFP_PATH = args.lfp_path
 if LFP_PATH is None:

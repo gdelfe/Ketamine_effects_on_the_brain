@@ -24,7 +24,7 @@ addpath('C:\Users\fentonlab\Desktop\luke\kfx\analysis\00-functions-tools\matlab-
 addpath('C:\Users\fentonlab\Desktop\luke\kfx\analysis\00-functions-tools\matlab-tools\shadedErrorBars');
 
 % INPUT PARAMETERS 
-iSess = 0; % python session number 
+iSess = 8; % python session number 
 sess = iSess + 1; % session number 
 ch = 1; minute = 13; % channel and minute to look at 
 W  = 3; % frequency resolution PSD
@@ -39,12 +39,20 @@ method = 'CSD';
 % channels for HPC subareas -- Copy/Pase the values on the excel file
 
 % Session 0
-so = 1:5; % oriens layer  
-sp = 6:14; % pyramidal layer 
-rad = 15:17; % Radiatum 
-lm = 18:20; % Loc Mol 
-dup = 21:29; % Dentate upper part 
-dd = 30:38; % Dentate lower part
+% so = 1:5; % oriens layer  
+% sp = 6:14; % pyramidal layer 
+% rad = 15:17; % Radiatum 
+% lm = 18:20; % Loc Mol 
+% dup = 21:29; % Dentate upper part 
+% dd = 30:38; % Dentate lower part
+
+% Session 1
+% so = 1:5;
+% sp = 6:13;
+% rad = 14:14;
+% lm = 15:16;
+% dup = 17:21;
+% dd = 22:27;
 
 % Session 2
 % so = 1:5;
@@ -61,6 +69,72 @@ dd = 30:38; % Dentate lower part
 % lm = 16:17;
 % dup = 18:20;
 % dd = 21:23;
+
+% Session 8
+so = 1:1; % there were no SO channels, so SO figures should be ignored.
+sp = 2:7; % first channel was taken from SP and given to SO to avoid double-counting
+rad = 8:18;
+lm = 19:30;
+dup = 31:36;
+dd = 37:42;
+
+% Session 16
+% so = 1:5;
+% sp = 6:11;
+% rad = 12:12;
+% lm = 13:13;
+% dup = 14:23;
+% dd = 24:33;
+
+% WARNING! CODE BELOW HAS DUMMY CHANNEL VALUES, to run analysis across all HPC
+% Session 17 (THESE CHANNEL RANGES ARE ARTIFICIAL, just to get all-HPC result figures)
+% so = 1:6;    % from excel file
+% sp = 7:13;   % from excel file
+% rad = 14:16; % made up! ignore radiatum figures.
+% lm = 17:19;  % made up! ignore loc mol figures.
+% dup = 20:22; % made up! ignore dentate up figures.
+% dd = 23:25;  % made up! ignore dendate down figures.
+
+% Session 15 (THESE CHANNEL RANGES ARE ARTIFICIAL, just to get all-HPC result figures)
+% so = 1:6;    % made up
+% sp = 7:13;   % made up
+% rad = 14:16; % made up
+% lm = 17:19;  % made up
+% dup = 20:22; % made up
+% dd = 23:26;  % made up
+
+% Session 10 (THESE CHANNEL RANGES ARE ARTIFICIAL, just to get all-HPC result figures)
+% so = 1:1;    % from excel file
+% sp = 2:12;   % from excel file
+% rad = 13:15; % made up
+% lm = 16:19;  % made up
+% dup = 20:27; % made up
+% dd = 28:35;  % made up
+
+% Session 9 (THESE CHANNEL RANGES ARE ARTIFICIAL, just to get all-HPC result figures)
+% so = 1:5;    % from excel file
+% sp = 6:12;   % from excel file
+% rad = 13:17; % made up
+% lm = 18:24;  % made up
+% dup = 25:36; % made up
+% dd = 37:48;  % made up
+
+% Session 7 (THESE CHANNEL RANGES ARE ARTIFICIAL, just to get all-HPC result figures)
+% so = 1:21;   % from excel file (suspicious value)
+% sp = 22:26;  % from excel file (suspicious value)
+% rad = 27:27; % made up
+% lm = 28:29;  % made up
+% dup = 30:30; % made up
+% dd = 31:31;  % made up
+
+% Session 4 (THESE CHANNEL RANGES ARE ARTIFICIAL, just to get all-HPC result figures)
+% so = 1:11;   % from excel file
+% sp = 12:19;  % from excel file
+% rad = 20:21; % made up
+% lm = 22:22;  % made up
+% dup = 23:23; % made up
+% dd = 24:24;  % made up
+% END CODE WITH DUMMY CHANNEL VALUES
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -115,7 +189,7 @@ plot(lfp.H{ch,minute}(1,:))
 save_psd(psd, dir_rec, name_file_psd);
 % psd = load_psd(dir_rec, name_file_psd);
 
-keyboard 
+% keyboard 
 
 % plotting PSD
 % plot_psd_20_min(psd, 'PSD all HPC - Stationary - RS Ketamine', dir_rec,1)
@@ -156,7 +230,7 @@ min_end = 15;   % ending minute
 spec_par.fs = 1250; % sampling rate 
 spec_par.fk = [0 100]; % freq range
 spec_par.tapers = [0.6 5]; % Time resolution, Freq. resoluzion
-k = floor(2*spec_par.tapers(1)*spec_par.tapers(2) - 1) % number of tapers used
+k = floor(2*spec_par.tapers(1)*spec_par.tapers(2) - 1); % number of tapers used
 spec_par.dn = 0.05; % sliding step
 % ----------------------------------
 

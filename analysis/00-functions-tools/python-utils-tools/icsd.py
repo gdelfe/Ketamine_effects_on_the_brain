@@ -278,6 +278,7 @@ plt.show()
 import numpy as np
 import scipy.integrate as si
 import scipy.signal as ss
+import scipy.signal.windows as ssw
 import quantities as pq
 import neo
 
@@ -366,16 +367,16 @@ class CSD(object):
             raise ae("{} not equal to 'filtfilt' or 'convolve'".format(filterfunction))
 
         if self.f_type == 'boxcar':
-            num = ss.boxcar(self.f_order)
+            num = ssw.boxcar(self.f_order)
             denom = np.array([num.sum()])
         elif self.f_type == 'hamming':
-            num = ss.hamming(self.f_order)
+            num = ssw.hamming(self.f_order)
             denom = np.array([num.sum()])
         elif self.f_type == 'triangular':
-            num = ss.triang(self.f_order)
+            num = ssw.triang(self.f_order)
             denom = np.array([num.sum()])
         elif self.f_type == 'gaussian':
-            num = ss.gaussian(self.f_order[0], self.f_order[1])
+            num = ssw.gaussian(self.f_order[0], self.f_order[1])
             denom = np.array([num.sum()])
         elif self.f_type == 'identity':
             num = np.array([1.])
