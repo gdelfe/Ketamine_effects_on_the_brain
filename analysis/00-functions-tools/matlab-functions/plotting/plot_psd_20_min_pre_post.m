@@ -14,7 +14,7 @@ baseColor(2,:) = [0.8500    0.3250    0.0980];
 baseColor(3,:) = [0.9290    0.6940    0.1250] ;
 baseColor(4,:) = [0.4940    0.1840    0.5560];
 
-psd_1_tot = []; psd_2_tot = [] ;
+% psd_1_tot = []; psd_2_tot = [] ;
 
 i = 1;
 for epoch = epochs
@@ -25,6 +25,7 @@ for epoch = epochs
     darkColor = darkenColor(baseColor(i,:), 0.5); % Darken by 50%
     ha = tight_subplot(5,4,[.021 .02],[.05 .05],[.07 .2]);  % [gap_h gap_w] , margin [lower upper] [left right]
     
+    psd_1_tot = []; psd_2_tot = [] ;
     for minute = 1:size(psd_1.B,1) % numb of minute
         axes(ha(minute));
         
@@ -86,14 +87,14 @@ for epoch = epochs
         'FontSize', 12,...
         'FontWeight', 'bold');
     
-    psd_1_avg = mean(psd_1_tot,1);
-    psd_1_sem = std(psd_1_tot)/sqrt(size(psd_1_tot,1));
-    psd_2_avg = mean(psd_2_tot,1);
-    psd_2_sem = std(psd_2_tot)/sqrt(size(psd_2_tot,1));
+    psd_1_avg = mean(psd_1_tot,1,'omitnan');
+    psd_1_sem = std(psd_1_tot,'omitnan')/sqrt(size(psd_1_tot,1));
+    psd_2_avg = mean(psd_2_tot,1,'omitnan');
+    psd_2_sem = std(psd_2_tot,'omitnan')/sqrt(size(psd_2_tot,1));
     
     fig_avg = figure('Position', [300, 300, 300, 250]);
     shadedErrorBar(f,psd_1_avg, psd_1_sem,'lineprops',{'color', baseColor(i,:)},'patchSaturation',0.4); hold on
-    shadedErrorBar(f,psd_2_avg, psd_2_sem,'lineprops',{'color', darkColor},'patchSaturation',0.4);
+    shadedErrorBar(f,psd_2_avg, psd_2_sem,'lineprops',{'color', darkColor},'patchSaturation',0.4); hold on
     xlabel('Frequency (Hz)')
     ylabel('Norm log(PSD)')
     legend('PRE','POST')
@@ -108,9 +109,6 @@ for epoch = epochs
         end
         saveas(fig, strcat(dir_out,sprintf('\\20_min_psd_pre_post_epoch_%s_reg_%s.png',epoch, hpc_reg) ))
         saveas(fig_avg, strcat(dir_out,sprintf('\\20_min_psd_AVG_pre_post_epoch_%s_reg_%s.png',epoch, hpc_reg) ))
-        
-        saveas(fig, strcat(dir_out,sprintf('\\20_min_psd_pre_post_epoch_%s_reg_%s.pdf',epoch, hpc_reg) ))
-        saveas(fig_avg, strcat(dir_out,sprintf('\\20_min_psd_AVG_pre_post_epoch_%s_reg_%s.pdf',epoch, hpc_reg) ))
     end
     
     i = i + 1;
