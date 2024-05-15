@@ -2,8 +2,8 @@ env:
 	python3 -m venv env
 	source env/bin/activate && \
 	pip install --upgrade pip && \
-	pip install -r requirements.txt
-	rm -rf kfx.egg-info
+	pip install -r requirements.txt && \
+	pip install -e . && rm -rf src.egg-info
 
 notebook:
 	source env/bin/activate && jupyter notebook

@@ -12,4 +12,3 @@ joblib
 quantities
 neo
 dask
--e .

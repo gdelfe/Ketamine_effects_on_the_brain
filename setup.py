@@ -1,6 +1,6 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
-    name='kfx',
-    packages=find_packages()
+    name='src',
+    packages=['src'],
 )
