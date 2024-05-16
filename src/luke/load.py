@@ -4,18 +4,22 @@ import pandas as pd
 from scipy.io import loadmat
 
 
+def load_metadata(path):
+    meta = {}
+    with open(path.replace('.bin', '.meta'), 'r') as f:
+        for line in f.readlines():
+            k, v = line.split('=')
+            meta[k.strip('~')] = v.strip()
+    return meta
+
+
 def load_lfp(path, startmin=0, endmin=1, offset=0, channels=None):
     """ Load raw voltages as recorded by the neuropixels probe. 
 
     path = '2022-08-11-01-55-00_M018_SAL_mPFC_HPC_0_0_0mpk_g0_t0.imec1.lf.bin'
     df = load_lfp(path)
     """
-    
-    with open(path.replace('.bin', '.meta'), 'r') as f:
-        meta = {}
-        for line in f.readlines():
-            k, v = line.split('=')
-            meta[k.strip('~')] = v.strip()
+    meta = load_metadata(path)
 
     # sanity check the input file
     assert int(meta['nSavedChans']) == 385
