@@ -16,46 +16,51 @@
 # link is ~100 MB/s
 #
 # usage: ./monkcopy.sh           (bash)
-#        sbatch monkcopy.sh      (slurm)
+#        sbatch monkcopy.sh      (slurm - for big copies)
 
 # which kind of file to copy?
-sig="ap" # 'ap' | 'lf'
-ext="bin" # 'meta' | 'bin'
+area="0"    # '0': PFC, '1': HPC
+sig="ap"    # 'ap': spikes, 'lf': LFP
+ext="bin"  # 'meta': metadata, 'bin': raw data
+flags="-v"    # '-v': make scp verbose
 
 # these two raw files break naming convention of all others
-sshpass -f monkauth scp -v "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-07-27-07-41-00_M015_SAL_PFC_HPC_0_0_0mpk/07-27-2022-M015_SAL_0.09_0.3_0.9_g0_imec1/07-27-2022-M015_SAL_0.09_0.3_0.9_g0_t0.imec1.${sig}.${ext}" "2022-07-27-07-41-00_M015_SAL_PFC_HPC_0_0_0mpk_g0_t0.imec1.${sig}.${ext}"
+sshpass -f monkauth scp ${flags} "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-07-27-07-41-00_M015_SAL_PFC_HPC_0_0_0mpk/07-27-2022-M015_SAL_0.09_0.3_0.9_g0_imec${area}/07-27-2022-M015_SAL_0.09_0.3_0.9_g0_t0.imec${area}.${sig}.${ext}" "2022-07-27-07-41-00_M015_SAL_PFC_HPC_0_0_0mpk_g0_t0.imec${area}.${sig}.${ext}"
 
-sshpass -f monkauth scp -v "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-07-28-13-19-00_M016_SAL_PFC_HPC_0_0_0mpk/07-28-2022_M016_SAL_0.09_0.3_0.9_g0_imec1/07-28-2022_M016_SAL_0.09_0.3_0.9_g0_t0.imec1.${sig}.${ext}" "2022-07-28-13-19-00_M016_SAL_PFC_HPC_0_0_0mpk_g0_t0.imec1.${sig}.${ext}"
+sshpass -f monkauth scp ${flags} "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-07-28-13-19-00_M016_SAL_PFC_HPC_0_0_0mpk/07-28-2022_M016_SAL_0.09_0.3_0.9_g0_imec${area}/07-28-2022_M016_SAL_0.09_0.3_0.9_g0_t0.imec${area}.${sig}.${ext}" "2022-07-28-13-19-00_M016_SAL_PFC_HPC_0_0_0mpk_g0_t0.imec${area}.${sig}.${ext}"
 
 # these three raw files have an underbar instead of hyphen in one spot
-sshpass -f monkauth scp -v "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-08-01_04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk/2022-08-01_04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk_g0_imec1/2022-08-01_04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec1.${sig}.${ext}" "2022-08-01-04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec1.${sig}.${ext}"
+sshpass -f monkauth scp ${flags} "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-08-01_04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk/2022-08-01_04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk_g0_imec${area}/2022-08-01_04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec${area}.${sig}.${ext}" "2022-08-01-04-30-00_M015_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec${area}.${sig}.${ext}"
 
-sshpass -f monkauth scp -v "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-08-03_12-45-00_M015_RSK_mPFC_HPC_3_10_30mpk/2022-08-03_12-45-00_M015_RSK_mPFC_HPC_3_10_30mpk_g0_imec1/2022-08-03_12-45-00_M015_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec1.${sig}.${ext}" "2022-08-03-12-45-00_M015_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec1.${sig}.${ext}"
+sshpass -f monkauth scp ${flags} "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-08-03_12-45-00_M015_RSK_mPFC_HPC_3_10_30mpk/2022-08-03_12-45-00_M015_RSK_mPFC_HPC_3_10_30mpk_g0_imec${area}/2022-08-03_12-45-00_M015_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec${area}.${sig}.${ext}" "2022-08-03-12-45-00_M015_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec${area}.${sig}.${ext}"
 
-sshpass -f monkauth scp -v "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-08-04_03-45-00_M016_RSK_mPFC_HPC_3_10_30mpk/2022-08-04_03-45-00_M016_RSK_mPFC_HPC_3_10_30mpk_g0_imec1/2022-08-04_03-45-00_M016_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec1.${sig}.${ext}" "2022-08-04-03-45-00_M016_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec1.${sig}.${ext}"
+sshpass -f monkauth scp ${flags} "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-08-04_03-45-00_M016_RSK_mPFC_HPC_3_10_30mpk/2022-08-04_03-45-00_M016_RSK_mPFC_HPC_3_10_30mpk_g0_imec${area}/2022-08-04_03-45-00_M016_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec${area}.${sig}.${ext}" "2022-08-04-03-45-00_M016_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec${area}.${sig}.${ext}"
 
 # this session was broken in two since the behavior rig went down
 if [ "$ext" = "meta" ]; then
 
     # metadata for first chunk
-    sshpass -f monkauth scp -v "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_imec1/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec1.${sig}.${ext}" "2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec1.${sig}1.${ext}"
+    sshpass -f monkauth scp ${flags} "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_imec${area}/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec${area}.${sig}.${ext}" "2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec${area}.${sig}1.${ext}"
 
     # metadata for second chunk
-    sshpass -f monkauth scp -v "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_2/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_2_g0_imec1/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_2_g0_t0.imec1.${sig}.${ext}" "2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec1.${sig}2.${ext}"
+    sshpass -f monkauth scp ${flags} "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_2/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_2_g0_imec${area}/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_2_g0_t0.imec${area}.${sig}.${ext}" "2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec${area}.${sig}2.${ext}"
 
     # metadata for combined is just a copy of first chunk metadata
-    sshpass -f monkauth scp -v "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_all/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_imec1/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec1.${sig}.${ext}" "2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec1.${sig}.${ext}"
+    sshpass -f monkauth scp ${flags} "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_imec${area}/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec${area}.${sig}.${ext}" "2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec${area}.${sig}.${ext}"
 
-# else
+else
 
     # first chunk of recording
-    sshpass -f monkauth scp -v "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_imec1/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec1.${sig}.${ext}" "2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec1.${sig}1.${ext}"
+    sshpass -f monkauth scp ${flags} "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_imec${area}/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec${area}.${sig}.${ext}" "2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec${area}.${sig}1.${ext}"
 
     # second chunk of recording
-    sshpass -f monkauth scp -v "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_2/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_2_g0_imec1/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_2_g0_t0.imec1.${sig}.${ext}" "2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec1.${sig}2.${ext}"
+    sshpass -f monkauth scp ${flags} "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_2/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_2_g0_imec${area}/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_2_g0_t0.imec${area}.${sig}.${ext}" "2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec${area}.${sig}2.${ext}"
 
     # first and second chunks concated (LFP didn't stop recording, just behavior)
-    sshpass -f monkauth scp -v "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_all/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_imec1/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec1.${sig}2.${ext}" "2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec1.${sig}.${ext}"
+    sshpass -f monkauth scp ${flags} "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_all/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_imec${area}/2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec${area}.${sig}2.${ext}" "2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec${area}.${sig}.${ext}"
+    
+    160G    2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec0.ap2.bin
+14G     2022-08-10-03-33-00_M017_RSK_mPFC_HPC_3_10_30mpk_g0_t0.imec0.lf2.bin
 
 fi
 
@@ -71,5 +76,5 @@ for sess in \
 2022-09-14-03-35-00_M023_RSK_mPFC_HPC_3_10_30mpk \
 2022-09-16-02-10-00_M023_RSK_mPFC_HPC_3_10_30mpk
 do
-    sshpass -f monkauth scp -v "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/${sess}/${sess}_g0_imec1/${sess}_g0_t0.imec1.${sig}.${ext}" "${sess}_g0_t0.imec1.${sig}.${ext}"
+    sshpass -f monkauth scp ${flags} "lukea@monk.cns.nyu.edu:/f/fentonlab/RAWDATA/NeuroPix/Ketamine/${sess}/${sess}_g0_imec${area}/${sess}_g0_t0.imec${area}.${sig}.${ext}" "${sess}_g0_t0.imec${area}.${sig}.${ext}"
 done
