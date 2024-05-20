@@ -12,3 +12,4 @@ joblib
 quantities
 neo
 dask
+mpi4py

@@ -38,6 +38,7 @@ Dependencies (mac environment):
 Installation:
 1. Clone this repository to local filesystem
 2. Run `make env` to build python environment
+3. Simlink data into directory called `data` at top level of repo
 
 To use repository:
 1. Run `make notebook` to start jupyter notebook server
@@ -46,7 +47,9 @@ To use repository:
 
 ### Repository structure
 
-`gino` contains code from Gino,
+`src` contains code called into by analysis scripts.
+
+`src/gino` contains code from Gino,
 1. converts raw LFP to CSD and computes running speed/LFP artifact masks (python)
     - accepts raw neuropixel files (.bin and .meta) as input and produces CSD and mask files (.mat) as output
     - each second is considered as a trial having movement speed 'none', 'low' or 'high'
@@ -57,11 +60,9 @@ To use repository:
 3. compares PSD for each epoch between RSK sessions 1 and 2 (matlab)
 4. analyzes spike fields (matlab)
 
-`simon` contains code from Simon, which does spike sorting, cofiring analysis, manifold visualization, and other things.
+`src/simon` contains code from Simon, which does spike sorting, cofiring analysis, manifold visualization, and other things.
 
-`kfx` is space for new code built on top of Gino and Simon's framework.
-
-`notebooks` has separate spaces with notebooks from each person.
+`notebooks` contains notebooks organized by individual.
 
 `ref` contains metadata files, spreadsheets, etc. for common reference.
 
