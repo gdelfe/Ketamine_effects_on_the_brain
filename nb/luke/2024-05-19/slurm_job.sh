@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=csd      # Job name
 #SBATCH --output=job.out    # Output file
-#SBATCH --error=job.err     # Error file
+#SBATCH --error=job.out     # Error file
 #SBATCH --time=2:00:00      # Time limit hrs:min:sec
 #SBATCH --mem=16G           # Memory required per node
 #SBATCH --nodes=1           # Number of nodes per SLURM job

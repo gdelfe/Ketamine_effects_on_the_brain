@@ -17,7 +17,8 @@ for date in \
 do
     for region in hpc pfc
     do
-        cp "/mnt/home/larend/ceph/results/20240519/3461462/date=${date}_region=${region}.pkl" \
+        mv "/mnt/home/larend/ceph/results/20240519/3461610/date=${date}_region=${region}.pkl" \
         "/mnt/home/larend/kfx/data/${date}/${date}-${region}-csd.pkl"
+        echo "moved ${date} ${region}"
     done
 done
