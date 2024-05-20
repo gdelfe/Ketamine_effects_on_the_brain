@@ -4,6 +4,7 @@ numpy
 pandas
 scipy
 seaborn
+tqdm
 h5py
 mne
 PyWavelets

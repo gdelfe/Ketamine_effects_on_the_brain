@@ -1,9 +1,10 @@
 import json
 import logging
 import time
+import numpy as np
 import pandas as pd
 import src.paths
-from src.data import load_ephys
+from src.data import load_ephys, load_behavior
 from src.lfp import remove_dc_offset, combine_neighbors, decimate_by_2
 from src.lfp import bandpass_1_300Hz, notch_60Hz, compute_csd
 
@@ -56,3 +57,23 @@ def compute_session_csd(date, region):
     logging.info(f'total samples: {len(csd)}')
     logging.info(f'GB: {csd.values.nbytes / 1e9}')
     return csd
+
+
+def upsample_behavior(date):
+    with open(src.paths.REF / 'date_recid.json', 'r') as f:
+        recids = json.load(f)
+    with open(src.paths.REF / 'date_recoffset.json', 'r') as f:
+        offsets = json.load(f)
+        
+    recid = recids[date]
+    lfpstart, lfpend = offsets[date]
+
+    df = load_behavior(recid)
+    lfplen = (lfpend - lfpstart + 1) // 2
+    lfp_t = pd.date_range(start=0, periods=lfplen, freq='0.4ms')
+    behav_t = pd.date_range(start=0, periods=len(df), freq='10ms')
+
+    df = df.set_index(behav_t)
+    df = df.reindex(lfp_t).interpolate(method='linear')
+    df.index = pd.Series(np.arange(len(df)) / 2500, name='time')
+    return df

@@ -5,7 +5,7 @@ import os
 import pickle
 import sys
 
-from src.analysis.compute_csd import compute_session_csd
+from src.pipeline import compute_session_csd
 
 
 def main(output_path, params):
