@@ -75,5 +75,5 @@ def upsample_behavior(date):
 
     df = df.set_index(behav_t)
     df = df.reindex(lfp_t).interpolate(method='linear')
-    df.index = pd.Series(np.arange(len(df)) / 2500, name='time')
+    df.index = pd.Series(np.arange(len(df)) / 1250, name='time')
     return df
