@@ -7,10 +7,11 @@ seaborn
 tqdm
 h5py
 mne
-PyWavelets
+pyarrow
 scikit-learn
 joblib
 quantities
 neo
 dask
 mpi4py
+PyWavelets

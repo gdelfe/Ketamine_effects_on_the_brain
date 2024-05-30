@@ -7,6 +7,14 @@ import src.paths
 from src.data import load_ephys, load_behavior
 from src.lfp import remove_dc_offset, combine_neighbors, decimate_by_2
 from src.lfp import bandpass_1_300Hz, notch_60Hz, compute_csd
+from src.csd import wavelet_transform, extract_phase, resample_1250_250_Hz
+
+
+# use notebook luke/2024-05-29a to visualize choice of parameters
+FREQ_MIN = 1
+FREQ_MAX = 125
+FREQ_BINS = 64
+PHASE_BINS = 64
 
 
 def raw_lfp_to_csd(X):
@@ -57,6 +65,27 @@ def compute_session_csd(date, region):
     logging.info(f'total samples: {len(csd)}')
     logging.info(f'GB: {csd.values.nbytes / 1e9}')
     return csd
+
+
+def compute_session_wavelets(date, region, channel):
+    csd = pd.read_pickle(src.paths.DATA / date / f'{date}-{region}-csd.pkl')
+    spk = pd.read_pickle(src.paths.DATA / date / f'{date}-{region}-spikes.pkl')
+    spk = spk.loc[0:7200 - 1 / 250]
+    csd = csd.loc[0:7200 - 1 / 1250]
+    l = []
+    logging.info(f'session: {date}, region: {region}, channel: {channel}')
+    # for minute in range(120):
+    for minute in range(3):
+        start = minute * 60
+        end = (minute + 1) * 60
+        sig = csd.loc[start:end - 1 / 1250, channel]
+        coef = wavelet_transform(sig, FREQ_MIN, FREQ_MAX, FREQ_BINS)
+        coef = resample_1250_250_Hz(coef)
+        phi = extract_phase(coef)
+        l.append(phi)
+        if minute % 10 == 0:
+            logging.info(f'finished minute {minute}')
+    return pd.concat(l, axis=0)
 
 
 def upsample_behavior(date):

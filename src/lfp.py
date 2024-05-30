@@ -35,6 +35,7 @@ def decimate_by_2(X):
 
 
 def compute_csd(X):
+    """ Estimate current source density from LFP. """
     h = 20 * 1e-6 * pq.m             # inter-electrode spacing [m]
     d = 0.5 * 1e-3 * pq.m            # electrode diameter [m]
     sigma = 0.3 * pq.S / pq.m        # intracellular medium conductivity [S/m]
